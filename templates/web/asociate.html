@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="preload" href="../static/style.css" as="style">
+  <link rel="stylesheet" href="../static/style.css">
+  <link rel="stylesheet" href="../static/stylelogin.css">
+  <title>Login Veterinaria</title>
+</head>
+
+<body>
+  {%if errorlogin%}
+  <script>
+    alert("DATOS INCORRECTOS");
+  </script>
+  <div class="login-wrapper">
+    <form action="/login" class="form" method="POST">
+      <img src="../static/img/nosotros.jpg" alt="">
+      <h2>BIENVENIDOS </h2>
+      <div class="input-group">
+        <input type="text" name="loginUser" id="loginUser" required>
+        <label for="loginUser">teléfono usuario o correo electrónico</label>
+      </div>
+      <div class="input-group">
+        <input type="password" name="loginPassword" id="loginPassword" required>
+        <label for="loginPassword">contraseña</label>
+      </div>
+      <input type="submit" value="Ingresar" class="submit-btn">
+      <a href="/nuevou" class="forgot-pw">¿No tienes cuenta? Registrate<br></a>
+      <a href="#forgot-pw" class="forgot-pw">¿Olvide mi contraseña?</a>
+    </form>
+
+    <div id="forgot-pw">
+      <form action="" class="form">
+        <a href="#" class="close">&times;</a>
+        <h2>Reestablesca su contraseña</h2>
+        <div class="input-group">
+          <input type="email" name="email" id="email" required>
+          <label class="labelemail" for="email">Email</label>
+        </div>
+        <input type="submit" value="Confirmar" class="submit-btn">
+      </form>
+    </div>
+  </div>
+  <footer class="footer_aso">
+    <div class="contenedor">
+      <div class="barra_aso">
+        <a class="logo" href="/">
+          <h1 class="logo__nombre no-margin centrar-texto">Blog<span class="logo__bold">DeCafé</span></h1>
+        </a>
+
+        <nav class="navegacion">
+          <a href="/nosotros" class="navegacion__enlace">Nosotros</a>
+          <a href="/" class="navegacion__enlace">Cursos</a>
+          <a href="/contactos" class="navegacion__enlace">Contacto</a>
+        </nav>
+      </div>
+    </div>
+  </footer>
+  {%else%}
+
+  <div class="login-wrapper">
+    <form action="/login" class="form" method="POST">
+      <img src="../static/img/nosotros.jpg" alt="">
+      <h2>BIENVENIDOS </h2>
+      <div class="input-group">
+        <input type="text" name="loginUser" id="loginUser" required>
+        <label for="loginUser">teléfono usuario o correo electrónico</label>
+      </div>
+      <div class="input-group">
+        <input type="password" name="loginPassword" id="loginPassword" required>
+        <label for="loginPassword">contraseña</label>
+      </div>
+      <input type="submit" value="Ingresar" class="submit-btn">
+      <a href="/nuevou" class="forgot-pw">¿No tienes cuenta? Registrate<br></a>
+      <a href="#forgot-pw" class="forgot-pw">¿Olvide mi contraseña?</a>
+    </form>
+
+    <div id="forgot-pw">
+      <form action="" class="form">
+        <a href="#" class="close">&times;</a>
+        <h2>Reestablesca su contraseña</h2>
+        <div class="input-group">
+          <input type="email" name="email" id="email" required>
+          <label class="labelemail" for="email">Email</label>
+        </div>
+        <input type="submit" value="Confirmar" class="submit-btn">
+      </form>
+    </div>
+  </div>
+  <footer class="footer_aso">
+    <div class="contenedor">
+      <div class="barra_aso">
+        <a class="logo" href="/">
+          <h1 class="logo__nombre no-margin centrar-texto">Blog<span class="logo__bold">DeCafé</span></h1>
+        </a>
+
+        <nav class="navegacion">
+          <a href="/nosotros" class="navegacion__enlace">Nosotros</a>
+          <a href="/" class="navegacion__enlace">Cursos</a>
+          <a href="/contactos" class="navegacion__enlace">Contacto</a>
+        </nav>
+      </div>
+    </div>
+  </footer>
+  {%endif%}
+</body>
+
+</html>

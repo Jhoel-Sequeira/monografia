@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="preload" href="../static/style.css" as="style">
+    <link rel="stylesheet" href="../static/style.css">
+    <link rel="stylesheet" href="../static/stylelogin.css">
+
+    <link rel="preload" href="../static/normalize.css" as="style">
+    <link rel="stylesheet" href="../static/normalize.css">
+    <title>Login Veterinaria</title>
+</head>
+
+<body>
+    <div class="login-wrapper">
+        <form action="/nuevou" class="form" method="POST">
+            <input type="hidden" value="" name="flag">
+            <img src="../static/img/nosotros.jpg" alt="">
+            <h2>UNETE A NUESTRA FAMILIA </h2>
+            <!-- Datos generales del cliente  -->
+            <div class="input-group">
+                <input type="text" class="input-field" id="nombres" name="nombres" required>
+                <label for="loginUser">Nombres</label>
+            </div>
+            <div class="input-group">
+                <input type="text" class="input-field" id="apellidos" name="apellidos" required>
+                <label for="loginUser">Apellidos</label>
+            </div>
+
+            <div class="input-group">
+                <input type="text" class="input-field" id="telefono" name="telefono" required>
+                <label for="loginUser">telefono</label>
+            </div>
+            <div class="input-group">
+                <input type="text" class="input-field" id="celular" name="celular" required>
+                <label for="loginUser">Celular</label>
+            </div>
+            <div class="input-group">
+                <input type="text" class="input-field" id="direccion" name="direccion" required>
+                <label for="loginUser">Direccion</label>
+            </div>
+            <div class="input-group">
+                <input type="text" class="input-field" id="correo" name="correo" required>
+                <label for="loginUser">Correo</label>
+            </div>
+
+            <div class="input-group">
+                <input type="text" name="loginUser" id="loginUser" required>
+                <label for="loginUser">teléfono o correo electrónico</label>
+            </div>
+
+            <div class="input-group">
+                <input type="password" name="loginPassword" id="loginPassword" required>
+                <label for="loginPassword">contraseña</label>
+            </div>
+            <input type="hidden" name="flag" id="flag" required>
+            <!-- fin  -->
+
+            <input type="submit" value="Ingresar" class="submit-btn-as">
+        </form>
+
+        <div id="forgot-pw">
+
+
+
+
+</body>
+
+</html>

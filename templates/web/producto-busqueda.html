@@ -1,0 +1,25 @@
+<style>
+    .autocom-box {
+        position: absolute;
+        z-index: 9999;
+        box-shadow: 4px 4px 8px -1px black;
+        width: 100%;
+        margin-left: 1px;
+    }
+
+    .autocom-box li {
+        background-color: white;
+        color: black;
+        padding: 10px 20px;
+        list-style: none;
+
+    }
+</style>
+<div class="autocom-box row" id="busqueda" style="color: black">
+    {%for i in productos%}
+    <li class="col-lg-12">
+        <button class="btn btn-primary-outline" value="{{i.Nombre}}"
+            name="det"><a><strong>{{i.Nombre}}</strong></a></button>
+    </li>
+    {%endfor%}
+</div>

@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Veterinaria el buen productor</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.js"
+        integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
+    <!-- ICONS -->
+    <script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script>
+    <!-- sweet alert -->
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- font awesome cdn link  -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.js"
+        integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
+    <!-- js files -->
+    <script src="../../static/js/validaciones-nombres.js"></script>
+    <script src="../../static/js/Validaciones-contraseña-codigos.js"></script>
+    <!-- custom css file link  -->
+    <link rel="stylesheet" href="../static/web/css/layout-web.css">
+
+    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.css'  rel='stylesheet' />
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"
+        integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.min.js"
+        integrity="sha384-IDwe1+LCz02ROU9k972gdyvl+AESN10+x7tBKgc9I5HFtuNz0wWnPclzo6p9vxnk"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+
+
+</head>
+
+<body>
+    <!-- inicio sección del header -->
+    <header class="header">
+
+        <a href="#" class="logo"> <i class="fas fa-paw"></i> El buen productor </a>
+
+        <nav class="navbar">
+            <a href="#home">Inicio</a>
+            <a href="#shop">Productos</a>
+            <a href="#services">Servicios</a>
+            <a href="#plan">Clientes</a>
+            {%if rol == "Cliente"%}
+            <a href="#consultas">Mis Consultas</a>
+            {%endif%}
+            <a href="#contact">Contactanos</a>
+        </nav>
+        {%if rol == "Cliente"%}
+        <div class="icons">
+            <div class="fas fa-bars" id="menu-btn"></div>
+            <a href="/deslog" class="fas fa-sign-out-alt"></a>
+        </div>
+        {%else%}
+        <div class="icons">
+            <div class="fas fa-bars" id="menu-btn"></div>
+            <a href="#" class="fas fa-shopping-cart"></a>
+            <div class="fas fa-user" onclick="log()" id="login-btn"></div>
+        </div>
+        <!-- inicio de login de usuario -->
+        <form action="/login" method="POST" id="login" class="login-form">
+            <h3>Inicia Sesion</h3>
+            <input type="text" name="loginUser" placeholder="ingrese su usuario" id="" class="box">
+            <input type="password" name="loginPassword" placeholder="ingrese su contraseña" id="" class="box">
+            <div class="remember">
+                <input type="checkbox" name="" id="remember-me">
+                <label for="remember-me">recordarme</label>
+            </div>
+            <input type="submit" value="iniciar sesion" class="btn">
+            <div class="links">
+                <a href="#">recuperar cuenta</a>
+                <a href="#" id="register-btn">registrarse</a>
+            </div>
+        </form>
+        <!-- fin de login de usuario -->
+
+        <!-- inicio de registro de usuario -->
+        <form action="" method="POST" class="register-form" id="registro">
+            <h3>Registrate</h3>
+
+            <input type="text" name="nombres" placeholder="ingrese sus Nombres" required id="nombre" class="box">
+            <label id="mensaje_error_input" class="control-label col-md-12 text-danger" style="display: block;">Las
+                constraseñas no coinciden</label>
+            <input type="text" name="apellidos" placeholder="ingrese sus Apellidos" required id="apellido" class="box">
+            <label id="mensaje_error_input_a" class="control-label col-md-12 text-danger" style="display: block;">Las
+                constraseñas no coinciden</label>
+            <input type="text" name="telefono" maxlength="8" placeholder="ingrese su telefono" id="telfijo" class="box">
+            <input type="text" name="celular" maxlength="8" required placeholder="ingrese su celular" id="celular"
+                class="box">
+            <input type="text" name="direccion" required placeholder="ingrese su Direccion" id="direccion" class="box">
+            <input type="email" maxlength="80" required name="correo" placeholder="ingrese su correo" id="correo"
+                class="box">
+            <label id="mensaje_error_correo" class="control-label col-md-12 text-danger" style="display: block;">El
+                correo ya existe</label>
+            <input type="text" name="loginUser" required placeholder="ingrese su usuario" id="usuario" class="box">
+            <label id="mensaje_error_usu" class="control-label col-md-12 text-danger" style="display: block;">El
+                usuario ya existe</label>
+            <input type="password" name="loginPassword" required placeholder="ingrese su contraseña" id="contra"
+                class="box">
+            <input type="password" name="contra1" required placeholder="repita su contraseña" id="contra1" class="box">
+            <label id="mensaje_error" class="control-label col-md-12 text-danger" style="display: block;">Las
+                constraseñas no coinciden</label>
+            <label id="passstrength" class="control-label col-md-12 text-danger" style="display: block;">Las
+                constraseñas no coinciden</label>
+            <input type="" onclick="añadir()" value="Unirse" id="boton-enviar" disabled class="btn">
+
+        </form>
+        <!-- fin de registro de usuario -->
+        {%endif%}
+
+    </header>
+
+    <!-- fin sección del header -->
+
+  
+    <div id="todo">
+
+        <!-- inicio de sección de home  -->
+        <section class="home" id="home">
+            <div class="floating-access-button">
+                <button type="button" class="btn btn-primary m-1" onclick="toggleAccessibilityOptions()">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="2em" viewBox="0 0 448 512" class="blackssss">
+                        <path
+                            d="M423.9 255.8L411 413.1c-3.3 40.7-63.9 35.1-60.6-4.9l10-122.5-41.1 2.3c10.1 20.7 15.8 43.9 15.8 68.5 0 41.2-16.1 78.7-42.3 106.5l-39.3-39.3c57.9-63.7 13.1-167.2-74-167.2-25.9 0-49.5 9.9-67.2 26L73 243.2c22-20.7 50.1-35.1 81.4-40.2l75.3-85.7-42.6-24.8-51.6 46c-30 26.8-70.6-18.5-40.5-45.4l68-60.7c9.8-8.8 24.1-10.2 35.5-3.6 0 0 139.3 80.9 139.5 81.1 16.2 10.1 20.7 36 6.1 52.6L285.7 229l106.1-5.9c18.5-1.1 33.6 14.4 32.1 32.7zm-64.9-154c28.1 0 50.9-22.8 50.9-50.9C409.9 22.8 387.1 0 359 0c-28.1 0-50.9 22.8-50.9 50.9 0 28.1 22.8 50.9 50.9 50.9zM179.6 456.5c-80.6 0-127.4-90.6-82.7-156.1l-39.7-39.7C36.4 287 24 320.3 24 356.4c0 130.7 150.7 201.4 251.4 122.5l-39.7-39.7c-16 10.9-35.3 17.3-56.1 17.3z" />
+                    </svg>
+                </button>
+                <div class="accessibility-options" id="accessibilityOptions">
+                    <button class="btn btn-secondary p-1" onclick="increaseFontSize()">
+                        Aumentar letra
+                    </button>
+                    <button class="btn btn-secondary p-1" onclick="decreaseFontSize()">
+                        Reducir letra
+                    </button>
+    
+                    
+    
+                    <select class="btn  btn-secondary dropdown-toggle p-1 select-tool" onclick="changeBackgroundColor()"
+                        id="background-color-select">
+                        <option value="">Seleccionar color de fondo</option>
+                        <option value="white">Blanco</option>
+                        <option value="black">Negro</option>
+                        <option value="blue">Azul</option>
+                    </select>
+                    <button class="btn btn-danger" onclick="resetSettings()">
+                        Resetear
+                    </button>
+                </div>
+            </div>
+
+            <div class="content">
+                <h3> <span>Bienvenidos</span> <br> Veterinaria el buen productor </h3>
+                <a href="#" id="register-btn2" onclick="log()" class="btn">Asociate</a>
+            </div>
+
+            <img src="../static/web/img/bottom_wave.png" class="wave" alt="">
+        </section>
+        <!-- fin de sección de home -->
+
+        <!-- inicio de sección de acerca de nosotros  -->
+        <section class="about" id="about">
+
+            
+
+            <div class="image">
+                <img src="../static/web/img/about_img.png" alt="">
+            </div>
+
+            <div class="content">
+                <h3><span>Comida </span>Para mascotas</h3>
+                <p>Poseemos una gran variedad de alimentos para toda clase de mascotas.</p>
+                <a href="#" class="btn">Ver</a>
+            </div>
+
+        </section>
+        <!-- fin de sección de acerca de nosotros  -->
+
+        <!-- inicio banner de comida -->
+        <div class="dog-food">
+
+            <div class="image">
+                <img src="../static/web/img/dog_food.png" alt="">
+            </div>
+
+            <div class="content">
+                <h3> <span>Bolsas de alimentos </span>Para perros</h3>
+                <p>Disponibles alimentos caninos en distintas presentaciones.
+                </p>
+                <div class="amount">C$150.00 - C$300.00</div>
+                <a href="#"> <img src="../static/web/img/shop_now_dog.png" alt=""> </a>
+            </div>
+
+        </div>
+
+        <div class="cat-food">
+
+            <div class="content">
+                <h3> <span>Bolsas de alimentos </span>para gatos</h3>
+                <p>Disponibles alimentos gatunos en distintas presentaciones.
+                </p>
+                <div class="amount">C$150.00 - C$300.00</div>
+                <a href="#"> <img src="../static/web/img/shop_now_cat.png" alt=""> </a>
+            </div>
+
+            <div class="image">
+                <img src="../static/web/img/cat_food.png" alt="">
+            </div>
+
+        </div>
+        <!-- fin banner de comida -->
+
+        <!-- inicio de sección de productos  -->
+        <section class="shop" id="shop">
+
+            <h1 class="heading"> Nuestros <span> Productos </span> </h1>
+
+            <div class="box-container">
+
+                <div class="box">
+                    <div class="icons">
+                        <a href="#" class="fas fa-shopping-cart"></a>
+                        <a href="#" class="fas fa-heart"></a>
+                        <a href="#" class="fas fa-eye"></a>
+                    </div>
+                    <div class="image">
+                        <img src="../static/web/img/product_01.jpg" alt="">
+                    </div>
+                    <div class="content">
+                        <h3>Comida seca</h3>
+                        <div class="amount">C$150.00 - C$200.00</div>
+                    </div>
+                </div>
+
+                <div class="box">
+                    <div class="icons">
+                        <a href="#" class="fas fa-shopping-cart"></a>
+                        <a href="#" class="fas fa-heart"></a>
+                        <a href="#" class="fas fa-eye"></a>
+                    </div>
+                    <div class="image">
+                        <img src="../static/web/img/product_02.jpg" alt="">
+                    </div>
+                    <div class="content">
+                        <h3>Comida seca</h3>
+                        <div class="amount">C$170.00 - C$200.00</div>
+                    </div>
+                </div>
+
+                <div class="box">
+                    <div class="icons">
+                        <a href="#" class="fas fa-shopping-cart"></a>
+                        <a href="#" class="fas fa-heart"></a>
+                        <a href="#" class="fas fa-eye"></a>
+                    </div>
+                    <div class="image">
+                        <img src="../static/web/img/product_03.jpg" alt="">
+                    </div>
+                    <div class="content">
+                        <h3>Comida seca</h3>
+                        <div class="amount">C$180.00 - C$300.00</div>
+                    </div>
+                </div>
+
+                <div class="box">
+                    <div class="icons">
+                        <a href="#" class="fas fa-shopping-cart"></a>
+                        <a href="#" class="fas fa-heart"></a>
+                        <a href="#" class="fas fa-eye"></a>
+                    </div>
+                    <div class="image">
+                        <img src="../static/web/img/product_04.jpg" alt="">
+                    </div>
+                    <div class="content">
+                        <h3>Comida seca</h3>
+                        <div class="amount">C$250.00 - C$300.00</div>
+                    </div>
+                </div>
+
+                <div class="box">
+                    <div class="icons">
+                        <a href="#" class="fas fa-shopping-cart"></a>
+                        <a href="#" class="fas fa-heart"></a>
+                        <a href="#" class="fas fa-eye"></a>
+                    </div>
+                    <div class="image">
+                        <img src="../static/web/img/product_05.jpg" alt="">
+                    </div>
+                    <div class="content">
+                        <h3>Comida seca</h3>
+                        <div class="amount">C$300.00 - C$350.00</div>
+                    </div>
+                </div>
+
+                <div class="box">
+                    <div class="icons">
+                        <a href="#" class="fas fa-shopping-cart"></a>
+                        <a href="#" class="fas fa-heart"></a>
+                        <a href="#" class="fas fa-eye"></a>
+                    </div>
+                    <div class="image">
+                        <img src="../static/web/img/product_06.jpg" alt="">
+                    </div>
+                    <div class="content">
+                        <h3>Comida seca</h3>
+                        <div class="amount">C$300.00 - C$350.00</div>
+                    </div>
+                </div>
+
+            </div>
+
+        </section>
+        <!-- fin de la sección de productos -->
+
+        <!-- inicio de sección de servicios  -->
+        <section class="services" id="services">
+
+            <h1 class="heading"> Nuestros <span> Servicios</span> </h1>
+
+            <div class="box-container">
+
+                <div class="box">
+                    <i class="fas fa-dog"></i>
+                    <h3>Cortes de pelo</h3>
+                    <a href="#" class="btn">ver</a>
+                </div>
+
+                <div class="box">
+                    <i class="fas fa-cat"></i>
+                    <h3>Cortes de pelo</h3>
+                    <a href="#" class="btn">ver</a>
+                </div>
+
+                <div class="box">
+                    <i class="fas fa-bath"></i>
+                    <h3>Aseo</h3>
+                    <a href="#" class="btn">ver</a>
+                </div>
+
+                <div class="box">
+                    <i class="fas fa-drumstick-bite"></i>
+                    <h3>Comida Saludable</h3>
+                    <a href="#" class="btn">ver</a>
+                </div>
+
+                <div class="box">
+                    <i class="fas fa-baseball-ball"></i>
+                    <h3>Juguetes</h3>
+                    <a href="#" class="btn">ver</a>
+                </div>
+
+                <div class="box">
+                    <i class="fas fa-heartbeat"></i>
+                    <h3>Consultas</h3>
+                    <a href="#" class="btn">ver</a>
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- servicios fin -->
+
+        <!-- inicio de sección de clientes  -->
+
+        <section class="plan" id="plan">
+
+            <h1 class="heading"> Nuestros mejores <span> Clientes</span> </h1>
+
+            <div class="box-container">
+
+                <div class="box">
+                    <img src="../static/web/img/doggy.jpeg" class='imgRedonda' alt="">
+                    <br>
+                    <h3 class="title" style="margin-right: 80px; margin-top: 20px;">Doggy Alejandro</h3>
+                </div>
+
+                <div class="box">
+                    <img src="../static/web/img/cliford.jpeg" class='imgRedonda' alt="">
+                    <br>
+                    <h3 class="title" style="margin-right: 50px; margin-top: 20px;">Clifford</h3>
+
+                </div>
+
+                <div class="box">
+                    <img src="../static/web/img/loki.jpeg" class='imgRedonda' alt="">
+                    <br>
+                    <h3 class="title" style="margin-right: 50px; margin-top: 20px;">Loki</h3>
+                </div>
+
+            </div>
+
+        </section>
+        <!-- fin de sección de consultas -->
+
+        <!-- inicio de sección de consultas  -->
+        <section class="consultas" id="consultas">
+            {% block cliente %}
+
+            {% endblock %}
+        </section>
+        <!-- fin de sección de consultas -->
+
+        <!-- inicio de la burbuja del chatbot -->
+        <div class="chat-bubble">
+            <span>
+                <h1><svg xmlns="http://www.w3.org/2000/svg" height="1em" class="Chatbot" viewBox="0 0 512 512">
+                        <path
+                            d="M256 448c141.4 0 256-93.1 256-208S397.4 32 256 32S0 125.1 0 240c0 45.1 17.7 86.8 47.7 120.9c-1.9 24.5-11.4 46.3-21.4 62.9c-5.5 9.2-11.1 16.6-15.2 21.6c-2.1 2.5-3.7 4.4-4.9 5.7c-.6 .6-1 1.1-1.3 1.4l-.3 .3 0 0 0 0 0 0 0 0c-4.6 4.6-5.9 11.4-3.4 17.4c2.5 6 8.3 9.9 14.8 9.9c28.7 0 57.6-8.9 81.6-19.3c22.9-10 42.4-21.9 54.3-30.6c31.8 11.5 67 17.9 104.1 17.9zM128 208a32 32 0 1 1 0 64 32 32 0 1 1 0-64zm128 0a32 32 0 1 1 0 64 32 32 0 1 1 0-64zm96 32a32 32 0 1 1 64 0 32 32 0 1 1 -64 0z" />
+                    </svg></h1>
+            </span>
+            <div class="" id="chatbot">
+                <div class="chat-tray">
+                    
+                    <div class="chat-messages" id="chats">
+                        
+                        <div class="chat-bubble1">
+                            <span>VetBot: Ingrese su solicitud</span>
+                        </div>
+                        
+                        <!-- Aquí van los mensajes del chat -->
+                    </div>
+                    <div class="chat-form">
+                        <input type="text" id="mensaje" placeholder="Escribe tu mensaje...">
+                        <button class="botonenviar" type="button" onclick="MandarMensaje()">Enviar</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <!-- fin de la burbuja del chatbot -->
+
+        <!-- inicio de la sección contactanos -->
+        <section class="contact" id="contact">
+
+            <div class="image">
+                <img src="../static/web/img/contact_img.png" alt="">
+            </div>
+
+            <form action="">
+                <h3>Contactanos</h3>
+                <input type="text" placeholder="Ingrese su nombre " class="box" required maxlength="20">
+                <input type="email" placeholder="Ingrese su correo" class="box" required>
+                <!-- Validar que solamente ingrese numero -->
+                <input type="tumber" placeholder="Ingrese su telefono " class="box" required>
+                <textarea name="" placeholder="Dejanos tu comentario" id="" cols="30" rows="10" required></textarea>
+                <input type="submit" value="Enviar" class="btn">
+            </form>
+
+        </section>
+        <!-- fin de la sección contactanos -->
+
+        <!-- inicio de la sección footer -->
+        <section class="footer">
+
+            <img src="../static/web/img/top_wave.png" alt="">
+
+            <div class="share">
+                <a href="https://www.facebook.com/Vet.ElBuenProductor" class="btn"> <i class="fab fa-facebook-f"></i>
+                    facebook </a>
+                <a href="https://www.instagram.com/vet_elbuenproductor/" class="btn"> <i class="fab fa-instagram"></i>
+                    instagram </a>
+                <a href="https://api.whatsapp.com/send?phone=%2B50581654742" class="btn"> <i
+                        class="fab fa-whatsapp"></i>
+                    Whatsaap </a>
+            </div>
+            <div class="credit">
+                <p>Hecho por Jhoel Sequeira, Christopher Bermudez Copyright © 2022 </p>
+
+            </div>
+        </section>
+        <!-- fin de la sección footer -->
+    </div>
+</body>
+<script src="../static/web/js/script.js"></script>
+<script>
+    function changeFontColor(newColor) {
+        var elements = document.querySelectorAll("*");
+
+        for (var i = 0; i < elements.length; i++) {
+            elements[i].style.color = newColor;
+        }
+    }
+    function changeBackgroundColor() {
+        const select = document.getElementById("background-color-select");
+        const color = select.value;
+        document.body.style.backgroundColor = color;
+    }
+    function toggleAccessibilityOptions() {
+        var optionsDiv = document.getElementById("accessibilityOptions");
+        optionsDiv.classList.toggle("show");
+    }
+
+    function increaseFontSize() {
+        var elements = document.querySelectorAll("*");
+        for (var i = 0; i < elements.length; i++) {
+            var computedStyle = window.getComputedStyle(elements[i]);
+            var fontSize = parseFloat(computedStyle.fontSize);
+            elements[i].style.fontSize = fontSize + 1 + "px";
+        }
+    }
+
+    function changeFont() {
+        const select = document.getElementById("font-select");
+        const font = select.value;
+        document.body.style.fontFamily = font;
+    }
+
+    function decreaseFontSize() {
+        var elements = document.querySelectorAll("*");
+        for (var i = 0; i < elements.length; i++) {
+            var computedStyle = window.getComputedStyle(elements[i]);
+            var fontSize = parseFloat(computedStyle.fontSize);
+            elements[i].style.fontSize = fontSize - 1 + "px";
+        }
+    }
+
+    function resetSettings() {
+        location.reload();
+    }
+    $(document).ready(function () {
+        // cargarChatbot();    
+    });
+    function cargarChatbot(){
+        $.ajax({
+            url: "/cargarChatBot",
+            type: "POST",
+            data: {
+            },
+            success: function (response) {
+                $('#chatbot').html(response);
+                $('#chatbot').append(response.htmlresponse);
+
+
+            },
+            error: function (error) {
+                //console.log(error);
+            },
+        });
+    }
+
+    function MandarMensaje() {
+        var chatDisplay = document.getElementById("chats");
+        var userMessageInput = document.getElementById("mensaje");
+        var userMessage = userMessageInput.value;
+        var chatBubble = document.createElement("div");
+        chatBubble.className = "chat-bubble1 ";
+        chatBubble.innerHTML = "<span>Cliente: </span>" + $('#mensaje').val();
+        chatDisplay.append(chatBubble);
+
+        $.ajax({
+            url: "/recibirMensaje",
+            type: "POST",
+            data: {
+                mensaje: $('#mensaje').val(),
+            },
+            success: function (response) {
+                // Ejemplo de respuesta aleatoria:
+                var chatBubbleBot = document.createElement("div");
+                chatBubbleBot.className = "chat-bubble1 text-left";
+                chatBubbleBot.innerHTML = "<span>Vetbot: </span>" + response;
+                chatDisplay.appendChild(chatBubbleBot);
+
+                // Hacer scroll hacia abajo para mostrar la última respuesta.
+                chatDisplay.scrollTop = chatDisplay.scrollHeight;
+                userMessageInput.value = "";
+
+            },
+            error: function (error) {
+                //console.log(error);
+            },
+        });
+    }
+    function guardarusuario() {
+        var chatDisplay = document.getElementById("chats");
+        var userMessageInput = document.getElementById("mensaje");
+        $.ajax({
+            url: "/guardarUsuario",
+            type: "POST",
+            data: {
+                usuario: $('#mensaje').val(),
+            },
+            success: function (response) {
+                // Ejemplo de respuesta aleatoria:
+                var chatBubbleBot = document.createElement("div");
+                chatBubbleBot.className = "chat-bubble1";
+                chatBubbleBot.innerHTML = "<span>Vetbot: </span>" + response;
+                chatDisplay.appendChild(chatBubbleBot);
+
+                // Hacer scroll hacia abajo para mostrar la última respuesta.
+                chatDisplay.scrollTop = chatDisplay.scrollHeight;
+                userMessageInput.value = "";
+                // cargarChatbot();
+
+            },
+            error: function (error) {
+                //console.log(error);
+            },
+        });
+    }
+</script>
+
+</html>

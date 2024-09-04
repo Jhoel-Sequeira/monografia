@@ -1,0 +1,90 @@
+<body>
+    <div
+        style="padding:20px;background: rgb(52,156,255);background: linear-gradient(180deg, rgba(48,51,91,1) 0%, rgba(85,108,214,1) 100%);">
+        <div style="Margin:0px auto;max-width:680px;">
+            <div class="row justify-content-center p-5">
+                <div>
+                    <div align="center">
+                        <!-- Insertar logo de la veterinaria  -->
+                        <img style="max-width: 100%;"
+                            src="http://drive.google.com/uc?export=view&id=1YOlc7XWcH2hSKv_ispkeCCANHseEt3mK"
+                            allowfullscreen alt="veterinaria El buen productor">
+                    </div>
+                    <h2 style="color: #e67e22; margin: 0 0 7px; font-size: 25px;">VETERINARIA EL BUEN
+                        PRODUCTOR</h2>
+                    <hr style="background: #130f40; height: 5px; border-radius: 5px;">
+                    <p style="margin: 2px; font-size: 15px; color: white;">
+                        Gracias por confiar en nuestros servicios de calidad.
+                        <br>
+                        Nuestro equipo le enviará sus resultados de sus consultas.<br>
+                        Puede presentar el numero de receta en la sucursal para retirar sus medicamentos.<br>
+
+                        Datos de su Ultima consulta:
+                    </p>
+                    <div class="col-11 px-lg-5 mx-auto pb-5">
+
+                    </div>
+                </div>
+
+            </div>
+            <div id="main-container">
+                <ul style="font-size: 15px;  margin: 10px 0">
+                    <li style="color: white;">Diagnostico: </li>
+                    {%for list in diag%}
+                    <li style="list-style: none;">
+                        <h1 style="color: rgb(218, 237, 255);">{{list.Diagnostico}}</h1>
+                    </li>
+                    <li style="color: white;">N° Receta: </li>
+                    <li style="list-style: none;">
+                        <h1 style="color: rgb(218, 237, 255);">{{list.Id_Receta}}</h1>
+                    </li>
+                    {%endfor%}
+                </ul>
+
+
+                <table style="background-color: white;	text-align: left; border-collapse: collapse;width: 100%;">
+                    <thead style="background-color: #e67e22;border-bottom: solid 5px #fff;color: white;">
+                        <tr>
+                            <th style="padding: 20px;" align="center">Medicamento</th>
+                            <th style="padding: 20px;" align="center">Descripción</th>
+                        </tr>
+                    </thead>
+
+
+                    {%for i in receta%}
+                    <tr>
+                        <td style="padding: 20px;" align="center">{{i.Medicamento}}</td>
+                        <td style="padding: 20px;" align="center">{{i.Pasos}}</td>
+                    </tr>
+                    {%endfor%}
+
+
+                </table>
+            </div>
+            <hr style="background: #130f40; height: 5px; border-radius: 5px;">
+            <tbody align="center" style="background:transparent;background-color:transparent;width:100%">
+                <tr>
+
+                    <td style="font-size:11px;padding:10px 25px;word-break:break-word">
+
+
+                        <div
+                            style="font-size:13px;text-align:center;direction:ltr;display:inline-block;vertical-align:top;width:100%">
+
+                            <span>
+                                <hr /> <br>Enviado desde <b>Veterinaria el Buen Productor</b>
+                                <br>Telefono: (+505) 81654742
+                                WhatsApp:(+505) 81654742 <br> Dirección: Monumento la reforma, 10 al sur, 10 al oeste,
+                                contigue
+                                a la bahia de buses Mercado-San carlos
+                                Masaya, Nicaragua
+                            </span>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </div>
+    </div>
+
+
+</body>
