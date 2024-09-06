@@ -19,6 +19,9 @@
     <!-- js files -->
     <script src="../../static/js/validaciones-nombres.js"></script>
     <script src="../../static/js/Validaciones-contraseña-codigos.js"></script>
+    <!-- Animaciones js -->
+    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/> -->
+
     <!-- custom css file link  -->
     <link rel="stylesheet" href="../static/web/css/layout-web.css">
 
@@ -46,14 +49,13 @@
         <a href="#" class="logo"> <i class="fas fa-paw"></i> El buen productor </a>
 
         <nav class="navbar">
-            <a href="#home">Inicio</a>
-            <a href="#shop">Productos</a>
-            <a href="#services">Servicios</a>
-            <a href="#plan">Clientes</a>
+            <a href="/">Inicio</a>
+            <a href="/tienda">Tienda</a>
+            <a href="/servicios">Servicios</a>
+            <a href="/clientes">Clientes</a>
             {%if rol == "Cliente"%}
-            <a href="#consultas">Mis Consultas</a>
+            <a href="/consultas">Mis Consultas</a>
             {%endif%}
-            <a href="#contact">Contactanos</a>
         </nav>
         {%if rol == "Cliente"%}
         <div class="icons">
@@ -128,133 +130,6 @@
         {% endblock %}
 
         
-
-      
-
-        <!-- inicio banner de comida -->
-        <div class="dog-food">
-
-            <div class="image">
-                <img src="../static/web/img/dog_food.png" alt="">
-            </div>
-
-            <div class="content">
-                <h3> <span>Bolsas de alimentos </span>Para perros</h3>
-                <p>Disponibles alimentos caninos en distintas presentaciones.
-                </p>
-                <div class="amount">C$150.00 - C$300.00</div>
-                <a href="#"> <img src="../static/web/img/shop_now_dog.png" alt=""> </a>
-            </div>
-
-        </div>
-
-        <div class="cat-food">
-
-            <div class="content">
-                <h3> <span>Bolsas de alimentos </span>para gatos</h3>
-                <p>Disponibles alimentos gatunos en distintas presentaciones.
-                </p>
-                <div class="amount">C$150.00 - C$300.00</div>
-                <a href="#"> <img src="../static/web/img/shop_now_cat.png" alt=""> </a>
-            </div>
-
-            <div class="image">
-                <img src="../static/web/img/cat_food.png" alt="">
-            </div>
-
-        </div>
-        <!-- fin banner de comida -->
-
-    
-        <!-- inicio de sección de servicios  -->
-        <section class="services" id="services">
-
-            <h1 class="heading"> Nuestros <span> Servicios</span> </h1>
-
-            <div class="box-container">
-
-                <div class="box">
-                    <i class="fas fa-dog"></i>
-                    <h3>Cortes de pelo</h3>
-                    <a href="#" class="btn">ver</a>
-                </div>
-
-                <div class="box">
-                    <i class="fas fa-cat"></i>
-                    <h3>Cortes de pelo</h3>
-                    <a href="#" class="btn">ver</a>
-                </div>
-
-                <div class="box">
-                    <i class="fas fa-bath"></i>
-                    <h3>Aseo</h3>
-                    <a href="#" class="btn">ver</a>
-                </div>
-
-                <div class="box">
-                    <i class="fas fa-drumstick-bite"></i>
-                    <h3>Comida Saludable</h3>
-                    <a href="#" class="btn">ver</a>
-                </div>
-
-                <div class="box">
-                    <i class="fas fa-baseball-ball"></i>
-                    <h3>Juguetes</h3>
-                    <a href="#" class="btn">ver</a>
-                </div>
-
-                <div class="box">
-                    <i class="fas fa-heartbeat"></i>
-                    <h3>Consultas</h3>
-                    <a href="#" class="btn">ver</a>
-                </div>
-
-            </div>
-
-        </section>
-
-        <!-- servicios fin -->
-
-        <!-- inicio de sección de clientes  -->
-
-        <section class="plan" id="plan">
-
-            <h1 class="heading"> Nuestros mejores <span> Clientes</span> </h1>
-
-            <div class="box-container">
-
-                <div class="box">
-                    <img src="../static/web/img/doggy.jpeg" class='imgRedonda' alt="">
-                    <br>
-                    <h3 class="title" style="margin-right: 80px; margin-top: 20px;">Doggy Alejandro</h3>
-                </div>
-
-                <div class="box">
-                    <img src="../static/web/img/cliford.jpeg" class='imgRedonda' alt="">
-                    <br>
-                    <h3 class="title" style="margin-right: 50px; margin-top: 20px;">Clifford</h3>
-
-                </div>
-
-                <div class="box">
-                    <img src="../static/web/img/loki.jpeg" class='imgRedonda' alt="">
-                    <br>
-                    <h3 class="title" style="margin-right: 50px; margin-top: 20px;">Loki</h3>
-                </div>
-
-            </div>
-
-        </section>
-        <!-- fin de sección de consultas -->
-
-        <!-- inicio de sección de consultas  -->
-        <section class="consultas" id="consultas">
-            {% block cliente %}
-
-            {% endblock %}
-        </section>
-        <!-- fin de sección de consultas -->
-
         <!-- inicio de la burbuja del chatbot -->
         <div class="chat-bubble">
             <span>
@@ -284,25 +159,7 @@
         </div>
         <!-- fin de la burbuja del chatbot -->
 
-        <!-- inicio de la sección contactanos -->
-        <section class="contact" id="contact">
-
-            <div class="image">
-                <img src="../static/web/img/contact_img.png" alt="">
-            </div>
-
-            <form action="">
-                <h3>Contactanos</h3>
-                <input type="text" placeholder="Ingrese su nombre " class="box" required maxlength="20">
-                <input type="email" placeholder="Ingrese su correo" class="box" required>
-                <!-- Validar que solamente ingrese numero -->
-                <input type="tumber" placeholder="Ingrese su telefono " class="box" required>
-                <textarea name="" placeholder="Dejanos tu comentario" id="" cols="30" rows="10" required></textarea>
-                <input type="submit" value="Enviar" class="btn">
-            </form>
-
-        </section>
-        <!-- fin de la sección contactanos -->
+      
 
         <!-- inicio de la sección footer -->
         <section class="footer">

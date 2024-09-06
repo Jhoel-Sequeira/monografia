@@ -19,7 +19,7 @@
                 Reducir letra
             </button>
 
-            
+
 
             <select class="btn  btn-secondary dropdown-toggle p-1 select-tool" onclick="changeBackgroundColor()"
                 id="background-color-select">
@@ -42,4 +42,66 @@
     <img src="../static/web/img/bottom_wave.png" class="wave" alt="">
 </section>
 <!-- fin de sección de home -->
+<!-- inicio banner de comida -->
+<div class="dog-food">
+
+    <div class="image">
+        <img src="../static/web/img/dog_food.png" alt="">
+    </div>
+
+    <div class="content">
+        <h3> <span>Bolsas de alimentos </span>Para perros</h3>
+        <p>Disponibles alimentos caninos en distintas presentaciones.
+        </p>
+        <div class="amount">C$150.00 - C$300.00</div>
+        <a href="#"> <img src="../static/web/img/shop_now_dog.png" alt=""> </a>
+    </div>
+
+</div>
+
+<div class="cat-food">
+
+    <div class="content">
+        <h3> <span>Bolsas de alimentos </span>para gatos</h3>
+        <p>Disponibles alimentos gatunos en distintas presentaciones.
+        </p>
+        <div class="amount">C$150.00 - C$300.00</div>
+        <a href="#"> <img src="../static/web/img/shop_now_cat.png" alt=""> </a>
+    </div>
+
+    <div class="image">
+        <img src="../static/web/img/cat_food.png" alt="">
+    </div>
+
+</div>
+<!-- fin banner de comida -->
+
+<!-- inicio de sección de consultas  -->
+<section class="consultas" id="consultas">
+    {% block cliente %}
+
+    {% endblock %}
+</section>
+<!-- fin de sección de consultas -->
+
+
+<!-- inicio de la sección contactanos -->
+<section class="contact" id="contact">
+
+    <div class="image">
+        <img src="../static/web/img/contact_img.png" alt="">
+    </div>
+
+    <form action="">
+        <h3>Contactanos</h3>
+        <input type="text" placeholder="Ingrese su nombre " class="box" required maxlength="20">
+        <input type="email" placeholder="Ingrese su correo" class="box" required>
+        <!-- Validar que solamente ingrese numero -->
+        <input type="tumber" placeholder="Ingrese su telefono " class="box" required>
+        <textarea name="" placeholder="Dejanos tu comentario" id="" cols="30" rows="10" required></textarea>
+        <input type="submit" value="Enviar" class="btn">
+    </form>
+
+</section>
+<!-- fin de la sección contactanos -->
 {% endblock %}
