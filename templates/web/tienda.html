@@ -3,112 +3,62 @@
 
 {% block contenidos %}
 
-      <!-- inicio de sección de productos  -->
-      <section class="shop" id="shop">
+<!-- inicio de sección de productos  -->
+<section class="shop" id="shop">
 
-        <h1 class="heading"> Nuestra <span> Tienda </span> </h1>
-        <div class="d-flex row ">
-            <div class="d-flex col justify-content-center"><input type="text" class="form-control"></div>
-            
-        </div>
-        <input type="text" placeholder="buscar">
-
-        <div class="box-container">
-
-            <div class="box">
-                <div class="icons">
-                    <a href="#" class="fas fa-shopping-cart"></a>
-                    <a href="#" class="fas fa-heart"></a>
-                    <a href="#" class="fas fa-eye"></a>
-                </div>
-                <div class="image">
-                    <img src="../static/web/img/product_01.jpg" alt="">
-                </div>
-                <div class="content">
-                    <h3>Comida seca</h3>
-                    <div class="amount">C$150.00 - C$200.00</div>
-                </div>
+    <h1 class="heading"> Nuestra <span> Tienda </span> </h1>
+    <div class="container">
+        <div class="buscador">
+            <div class="d-flex col justify-content-center">
+                <form id="form">
+                    <input type="text" name="buscador" id="buscador" placeholder="Busca una comida o ingrediente">
+                    <button type="button" id="btn-top">
+                        <i class="fas fa-search"></i> <!-- Icono de lupa -->
+                    </button>
+                </form>
             </div>
-
-            <div class="box">
-                <div class="icons">
-                    <a href="#" class="fas fa-shopping-cart"></a>
-                    <a href="#" class="fas fa-heart"></a>
-                    <a href="#" class="fas fa-eye"></a>
-                </div>
-                <div class="image">
-                    <img src="../static/web/img/product_02.jpg" alt="">
-                </div>
-                <div class="content">
-                    <h3>Comida seca</h3>
-                    <div class="amount">C$170.00 - C$200.00</div>
-                </div>
-            </div>
-
-            <div class="box">
-                <div class="icons">
-                    <a href="#" class="fas fa-shopping-cart"></a>
-                    <a href="#" class="fas fa-heart"></a>
-                    <a href="#" class="fas fa-eye"></a>
-                </div>
-                <div class="image">
-                    <img src="../static/web/img/product_03.jpg" alt="">
-                </div>
-                <div class="content">
-                    <h3>Comida seca</h3>
-                    <div class="amount">C$180.00 - C$300.00</div>
-                </div>
-            </div>
-
-            <div class="box">
-                <div class="icons">
-                    <a href="#" class="fas fa-shopping-cart"></a>
-                    <a href="#" class="fas fa-heart"></a>
-                    <a href="#" class="fas fa-eye"></a>
-                </div>
-                <div class="image">
-                    <img src="../static/web/img/product_04.jpg" alt="">
-                </div>
-                <div class="content">
-                    <h3>Comida seca</h3>
-                    <div class="amount">C$250.00 - C$300.00</div>
-                </div>
-            </div>
-
-            <div class="box">
-                <div class="icons">
-                    <a href="#" class="fas fa-shopping-cart"></a>
-                    <a href="#" class="fas fa-heart"></a>
-                    <a href="#" class="fas fa-eye"></a>
-                </div>
-                <div class="image">
-                    <img src="../static/web/img/product_05.jpg" alt="">
-                </div>
-                <div class="content">
-                    <h3>Comida seca</h3>
-                    <div class="amount">C$300.00 - C$350.00</div>
-                </div>
-            </div>
-
-            <div class="box">
-                <div class="icons">
-                    <a href="#" class="fas fa-shopping-cart"></a>
-                    <a href="#" class="fas fa-heart"></a>
-                    <a href="#" class="fas fa-eye"></a>
-                </div>
-                <div class="image">
-                    <img src="../static/web/img/product_06.jpg" alt="">
-                </div>
-                <div class="content">
-                    <h3>Comida seca</h3>
-                    <div class="amount">C$300.00 - C$350.00</div>
-                </div>
-            </div>
-
         </div>
 
-    </section>
-    <!-- fin de la sección de productos -->
+    </div>
+
+    <div id="productos" class="box-container mt-2">
+
+
+
+    </div>
+
+</section>
+<!-- fin de la sección de productos -->
+
+<!-- INICIO BUSCADOR -->
+<script>
+    $(document).ready(function () {
+        buscarProducto();
+
+    });
+    function buscarProducto() {
+            $.ajax({
+                url: "{{ url_for('web.buscarProducto') }}",
+                type: "POST",
+                data: {
+                    producto: $("#buscador").val(),
+                },
+                success: function (response) {
+                    $("#productos").html(response);
+                    $("#productos").append(response.htmlresponse);
+                  
+                    
+                },
+                error: function (error) {
+                    // console.log(error);
+                },
+            });
+        
+    };
+    $('#buscador').on('keyup', buscarProducto)
+</script>
+
+<!-- FIN BUSCADOR -->
 
 
 

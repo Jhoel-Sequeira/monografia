@@ -2,7 +2,7 @@ import pyodbc
 
 def conectar():
     server = 'CRNDEVIT'
-    database = 'FEC'
+    database = 'Vet_ElBuenProductor'
     username = 'sistemacrn'
     password = 'L8JZus@G1h&3'
     driver= '{ODBC Driver 17 for SQL Server}'
