@@ -37,13 +37,37 @@ def buscarProducto():
 
         conn = conectar()
         cursor = conn.cursor()
-        query = 'select top 5 cod_producto,precio,Imagen,stock,nom_producto from producto where nom_producto like ?'
+        query = 'select  cod_producto,precio,Imagen,stock,nom_producto from producto where nom_producto like ?'
         cursor.execute(query,(producto + '%'))
         productos = cursor.fetchall()
         print(productos)
         if productos:
 
             return render_template('web/otros/buscador_productos.html', productos=productos)
+        else:
+            return "Sin Datos"
+    else:
+        return "No"
+    
+    return render_template('web/buscador_productos.html')
+
+# Fin buscador de la tienda
+# Llamado detalle del producto
+@bp.route('/detalleProducto', methods=['POST'])
+def detalleProducto():
+
+    if request.method == "POST":
+        num = request.form['num']
+
+        conn = conectar()
+        cursor = conn.cursor()
+        query = 'select  cod_producto,precio,Imagen,stock,stock_critico,nom_producto from producto where cod_producto = ?'
+        cursor.execute(query,(num))
+        datos = cursor.fetchall()
+        print(datos)
+        if datos:
+
+            return render_template('web/otros/modal_compra.html', producto=datos)
         else:
             return "Sin Datos"
     else:

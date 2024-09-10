@@ -48,7 +48,7 @@ $('#register-btn').click(function(){
 
 let navbar = document.querySelector('.header .navbar');
 
-document.querySelector('#menu-btn').onclick = () =>{
+document.querySelector('#menu-btn1').onclick = () =>{
     navbar.classList.toggle('active');    
     loginForm.classList.remove('active');
     registerForm.classList.remove('active');

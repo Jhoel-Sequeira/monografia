@@ -1,0 +1,81 @@
+{%for producto in producto%}
+<div class="modal" id="exampleModal" tabindex="-1" data-bs-focus="false">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Comprar Producto</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <input type="hidden" id="critico" value="{{producto.stock_critico}}">
+        <input type="hidden" id="stock" value="{{producto.stock}}">
+        <input type="hidden" id="precio" value="{{producto.stock}}">
+        <div class="modal-body shop">
+            <div class="d-flex box-container mt-2 justify-content-center">
+                <div class="box">
+                    
+                    <div class="contenedor" >
+                        <div class="image">
+                            <img src="{{producto.Imagen}}" alt="">
+                        </div>
+                    </div>
+                    
+                    <div class="content">
+                        <h3>{{producto.nom_producto}}</h3>
+                        <div class="amount">{{producto.precio}} C$</div>
+                        <div class="d-flex row justify-content-center mt-2">
+                            <div class="col-6 ">
+                                <input class="form-control" id="cantidad" type="number" placeholder="Cantidad">
+                            </div>
+                            
+                        </div>
+                        <hr>
+                        <div class="row justify-content-center">
+                            <div class="col-6">
+                                <h3><label id="total" for="">Total: </label></h3>
+
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+           
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary">Agregar</button>
+        </div>
+      </div>
+    </div>
+</div>
+{%endfor%}
+
+<script>
+    function validarCantidad() {
+        const cantidad = parseInt($('#cantidad').val());
+        const stock = parseInt($('#stock').val());
+        const precio = $('#precio').val();
+        const critico = $('#critico').val();
+        if(cantidad < stock){
+            const total = cantidad * precio;
+            const texto = 'Total: '+total + ' C$';
+            $("#total").css({
+            "font-size": "2.2rem", // Cambia el tamaño de la fuente
+            "color": "#130f40"       // Cambia el color del texto
+            });
+            $('#total').text(texto);
+        }else{
+            const texto = 'Lo sentimos no tenemos esa cantidad en stock.';
+            $("#total").css({
+            "font-size": "11px", // Cambia el tamaño de la fuente
+            "color": "red"       // Cambia el color del texto
+            });
+            $('#total').text(texto);
+        }
+        
+
+    };
+    $('#cantidad').on('keyup', validarCantidad)
+
+</script>

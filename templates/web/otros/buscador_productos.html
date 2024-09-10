@@ -2,8 +2,11 @@
 {%for producto in productos%}
 <div class="box-container mt-2">
     <div class="box">
-        <div class="icons">
-            <a href="#" class="fas fa-shopping-cart"></a>
+        <div class="icons1">
+            <button class="boton_invisible" value="{{producto.cod_producto}}">
+                <a data-bs-toggle="modal" data-bs-target="#exampleModal" class="fas fa-shopping-cart" href="#" onclick="detalleCompra(this.closest('button'))"></a>
+            </button>
+            
             <a href="#" class="fas fa-heart"></a>
             <a href="#" class="fas fa-eye"></a>
         </div>

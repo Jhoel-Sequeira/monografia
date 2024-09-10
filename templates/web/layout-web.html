@@ -8,8 +8,8 @@
     <title>Veterinaria el buen productor</title>
     <script src="https://code.jquery.com/jquery-3.6.0.js"
         integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
-    <!-- ICONS -->
-    <script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script>
+    <!-- icons1 -->
+    <script src="https://unpkg.com/boxicons1@2.1.4/dist/boxicons1.js"></script>
     <!-- sweet alert -->
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- font awesome cdn link  -->
@@ -39,6 +39,10 @@
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
 
+    <!-- ======= BOOTSTRAP ========= -->
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
     
 
 
@@ -60,13 +64,13 @@
             {%endif%}
         </nav>
         {%if rol == "Cliente"%}
-        <div class="icons">
-            <div class="fas fa-bars" id="menu-btn"></div>
+        <div class="icons1">
+            <div class="fas fa-bars" id="menu-btn1"></div>
             <a href="/deslog" class="fas fa-sign-out-alt"></a>
         </div>
         {%else%}
-        <div class="icons">
-            <div class="fas fa-bars" id="menu-btn"></div>
+        <div class="icons1">
+            <div class="fas fa-bars" id="menu-btn1"></div>
             <a href="#" class="fas fa-shopping-cart"></a>
             <div class="fas fa-user" onclick="log()" id="login-btn"></div>
         </div>
@@ -79,7 +83,7 @@
                 <input type="checkbox" name="" id="remember-me">
                 <label for="remember-me">recordarme</label>
             </div>
-            <input type="submit" value="iniciar sesion" class="btn">
+            <input type="submit" value="iniciar sesion" class="btn1">
             <div class="links">
                 <a href="#">recuperar cuenta</a>
                 <a href="#" id="register-btn">registrarse</a>
@@ -115,7 +119,7 @@
                 constraseñas no coinciden</label>
             <label id="passstrength" class="control-label col-md-12 text-danger" style="display: block;">Las
                 constraseñas no coinciden</label>
-            <input type="" onclick="añadir()" value="Unirse" id="boton-enviar" disabled class="btn">
+            <input type="" onclick="añadir()" value="Unirse" id="boton-enviar" disabled class="btn1">
 
         </form>
         <!-- fin de registro de usuario -->
@@ -169,11 +173,11 @@
             <img src="../static/web/img/top_wave.png" alt="">
 
             <div class="share">
-                <a href="https://www.facebook.com/Vet.ElBuenProductor" class="btn"> <i class="fab fa-facebook-f"></i>
+                <a href="https://www.facebook.com/Vet.ElBuenProductor" class="btn1"> <i class="fab fa-facebook-f"></i>
                     facebook </a>
-                <a href="https://www.instagram.com/vet_elbuenproductor/" class="btn"> <i class="fab fa-instagram"></i>
+                <a href="https://www.instagram.com/vet_elbuenproductor/" class="btn1"> <i class="fab fa-instagram"></i>
                     instagram </a>
-                <a href="https://api.whatsapp.com/send?phone=%2B50581654742" class="btn"> <i
+                <a href="https://api.whatsapp.com/send?phone=%2B50581654742" class="btn1"> <i
                         class="fab fa-whatsapp"></i>
                     Whatsaap </a>
             </div>
@@ -186,6 +190,10 @@
     </div>
 </body>
 <script src="../static/web/js/script.js"></script>
+    <!-- ======== SCRIPT DE BOOSTRAP ======== -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
 <script>
     function changeFontColor(newColor) {
         var elements = document.querySelectorAll("*");
