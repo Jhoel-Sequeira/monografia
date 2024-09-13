@@ -10,6 +10,7 @@ from controllers import sistema
 # Registra los Blueprints (si usas Blueprints)
 app.register_blueprint(web.bp)
 app.register_blueprint(sistema.bp)
+app.secret_key = 'your_secret_key'
 
 if __name__ == '__main__':
     app.run(debug=True)

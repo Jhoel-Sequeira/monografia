@@ -108,6 +108,18 @@ a{
   }
 }
 
+
+.cart-count {
+  position: absolute;
+  top: 10px; /* Ajusta según el diseño */
+  right: 11%; /* Ajusta según el diseño */
+  background-color: red;
+  color: white;
+  padding: 2px 6px;
+  border-radius: 50%;
+  font-size: 12px;
+}
+
 .header {
   background: #fff;
   display: -webkit-box;
@@ -251,6 +263,90 @@ a{
 }
 
 .header .login-form .links a:hover {
+  color: #130f40;
+  text-decoration: underline;
+}
+/* login sin header */
+.login-form {
+
+  width: 30rem;
+  border-radius: 1rem;
+  background: #fff;
+  -webkit-box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+  display: none;
+}
+
+.login-form.active {
+  display: block;
+  -webkit-animation: fadeIn 0.4s linear;
+  animation: fadeIn 0.4s linear;
+}
+
+.login-form h3 {
+  color: #130f40;
+  font-size: 2.5rem;
+  padding-bottom: 0.5rem;
+}
+
+.login-form .box {
+  width: 100%;
+  border-bottom: 0.2rem solid #130f40;
+  border-width: 0.1rem;
+  padding: 1.5rem 0;
+  font-size: 1.6rem;
+  color: #130f40;
+  text-transform: none;
+  margin: 1rem 0;
+}
+
+.login-form .remember {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem 0;
+}
+
+.login-form .remember label {
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #666;
+}
+
+.login-form .btn1 {
+  width: 100%;
+  text-align: center;
+  margin: 1.5rem 0;
+}
+
+.login-form .btn1:hover {
+  background: #130f40;
+}
+
+.login-form .links {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+.login-form .links a {
+  font-size: 1.4rem;
+  color: #e67e22;
+}
+
+.login-form .links a:hover {
   color: #130f40;
   text-decoration: underline;
 }
@@ -533,9 +629,6 @@ a{
   background-color: transparent;
 }
 
-.modal-backdrop {
-  display: none;
-}
 
 
 .shop .box-container .box {

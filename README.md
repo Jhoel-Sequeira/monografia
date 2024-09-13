@@ -5,5 +5,5 @@
 # 1) SE DEBERA DESCARGAR LAS LIBRERIAS CON EL SIGUIENTE COMANDO:
 # - pip install -r requirements.txt
 # 2) SE INICIALIZA EL SISTEMA CON EL COMANDO:
-# - flask --app app --debug run --host 0.0.0.0 --port 5005
+# - flask --app run --debug run --host 0.0.0.0 --port 5005
 

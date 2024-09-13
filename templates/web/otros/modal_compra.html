@@ -1,55 +1,94 @@
 {%for producto in producto%}
-<div class="modal" id="exampleModal" tabindex="-1" data-bs-focus="false">
+<div class="modal" id="exampleModal" data-bs-backdrop="false" data-bs-keyboard="false" tabindex="-1"
+    aria-labelledby="exampleModalToggleLabel" tabindex="-1">
     <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Comprar Producto</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <input type="hidden" id="critico" value="{{producto.stock_critico}}">
-        <input type="hidden" id="stock" value="{{producto.stock}}">
-        <input type="hidden" id="precio" value="{{producto.stock}}">
-        <div class="modal-body shop">
-            <div class="d-flex box-container mt-2 justify-content-center">
-                <div class="box">
-                    
-                    <div class="contenedor" >
-                        <div class="image">
-                            <img src="{{producto.Imagen}}" alt="">
-                        </div>
-                    </div>
-                    
-                    <div class="content">
-                        <h3>{{producto.nom_producto}}</h3>
-                        <div class="amount">{{producto.precio}} C$</div>
-                        <div class="d-flex row justify-content-center mt-2">
-                            <div class="col-6 ">
-                                <input class="form-control" id="cantidad" type="number" placeholder="Cantidad">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Comprar Producto</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <input type="hidden" id="critico" value="{{producto.stock_critico}}">
+            <input type="hidden" id="stock" value="{{producto.stock}}">
+            <input type="hidden" id="precio" value="{{producto.stock}}">
+            <input type="hidden" id="id" value="{{producto.cod_producto}}">
+            <div class="modal-body shop">
+                <div class="d-flex box-container mt-2 justify-content-center">
+                    <div class="box">
+
+                        <div class="contenedor">
+                            <div class="image">
+                                <img src="{{producto.Imagen}}" alt="">
                             </div>
-                            
                         </div>
-                        <hr>
-                        <div class="row justify-content-center">
-                            <div class="col-6">
-                                <h3><label id="total" for="">Total: </label></h3>
+
+                        <div class="content">
+                            <h3>{{producto.nom_producto}}</h3>
+                            <div class="amount">{{producto.precio}} C$</div>
+                            <div class="d-flex row justify-content-center mt-2">
+                                <div class="col-6 ">
+                                    <input class="form-control" id="cantidad" type="number" placeholder="Cantidad">
+                                </div>
 
                             </div>
-                            
+                            <hr>
+                            <div class="row justify-content-center">
+                                <div class="col-6">
+                                    <h3><label id="total" for="">Total: </label></h3>
+
+                                </div>
+
+                            </div>
                         </div>
                     </div>
+
                 </div>
-                
+
             </div>
-           
+            <div class="modal-footer">
+                <button type="button" id="cerrarDetalle" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" onclick="GuardarEnelCarrito($('#id').val(),$('#cantidad').val())"
+                    class="btn btn-primary">Agregar</button>
+                <button id="btnlogin" data-bs-target="#iniciarSesion" data-bs-toggle="modal"
+                    data-bs-dismiss="modal">aqui</button>
+
+            </div>
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary">Agregar</button>
-        </div>
-      </div>
     </div>
+
 </div>
 {%endfor%}
+
+<div class="modal fade" id="iniciarSesion" data-bs-backdrop="false" aria-hidden="true"
+    aria-labelledby="exampleModalToggleLabel2" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="background-color: transparent; border: none;">
+
+            <div class="modal-body d-flex justify-content-center">
+                <div class="">
+                    <div class="login-form active">
+                        <h3>Inicia Sesion</h3>
+                        <input type="text" name="loginUser" placeholder="ingrese su usuario" id="loginUser" class="box">
+                        <input type="password" name="loginPassword" placeholder="ingrese su contraseña"
+                            id="loginPassword" class="box">
+                        <div class="remember">
+                            <input type="checkbox" name="" id="remember-me">
+                            <label for="remember-me">recordarme</label>
+                        </div>
+                        <input type="submit" onclick="comprar()" value="iniciar sesion" class="btn1">
+                        <div class="links">
+                            <a href="#">recuperar cuenta</a>
+                            <a href="#" id="register-btn">registrarse</a>
+                        </div>
+                        <button class="btn btn-primary" data-bs-target="#exampleModal" data-bs-toggle="modal"
+                            data-bs-dismiss="modal">Back to first</button>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
 
 <script>
     function validarCantidad() {
@@ -57,25 +96,83 @@
         const stock = parseInt($('#stock').val());
         const precio = $('#precio').val();
         const critico = $('#critico').val();
-        if(cantidad < stock){
+        if (cantidad < stock) {
             const total = cantidad * precio;
-            const texto = 'Total: '+total + ' C$';
+            const texto = 'Total: ' + total + ' C$';
             $("#total").css({
-            "font-size": "2.2rem", // Cambia el tamaño de la fuente
-            "color": "#130f40"       // Cambia el color del texto
+                "font-size": "2.2rem", // Cambia el tamaño de la fuente
+                "color": "#130f40"       // Cambia el color del texto
             });
             $('#total').text(texto);
-        }else{
+        } else {
             const texto = 'Lo sentimos no tenemos esa cantidad en stock.';
             $("#total").css({
-            "font-size": "11px", // Cambia el tamaño de la fuente
-            "color": "red"       // Cambia el color del texto
+                "font-size": "11px", // Cambia el tamaño de la fuente
+                "color": "red"       // Cambia el color del texto
             });
             $('#total').text(texto);
         }
-        
+
 
     };
     $('#cantidad').on('keyup', validarCantidad)
+    // Guardar Producto en el carrito
 
+    function GuardarEnelCarrito(producto, cantidad) {
+
+        $.ajax({
+            url: "{{ url_for('web.guardarCarrito') }}",
+            type: "POST",
+            data: {
+                producto: producto,
+                cantidad: cantidad,
+
+            },
+            success: function (response) {
+                if (response == 'HECHO') {
+                    Swal.fire({ icon: 'success', title: 'Producto añadido', confirmButtonText: 'Ok', text: 'Se actualizó su carrito de compras' }).then((result) => { /* Read more about isConfirmed, isDenied below */
+                        if (result.isConfirmed) {
+                            $('#cerrarDetalle').click();
+                            traerCarrito();
+                        }
+                    })
+                } else if (response == 'Sin Sesion') {
+                    $('#btnlogin').click();
+
+                }
+
+            },
+            error: function (error) {
+                // console.log(error);
+            },
+        });
+    }
+
+
+    //INICIAR SESION PARA COMPRAR AL CARRITO
+    function comprar() {
+        $.ajax({
+            url: "{{ url_for('web.comprar') }}",
+            type: "POST",
+            data: {
+                usuario: $('#loginUser').val(),
+                pass: $('#loginPassword').val(),
+
+            },
+            success: function (response) {
+                if (response == 'exito') {
+                    GuardarEnelCarrito($('#id').val(), $('#cantidad').val());
+                    
+                    
+                } else if (response == 'error') {
+
+
+                }
+
+            },
+            error: function (error) {
+                // console.log(error);
+            },
+        });
+    }
 </script>

@@ -1,4 +1,5 @@
 {% extends "web/layout-web.html" %}
+
 <head>
     <link rel="stylesheet" href="../../static/web/css/layout-web.css">
 </head>
@@ -25,6 +26,8 @@
 
     <div class="container">
         AQUI VA EL FILTRO
+        <!-- Button trigger modal -->
+
     </div>
 
     <div id="productos" class="box-container mt-2 overflow-scroll p-5" style="width: 100%;">
@@ -36,11 +39,10 @@
 </section>
 <!-- fin de la sección de productos -->
 <!-- SECCION DE MODAL DE COMPRAS -->
-<!-- Button trigger modal -->
-<input type="hidden" id="llamarModal" data-bs-toggle="modal" data-bs-target="#exampleModal">
-    
+<input type="hidden" value="jahaja" id="llamarModal" data-bs-toggle="modal" data-bs-target="#exampleModal">
+
 </input>
-  
+
 <div id="modal">
 
 </div>
@@ -51,7 +53,9 @@
     $(document).ready(function () {
         buscarProducto();
 
+
     });
+
     function buscarProducto() {
         $.ajax({
             url: "{{ url_for('web.buscarProducto') }}",
@@ -60,7 +64,7 @@
                 producto: $("#buscador").val(),
             },
             success: function (response) {
-                
+
                 $("#productos").html(response);
                 $("#productos").append(response.htmlresponse);
 
@@ -75,7 +79,7 @@
 
 
     function detalleCompra(button) {
-    // Obtén el valor del botón pasado como parámetro
+        // Obtén el valor del botón pasado como parámetro
         const valorBoton = $(button).val();
         $.ajax({
             url: "{{ url_for('web.detalleProducto') }}",
@@ -84,11 +88,17 @@
                 num: valorBoton,
             },
             success: function (response) {
-                
 
+                // Cargar el nuevo contenido en el modal
                 $("#modal").html(response);
                 $("#modal").append(response.htmlresponse);
+
                 $('#llamarModal').click();
+
+
+
+
+
             },
             error: function (error) {
                 // console.log(error);
