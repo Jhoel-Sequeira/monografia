@@ -1,5 +1,7 @@
 
+{%if productos%}
 {%for producto in productos%}
+
 <div class="box-container mt-2">
     <div class="box">
         <div class="icons1">
@@ -24,4 +26,10 @@
     
 </div>
 
+
 {%endfor%}
+{%else%}
+<div class="d-flex box-container mt-2 justify-content-center">
+    <h1>SIN RESULTADOS</h1>
+</div>
+{%endif%}

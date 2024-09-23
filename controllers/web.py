@@ -54,11 +54,8 @@ def buscarProducto():
         cursor.execute(query,(producto + '%'))
         productos = cursor.fetchall()
         print(productos)
-        if productos:
-
-            return render_template('web/otros/buscador_productos.html', productos=productos)
-        else:
-            return "Sin Datos"
+        return render_template('web/otros/buscador_productos.html', productos=productos)
+        
     else:
         return "No"
     
@@ -90,6 +87,30 @@ def detalleProducto():
 
 # Fin buscador de la tienda
 
+# Llamado del Carrito total por Usuario
+@bp.route('/carritoTotal', methods=['POST'])
+def carritoTotal():
+
+    if request.method == "POST":
+
+        conn = conectar()
+        cursor = conn.cursor()
+        query = 'SELECT cc.id_carrito,p.Imagen, p.nom_producto, cc.cantidad, p.precio, e.NombreEstado FROM carrito_compra AS cc INNER JOIN producto AS p ON cc.cod_producto = p.cod_producto INNER JOIN cliente AS c ON cc.num_cliente = c.num_cliente INNER JOIN estado AS e ON cc.id_estado = e.id_estado where cc.num_cliente = ? GROUP BY p.nom_producto, cc.id_carrito, cc.cantidad, p.precio, e.NombreEstado, p.Imagen;'
+        cursor.execute(query,(session['id']))
+        datos = cursor.fetchall()
+        print(datos)
+        if datos:
+
+            return render_template('web/otros/modal_carrito.html', producto=datos)
+        else:
+            return "Sin Datos"
+    else:
+        return "No"
+    
+    return render_template('web/buscador_productos.html')
+
+# Fin buscador de la tienda
+
 # Guardar carrito del cliente
 @bp.route('/guardarCarrito', methods=['POST'])
 def guardarCarrito():
@@ -99,13 +120,33 @@ def guardarCarrito():
             producto = request.form['producto']
             cantidad = request.form['cantidad']
 
+
             conn = conectar()
             cursor = conn.cursor()
-            query = 'INSERT INTO carrito_compra (cod_producto,num_cliente,cantidad,id_estado) VALUES (?,?,?,2)'
-            cursor.execute(query,(producto,session['id'],cantidad))
-            conn.commit()
+            query = 'select * from carrito_compra where num_cliente = ? and cod_producto = ? and id_estado = 2'
+            cursor.execute(query, (session['id'],producto))
+            carrito = cursor.fetchone()
             cursor.close()
             conn.close()
+
+
+            if carrito:
+                conn = conectar()
+                cursor = conn.cursor()
+                query = 'UPDATE carrito_compra set cantidad += ? where id_carrito = ?'
+                cursor.execute(query,(cantidad,carrito[0]))
+                conn.commit()
+                cursor.close()
+                conn.close()
+            else:
+                
+                conn = conectar()
+                cursor = conn.cursor()
+                query = 'INSERT INTO carrito_compra (cod_producto,num_cliente,cantidad,id_estado) VALUES (?,?,?,2)'
+                cursor.execute(query,(producto,session['id'],cantidad))
+                conn.commit()
+                cursor.close()
+                conn.close()
             
             return 'HECHO'
         else:

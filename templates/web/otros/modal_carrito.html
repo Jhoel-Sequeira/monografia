@@ -1,0 +1,66 @@
+<div class="modal" id="Carrito" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Su Carrito</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body shop">
+                {%for producto in producto%}
+                <div class="card row m-1 shadow p-3 mb-5 bg-body rounded position-relative"
+                    style="flex-direction: row;">
+                    <span class="close-button" onclick="removeProduct()">&times;</span> <!-- Botón de cerrar -->
+
+                    <div class="col-3">
+                        <div class="">
+                            <div class="card-body">
+                                <img src="{{producto.Imagen}}" class="imagenCarrito" alt="">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col" style="margin-left: 20%;">
+                        <div class="">
+                            <div class="row card-body justify-content-center">
+                                <h5 class="titulo">{{ producto.nom_producto }}</h5>
+                                <p class="card-text">Descripcion</p>
+
+                                <div class="row d-flex align-items-center" style="font-size: 20px;">
+                                    <div class="col-auto p-0">
+                                        <button class="btn">
+                                            <i class="fas fa-plus"></i>
+                                        </button>
+                                    </div>
+                                    <div class="col-auto p-0">
+                                        <input type="text" id="cantidad" value="{{ producto.cantidad }}"
+                                            style="width: 50px; text-align: center;">
+                                    </div>
+                                    <div class="col-auto p-0">
+                                        <button class="btn">
+                                            <i class="fas fa-minus"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <input type="text">
+                {%endfor%}
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="cerrarDetalle" class="btn btn-secondary"
+                    data-bs-dismiss="modal">Close</button>
+                <button type="button" onclick="GuardarEnelCarrito($('#id').val(),$('#cantidad').val())"
+                    class="btn btn-primary">Agregar</button>
+                <button class="d-none" id="btnlogin" data-bs-target="#iniciarSesion" data-bs-toggle="modal"
+                    data-bs-dismiss="modal">aqui</button>
+
+            </div>
+        </div>
+    </div>
+
+</div>

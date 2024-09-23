@@ -71,8 +71,8 @@
         {%else%}
         <div class="icons1">
             <div class="fas fa-bars" id="menu-btn1"></div>
-            <a href="#" class="fas fa-shopping-cart">
-                <span id="cart-count" class="cart-count"></span>
+            <a  href="#" class="fas fa-shopping-cart" onclick="carritoUsuario()">
+                <span  id="cart-count" class="cart-count"></span>
             </a>
             <div class="fas fa-user" onclick="log()" id="login-btn"></div>
         </div>
@@ -191,6 +191,13 @@
         <!-- fin de la sección footer -->
     </div>
 </body>
+<input type="hidden" value="jahaja" id="llamarCarrito" data-bs-toggle="modal" data-bs-target="#Carrito">
+
+</input>
+
+<div id="modalCarrito">
+
+</div>
 <script src="../static/web/js/script.js"></script>
 <!-- ======== SCRIPT DE BOOSTRAP ======== -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
@@ -336,6 +343,35 @@
 {%if session%}
 <script>
     traerCarrito();
+
+    function carritoUsuario() {
+        $.ajax({
+            url: "{{ url_for('web.carritoTotal') }}",
+            type: "POST",
+            data: {
+            },
+            success: function (response) {
+
+                // Cargar el nuevo contenido en el modal
+                $("#modalCarrito").html(response);
+                $("#modalCarrito").append(response.htmlresponse);
+
+                $('#llamarCarrito').click();
+
+
+
+
+
+            },
+            error: function (error) {
+                // console.log(error);
+            },
+        });
+
+    }
+
+
+
     function traerCarrito(){
         $.ajax({
         url: "{{ url_for('web.cargarCarrito') }}",
