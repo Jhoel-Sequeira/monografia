@@ -126,9 +126,95 @@ a{
 }
 
 .titulo{
-  font-size: 25px;
+  font-size: 15px;
   color: #130f40;
 }
+
+
+
+
+
+
+
+
+.card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 10px;
+}
+
+.close-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  color: #ff0000;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.imagenCarrito {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+
+.titulo {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.card-text {
+  font-size: 14px;
+  color: #666;
+}
+
+.descuento {
+  text-decoration: line-through;
+  color: #999;
+}
+
+.btn {
+  background-color: #f8f9fa;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+input[type="text"] {
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 5px;
+}
+
+.shadow {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+.este::-webkit-scrollbar {
+  display: none;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 .position-relative {

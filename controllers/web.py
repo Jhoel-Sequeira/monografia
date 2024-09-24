@@ -77,15 +77,116 @@ def detalleProducto():
         print(datos)
         if datos:
 
-            return render_template('web/otros/modal_compra.html', producto=datos)
+            return render_template('web/modales/modal_compra.html', producto=datos)
         else:
             return "Sin Datos"
     else:
         return "No"
     
-    return render_template('web/buscador_productos.html')
+    return render_template('web/otros/buscador_productos.html')
 
 # Fin buscador de la tienda
+
+
+# RESTAR PRODUCTO DEL CARRITO
+@bp.route('/restarProducto', methods=['POST'])
+def restarProducto():
+
+    if request.method == "POST":
+        
+        producto = request.form['producto']
+        print(producto)
+
+        conn = conectar()
+        cursor = conn.cursor()
+        query = 'select cantidad from carrito_compra where id_carrito = ?'
+        cursor.execute(query,(producto))
+        datos = cursor.fetchone()
+
+        if datos[0] <= 1:
+            return 'no'
+
+
+
+
+        conn = conectar()
+        cursor = conn.cursor()
+        query = 'UPDATE carrito_compra set cantidad -= 1 where num_cliente = ? and id_carrito = ? and id_estado = 2'
+        cursor.execute(query,(session['id'],producto))
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+        conn = conectar()
+        cursor = conn.cursor()
+        query = 'select cantidad from carrito_compra where id_carrito = ?'
+        cursor.execute(query,(producto))
+        datos = cursor.fetchone()
+        
+        return str(datos[0])
+    else:
+        return "No"
+    
+    return render_template('web/otros/buscador_productos.html')
+
+# Fin RESTA DE PRODUCTO
+
+# RESTAR PRODUCTO DEL CARRITO
+@bp.route('/sumarCantidad', methods=['POST'])
+def sumarCantidad():
+
+    if request.method == "POST":
+        
+        producto = request.form['producto']
+        print(producto)
+        conn = conectar()
+        cursor = conn.cursor()
+        query = 'UPDATE carrito_compra set cantidad += 1 where num_cliente = ? and id_carrito = ? and id_estado = 2'
+        cursor.execute(query,(session['id'],producto))
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+        conn = conectar()
+        cursor = conn.cursor()
+        query = 'select cantidad from carrito_compra where id_carrito = ?'
+        cursor.execute(query,(producto))
+        datos = cursor.fetchone()
+        
+        return str(datos[0])
+    else:
+        return "No"
+    
+    return render_template('web/otros/buscador_productos.html')
+# Fin RESTA DE PRODUCTO
+
+
+# RESTAR PRODUCTO DEL CARRITO
+@bp.route('/borrarProducto', methods=['POST'])
+def borrarProducto():
+
+    if request.method == "POST":
+        
+        producto = request.form['producto']
+        print(producto)
+
+        conn = conectar()
+        cursor = conn.cursor()
+        query = 'delete from carrito_compra where id_carrito = ?'
+        cursor.execute(query,(producto))
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+        return 'hecho'
+    else:
+        return "No"
+    
+    return render_template('web/otros/buscador_productos.html')
+
+# Fin RESTA DE PRODUCTO
+
+
 
 # Llamado del Carrito total por Usuario
 @bp.route('/carritoTotal', methods=['POST'])
@@ -101,13 +202,51 @@ def carritoTotal():
         print(datos)
         if datos:
 
-            return render_template('web/otros/modal_carrito.html', producto=datos)
+            return render_template('web/modales/modal_carrito.html', producto=datos)
         else:
             return "Sin Datos"
     else:
         return "No"
     
     return render_template('web/buscador_productos.html')
+
+
+@bp.route('/carrito')
+def carrito():
+
+
+        return render_template('web/carrito.html')
+
+@bp.route('/cargarProductosCarrito', methods=['POST'])
+def cargarProductosCarrito():
+
+        conn = conectar()
+        cursor = conn.cursor()
+        query = 'SELECT cc.id_carrito,p.Imagen, p.nom_producto, cc.cantidad, p.precio, e.NombreEstado FROM carrito_compra AS cc INNER JOIN producto AS p ON cc.cod_producto = p.cod_producto INNER JOIN cliente AS c ON cc.num_cliente = c.num_cliente INNER JOIN estado AS e ON cc.id_estado = e.id_estado where cc.num_cliente = ? GROUP BY p.nom_producto, cc.id_carrito, cc.cantidad, p.precio, e.NombreEstado, p.Imagen;'
+        cursor.execute(query,(session['id']))
+        datos = cursor.fetchall()
+        print(datos)
+        if not datos:
+            datos = ''
+
+        return render_template('web/otros/traer_productos.html', producto=datos)
+
+@bp.route('/cantidadArticulos', methods=['POST'])
+def cantidadArticulos():
+
+        conn = conectar()
+        cursor = conn.cursor()
+        query = 'SELECT COUNT(DISTINCT p.cod_producto) AS total_productos FROM carrito_compra AS cc INNER JOIN producto AS p ON cc.cod_producto = p.cod_producto INNER JOIN cliente AS c ON cc.num_cliente = c.num_cliente INNER JOIN estado AS e ON cc.id_estado = e.id_estado WHERE cc.num_cliente = ?;'
+        cursor.execute(query,(session['id']))
+        datos = cursor.fetchone()
+        print(datos)
+        if not datos[0]:
+            datos = 0
+        else:
+            datos = datos[0]
+        return render_template('web/otros/cantidad_articulos.html', producto=datos)
+    
+    
 
 # Fin buscador de la tienda
 
@@ -210,6 +349,32 @@ def cargarCarrito():
             return 'Sin Sesion'
     else:
         return "No"
+
+# TAbla de precios en el carrito de la persona
+@bp.route('/cargarTabla', methods=["GET", "POST"])
+def cargarTabla():
+
+    conn = conectar()
+    cursor = conn.cursor()
+    query = 'SELECT cc.id_carrito,p.Imagen, p.nom_producto, cc.cantidad, p.precio, e.NombreEstado FROM carrito_compra AS cc INNER JOIN producto AS p ON cc.cod_producto = p.cod_producto INNER JOIN cliente AS c ON cc.num_cliente = c.num_cliente INNER JOIN estado AS e ON cc.id_estado = e.id_estado where cc.num_cliente = ? GROUP BY p.nom_producto, cc.id_carrito, cc.cantidad, p.precio, e.NombreEstado, p.Imagen;'
+    cursor.execute(query,(session['id']))
+    datos = cursor.fetchall()
+
+
+    conn = conectar()
+    cursor = conn.cursor()
+    query = 'SELECT SUM(cc.cantidad * p.precio) AS total_factura FROM carrito_compra AS cc INNER JOIN producto AS p ON cc.cod_producto = p.cod_producto INNER JOIN cliente AS c ON cc.num_cliente = c.num_cliente WHERE cc.num_cliente = ?'
+    cursor.execute(query,(session['id']))
+    total = cursor.fetchone()
+    
+    return render_template('web/tablas/tabla_precios.html', productos = datos,total = total[0])
+
+
+#FIN TABLA
+
+
+
+
 
 
 # FIN DE LA TIENDA

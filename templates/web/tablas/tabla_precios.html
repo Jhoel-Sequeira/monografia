@@ -1,0 +1,24 @@
+<table id="entradas" class="table table-borderless" style="font-size: 15px;">
+    <thead>
+        <tr>
+            <th></th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody class="justify-content-center">
+        {% set total_general = 0 %}
+        {% for producto in productos %}
+        <tr>
+            <td class="text-center" style="width: 80px;">{{ producto.nom_producto }}</td>
+            <td class="text-center" style="width: 80px;">{{ producto.cantidad * producto.precio }}</td>
+        </tr>
+        {% set total_general = total_general + (producto.cantidad * producto.precio) %}
+        {% endfor %}
+    </tbody>
+    <tfoot>
+        <tr>
+            <td class="text-center"><strong>Total</strong></td>
+            <td class="text-center"><strong>{%if total%}{{ total }}{%else%}0{%endif%} C$</strong></td>
+        </tr>
+    </tfoot>
+</table>

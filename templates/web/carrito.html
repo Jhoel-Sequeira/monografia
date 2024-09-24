@@ -1,0 +1,238 @@
+{% extends "web/layout-web.html" %}
+
+<head>
+    <link rel="stylesheet" href="../../static/web/css/layout-web.css">
+</head>
+
+{% block contenidos %}
+
+<!-- inicio de sección de productos  -->
+<section class="shop" id="shop">
+    <div class="este justify-content-start" style=" height: 45vh; overflow: scroll;">
+        <div class="row mt-5" id="cantidadArticulos">
+            <h1>a</h1>
+        </div>
+        <div class="row">
+            <div class="col" id="productos_car">
+                
+            </div>
+            <div class="col">
+                <div style="border: 1px solid rgb(139, 139, 139); border-radius: 5px;">
+                    <div class="row ">
+                        <div class="d-flex col justify-content-center">
+                            <h1>Resumen del Pedido</h1>
+                        </div>
+
+                    </div>
+                    <div class="row">
+                        <div class="d-flex col-12 justify-content-start" id="tabla_precios">
+
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+</section>
+<!-- fin de la sección de productos -->
+<!-- SECCION DE MODAL DE COMPRAS -->
+<input type="hidden" value="jahaja" id="llamarModal" data-bs-toggle="modal" data-bs-target="#exampleModal">
+
+</input>
+
+<div id="modal">
+
+</div>
+
+
+
+<!-- FIN SECCION MODAL COMPRAS -->
+<!-- INICIO BUSCADOR -->
+<script>
+    $(document).ready(function () {
+        
+        traerTabla();
+        traerTodo();
+        cantidadArticulos();
+
+
+    });
+    function traerTodo(){
+        $.ajax({
+            url: "{{ url_for('web.cargarProductosCarrito') }}",
+            type: "POST",
+            data: {
+            },
+            success: function (response) {
+                $("#productos_car").html(response);
+                $("#productos_car").append(response.htmlresponse);
+
+            },
+            error: function (error) {
+                // console.log(error);
+            },
+        });
+    }
+    function cantidadArticulos(){
+        $.ajax({
+            url: "{{ url_for('web.cantidadArticulos') }}",
+            type: "POST",
+            data: {
+            },
+            success: function (response) {
+                $("#cantidadArticulos").html(response);
+                $("#cantidadArticulos").append(response.htmlresponse);
+
+            },
+            error: function (error) {
+                // console.log(error);
+            },
+        });
+    }
+
+    function sumarCantidad(button) {
+        const valorBoton = $(button).val();
+
+        $.ajax({
+            url: "{{ url_for('web.sumarCantidad') }}",
+            type: "POST",
+            data: {
+                producto: valorBoton,
+            },
+            success: function (response) {
+                $('#cantidad_' + valorBoton).val(response);
+                traerTabla();
+
+            },
+            error: function (error) {
+                // console.log(error);
+            },
+        });
+    }
+    function restarCantidad(button) {
+        const valorBoton = $(button).val();
+        $.ajax({
+            url: "{{ url_for('web.restarProducto') }}",
+            type: "POST",
+            data: {
+                producto: valorBoton,
+            },
+            success: function (response) {
+                if (response == 'no') {
+
+                } else {
+                    $('#cantidad_' + valorBoton).val(response);
+                    traerTabla();
+                }
+
+
+            },
+            error: function (error) {
+                // console.log(error);
+            },
+        });
+    }
+
+    function borrarProducto(button) {
+        const valorBoton = $(button).val();
+        $.ajax({
+            url: "{{ url_for('web.borrarProducto') }}",
+            type: "POST",
+            data: {
+                producto: valorBoton,
+            },
+            success: function (response) {
+
+                traerTodo();
+                traerTabla();
+                cantidadArticulos();
+
+            },
+            error: function (error) {
+                // console.log(error);
+            },
+        });
+    }
+    function traerTabla() {
+        $.ajax({
+            url: "{{ url_for('web.cargarTabla') }}",
+            type: "POST",
+            data: {
+                producto: $("#buscador").val(),
+            },
+            success: function (response) {
+
+                $("#tabla_precios").html(response);
+                $("#tabla_precios").append(response.htmlresponse);
+
+            },
+            error: function (error) {
+                // console.log(error);
+            },
+        });
+
+    };
+
+    function buscarProducto() {
+        $.ajax({
+            url: "{{ url_for('web.buscarProducto') }}",
+            type: "POST",
+            data: {
+                producto: $("#buscador").val(),
+            },
+            success: function (response) {
+
+                $("#productos").html(response);
+                $("#productos").append(response.htmlresponse);
+
+            },
+            error: function (error) {
+                // console.log(error);
+            },
+        });
+
+    };
+    $('#buscador').on('keyup', buscarProducto)
+
+
+    function detalleCompra(button) {
+        // Obtén el valor del botón pasado como parámetro
+        const valorBoton = $(button).val();
+        $.ajax({
+            url: "{{ url_for('web.detalleProducto') }}",
+            type: "POST",
+            data: {
+                num: valorBoton,
+            },
+            success: function (response) {
+
+                // Cargar el nuevo contenido en el modal
+                $("#modal").html(response);
+                $("#modal").append(response.htmlresponse);
+
+                $('#llamarModal').click();
+
+
+
+
+
+            },
+            error: function (error) {
+                // console.log(error);
+            },
+        });
+
+    }
+
+
+</script>
+
+<!-- FIN BUSCADOR -->
+
+
+
+{% endblock %}
