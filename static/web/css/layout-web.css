@@ -198,6 +198,12 @@ input[type="text"] {
 .este::-webkit-scrollbar {
   display: none;
 }
+.ocultarScroll::-webkit-scrollbar {
+  display: none;
+}
+.info{
+  font-size: 20px;
+}
 
 
 
@@ -1219,6 +1225,21 @@ input[type="text"] {
 /* FIN TIENDA CSS */
 
 @media (max-width: 991px) {
+
+  .cart-count {
+    position: absolute;
+    top: 10px; /* Ajusta según el diseño */
+    right: 4%; /* Ajusta según el diseño */
+    background-color: red;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 50%;
+    font-size: 12px;
+  }
+
+
+
+
   html {
     font-size: 55%;
   }
@@ -1249,6 +1270,19 @@ input[type="text"] {
 }
 
 @media (max-width: 768px) {
+
+  .cart-count {
+    position: absolute;
+    top: 10px; /* Ajusta según el diseño */
+    right: 5%; /* Ajusta según el diseño */
+    background-color: red;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 50%;
+    font-size: 12px;
+  }
+
+
   #menu-btn1 {
     display: inline-block;
   }
@@ -1289,6 +1323,20 @@ input[type="text"] {
 }
 
 @media (max-width: 450px) {
+
+  .cart-count {
+    position: absolute;
+    top: 10px; /* Ajusta según el diseño */
+    right: 10%; /* Ajusta según el diseño */
+    background-color: red;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 50%;
+    font-size: 12px;
+  }
+
+
+
   html {
     font-size: 50%;
   }
@@ -1321,6 +1369,7 @@ input[type="text"] {
 
 .chat-bubble {
   position: fixed;
+  z-index: 1000;
   bottom: 20px;
   right: 20px;
   width: 50px;

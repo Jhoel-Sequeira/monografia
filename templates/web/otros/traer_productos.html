@@ -1,65 +1,48 @@
-{%for producto in producto%}
+{% for producto in producto%}
+<div class="card row m-1 shadow p-3 mb-5 bg-body rounded d-flex flex-row align-items-center">
+    <!-- Imagen del producto -->
+    <div class="col-3">
+        <div class="card-body">
+            <img src="{{ producto.Imagen }}" class="imagenCarrito img-fluid" alt="">
+        </div>
+    </div>
 
-                <div class="card row m-1 shadow p-3 mb-5 bg-body rounded position-relative"
-                    style="flex-direction: row;">
-                    <!-- Botón de cerrar -->
-                    <!-- <span class="close-button" onclick="removeProduct()">&times;</span> -->
+    <!-- Información del producto -->
+    <div class="col-9">
+        <div class="row">
+            <h5 class="titulo">{{ producto.nom_producto }}</h5>
+            <p class="card-text">{{ producto.descripcion }}</p>
+        </div>
 
-                    <!-- Imagen del producto -->
-                    <div class="col-3">
-                        <div class="">
-                            <div class="card-body">
-                                <img src="{{producto.Imagen}}" class="imagenCarrito" alt="">
-                            </div>
-                        </div>
-                    </div>
+        <!-- Cantidad de producto y acciones -->
+        <div class="row d-flex align-items-center justify-content-between" style="font-size: 20px; margin-top: 50px;">
+            <div class="col-6">
+                <p class="card-text" style="font-size: 25px;"><strong>C$ {{ producto.precio }}</strong></p>
+            </div>
+            <div class="col-auto">
+                <div class="d-flex align-items-center">
+                    <!-- Botón para aumentar la cantidad -->
+                    <button class="btn" value="{{ producto.cod_detalle }}" style="font-size: 20px;" onclick="sumarCantidad(this)">
+                        <i class="fas fa-plus" ></i>
+                    </button>
 
-                    <!-- Información del producto -->
-                    <div class="col">
-                        <div class="">
-                            <div class="row ">
+                    <!-- Campo de cantidad -->
+                    <input type="text" id="cantidad_{{ producto.cod_detalle }}" value="{{ producto.cantidad }}"
+                        style="width: 35px; text-align: center; height: 30px;" readonly>
 
-                                <h5 class="titulo">{{ producto.nom_producto }}</h5>
-                                <p class="card-text">descpd{{ producto.descripcion }}</p>
-
-
-                                <!-- Cantidad de producto -->
-                                <div class="row d-flex align-items-end justify-content-end" style="font-size: 15px;">
-                                    <div class="col-8">
-                                        <p class="card-text"><strong>C$ {{ producto.precio }}</strong>
-                                    </div>
-                                    <div class="col-lg-auto justify-content-end">
-                                        <div class="row d-flex align-items-center" style="font-size: 20px;">
-                                            <div class="col-auto p-0">
-                                                <button class="btn" value="{{producto.id_carrito}}"
-                                                    onclick="sumarCantidad(this.closest('button'))">
-                                                    <i class="fas fa-plus"></i>
-                                                </button>
-                                            </div>
-                                            <div class="col-auto p-0">
-                                                <input type="text" id="cantidad_{{producto.id_carrito}}"
-                                                    value="{{ producto.cantidad }}"
-                                                    style="width: 25px; text-align: center; height: 20px;">
-                                            </div>
-                                            <div class="col-auto p-0">
-                                                <button class="btn" value="{{producto.id_carrito}}"
-                                                    onclick="restarCantidad(this.closest('button'))">
-                                                    <i class="fas fa-minus"></i>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-auto">
-                                        <button class="btn" value="{{producto.id_carrito}}"
-                                            onclick="borrarProducto(this.closest('button'))">
-                                            <i class="far fa-trash-alt"></i>
-                                        </button>
-
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <!-- Botón para reducir la cantidad -->
+                    <button class="btn" value="{{ producto.cod_detalle }}" style="font-size: 20px;" onclick="restarCantidad(this)">
+                        <i class="fas fa-minus"></i>
+                    </button>
                 </div>
-
-                {%endfor%}
+            </div>
+            <div class="col-auto">
+                <!-- Botón para borrar producto -->
+                <button class="btn" value="{{ producto.cod_detalle }}" style="font-size: 20px;" onclick="borrarProducto(this)">
+                    <i class="far fa-trash-alt"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}

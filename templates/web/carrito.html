@@ -8,36 +8,43 @@
 
 <!-- inicio de sección de productos  -->
 <section class="shop" id="shop">
-    <div class="este justify-content-start" style=" height: 45vh; overflow: scroll;">
+    <div class="justify-content-start">
         <div class="row mt-5" id="cantidadArticulos">
             <h1>a</h1>
         </div>
         <div class="row">
-            <div class="col" id="productos_car">
+            <!-- Columna de productos -->
+            <div class="col-md-6 col-12 overflow-scroll ocultarScroll" style="height: 70vh!important;"
+                id="productos_car">
+                <!-- Contenido de productos -->
+            </div>
+
+            <!-- Columna del resumen -->
+            <div class="col-md-6 col-12">
+                <div style="border: 1px solid rgb(139, 139, 139); border-radius: 5px;">
+                    <div class="row">
+                        <div class="d-flex col justify-content-center">
+                            <h1 class="m-4">Resumen del Pedido</h1>
+                        </div>
+                    </div>
+                    <div class="row over">
+                        <div class="d-flex col-12 justify-content-start" id="tabla_precios">
+                            <!-- Contenido del resumen -->
+                        </div>
+                    </div>
+                    <div class="row bg-danger m-3" style="border-bottom-left-radius: 10px; border-bottom-right-radius: 10px; height: 50px; ">
+                            <button class="btn btn-dark" onclick="generarOrden()" style="font-size: 25px;">GENERAR ORDEN</button>
+                        
+                    </div>
+                    
+                </div>
                 
             </div>
-            <div class="col">
-                <div style="border: 1px solid rgb(139, 139, 139); border-radius: 5px;">
-                    <div class="row ">
-                        <div class="d-flex col justify-content-center">
-                            <h1>Resumen del Pedido</h1>
-                        </div>
-
-                    </div>
-                    <div class="row">
-                        <div class="d-flex col-12 justify-content-start" id="tabla_precios">
-
-                        </div>
-
-                    </div>
-                </div>
-
-            </div>
+            
         </div>
-
     </div>
-
 </section>
+
 <!-- fin de la sección de productos -->
 <!-- SECCION DE MODAL DE COMPRAS -->
 <input type="hidden" value="jahaja" id="llamarModal" data-bs-toggle="modal" data-bs-target="#exampleModal">
@@ -54,14 +61,14 @@
 <!-- INICIO BUSCADOR -->
 <script>
     $(document).ready(function () {
-        
+
         traerTabla();
         traerTodo();
         cantidadArticulos();
 
 
     });
-    function traerTodo(){
+    function generarOrden(){
         $.ajax({
             url: "{{ url_for('web.cargarProductosCarrito') }}",
             type: "POST",
@@ -77,7 +84,23 @@
             },
         });
     }
-    function cantidadArticulos(){
+    function traerTodo() {
+        $.ajax({
+            url: "{{ url_for('web.cargarProductosCarrito') }}",
+            type: "POST",
+            data: {
+            },
+            success: function (response) {
+                $("#productos_car").html(response);
+                $("#productos_car").append(response.htmlresponse);
+
+            },
+            error: function (error) {
+                // console.log(error);
+            },
+        });
+    }
+    function cantidadArticulos() {
         $.ajax({
             url: "{{ url_for('web.cantidadArticulos') }}",
             type: "POST",
@@ -104,8 +127,24 @@
                 producto: valorBoton,
             },
             success: function (response) {
-                $('#cantidad_' + valorBoton).val(response);
-                traerTabla();
+                if (response == 'Sin Stock') {
+                    Toastify({
+
+                        text: "Lo sentimos no tenemos mas stock.",
+                        gravity: "top", // `top` or `bottom`
+                        position: "right",
+                        className: "info",
+                        duration: 3000,
+                        style: {
+                            background: "#5852a19d",
+                        },
+
+                    }).showToast();
+                } else {
+                    $('#cantidad_' + valorBoton).val(response);
+                    traerTabla();
+                }
+
 
             },
             error: function (error) {

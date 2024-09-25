@@ -1,4 +1,4 @@
-<table id="entradas" class="table table-borderless" style="font-size: 15px;">
+<table id="entradas" class="table table-borderless" style="font-size: 15px; margin-bottom: 0;">
     <thead>
         <tr>
             <th></th>
@@ -9,16 +9,20 @@
         {% set total_general = 0 %}
         {% for producto in productos %}
         <tr>
-            <td class="text-center" style="width: 80px;">{{ producto.nom_producto }}</td>
-            <td class="text-center" style="width: 80px;">{{ producto.cantidad * producto.precio }}</td>
+            <td class="text-start" style="width: 80px; padding-left: 30px;">{{ producto.nom_producto }}</td>
+            <td class="text-center" style="width: 80px;">{{ producto.cantidad * producto.precio }} C$</td>
         </tr>
         {% set total_general = total_general + (producto.cantidad * producto.precio) %}
         {% endfor %}
     </tbody>
-    <tfoot>
+    <tfoot >
         <tr>
-            <td class="text-center"><strong>Total</strong></td>
-            <td class="text-center"><strong>{%if total%}{{ total }}{%else%}0{%endif%} C$</strong></td>
+            <td style="box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);"></td>
+            <td style="box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);"></td>
+        </tr>
+        <tr style="border-top: 0.5px solid rgb(204, 204, 204);height: 50px; font-size: 20px; padding: 0;">
+            <td class="text-center" style="background-color: rgba(199, 199, 199, 0.1);" ><strong>Total</strong></td>
+            <td class="text-center" style="background-color: rgba(199, 199, 199, 0.1);"><strong>{%if total%}{{ total }}{%else%}0{%endif%} C$</strong></td>
         </tr>
     </tfoot>
 </table>

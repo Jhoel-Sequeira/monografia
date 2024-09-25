@@ -12,6 +12,15 @@ from werkzeug.security import check_password_hash, generate_password_hash
 import jinja2
 from jinja2 import Environment
 
+
+
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email.mime.base import MIMEBase
+from email import encoders
+from fpdf import FPDF
+import smtplib
+
 #IMPORTS PARA GENERAR EL EXCEL
 from openpyxl import Workbook
 from openpyxl.drawing.image import Image
@@ -99,7 +108,7 @@ def restarProducto():
 
         conn = conectar()
         cursor = conn.cursor()
-        query = 'select cantidad from carrito_compra where id_carrito = ?'
+        query = 'select cod_producto,cantidad from detalle_carrito where cod_detalle = ?'
         cursor.execute(query,(producto))
         datos = cursor.fetchone()
 
@@ -108,18 +117,17 @@ def restarProducto():
 
 
 
-
         conn = conectar()
         cursor = conn.cursor()
-        query = 'UPDATE carrito_compra set cantidad -= 1 where num_cliente = ? and id_carrito = ? and id_estado = 2'
-        cursor.execute(query,(session['id'],producto))
+        query = 'UPDATE detalle_carrito set cantidad -= 1 where cod_detalle = ?'
+        cursor.execute(query,(producto))
         conn.commit()
         cursor.close()
         conn.close()
 
         conn = conectar()
         cursor = conn.cursor()
-        query = 'select cantidad from carrito_compra where id_carrito = ?'
+        query = 'select cantidad from detalle_carrito where cod_detalle = ?'
         cursor.execute(query,(producto))
         datos = cursor.fetchone()
         
@@ -139,27 +147,260 @@ def sumarCantidad():
         
         producto = request.form['producto']
         print(producto)
-        conn = conectar()
-        cursor = conn.cursor()
-        query = 'UPDATE carrito_compra set cantidad += 1 where num_cliente = ? and id_carrito = ? and id_estado = 2'
-        cursor.execute(query,(session['id'],producto))
-        conn.commit()
-        cursor.close()
-        conn.close()
 
         conn = conectar()
         cursor = conn.cursor()
-        query = 'select cantidad from carrito_compra where id_carrito = ?'
+        query = 'select cod_producto,cantidad from detalle_carrito where cod_detalle = ?'
         cursor.execute(query,(producto))
-        datos = cursor.fetchone()
-        
-        return str(datos[0])
+        product = cursor.fetchone()
+
+        cantidad = product[1]
+
+        #AQUI REVISAMOS EL STOCK DEL MATERIAL QUE ESTA EN EL CARRITO
+        conn = conectar()
+        cursor = conn.cursor()
+        query = 'select stock from producto where cod_producto = ?'
+        cursor.execute(query,(product[0]))
+        stock = cursor.fetchone()
+
+        if cantidad + 1 <= stock[0]:
+
+
+            conn = conectar()
+            cursor = conn.cursor()
+            query = 'UPDATE detalle_carrito set cantidad += 1 where cod_detalle = ?'
+            cursor.execute(query,producto)
+            conn.commit()
+            cursor.close()
+            conn.close()
+
+            conn = conectar()
+            cursor = conn.cursor()
+            query = 'select cantidad from detalle_carrito where cod_detalle = ?'
+            cursor.execute(query,(producto))
+            datos = cursor.fetchone()
+            
+            return str(datos[0])
+        else:
+            return 'Sin Stock'
     else:
         return "No"
     
     return render_template('web/otros/buscador_productos.html')
 # Fin RESTA DE PRODUCTO
+# MANDAR ORDEN DE COMPRA
+@bp.route('/mandarSalida', methods=["POST"])
+def mandarSalida():
+    num = request.form['id']
+    tempPdfFilePath = r'C:\Users\JHOEL SEQUEIRA\Documents\GitHub\monografia\ordenCompra\Orden.pdf'
 
+    conn = conectar()
+    cursor = conn.cursor()
+
+    # Consulta SQL para obtener los datos del ticket
+    query = """
+    SELECT sm.NumSalida, t.Tramportista, c.Placa, r.Rastra, con.NombreConductor, p.NombreProveedor, 
+    m.NombreMaterial, sm.PesoBruto, sm.PesoTara, sm.PesoTara2, sm.PesoNeto, sm.Observacion, sm.FechaIngreso, sm.FechaSalida 
+    FROM SalidaMaterial as sm 
+    INNER JOIN Camiones as c ON sm.NumCamion = c.NumCamion 
+    INNER JOIN Tramportistas as t ON sm.NumTramportista = t.NumTramportista 
+    INNER JOIN Rastras as r ON r.NumRastra = sm.NumRastra
+    INNER JOIN Materiales as m ON sm.NumMaterial = m.NumMaterial 
+    INNER JOIN Proveedores as p ON sm.NumProveedor = p.NumProveedor 
+    INNER JOIN Conductores as con ON sm.NumConductor = con.NumConductor 
+    WHERE sm.NumSalida = ?
+    """
+
+    cursor.execute(query, (num,))
+    ticket = cursor.fetchone()
+
+    fecha_ingreso = ticket[12].strftime("%Y-%m-%d | %I:%M:%S %p") if isinstance(ticket[12], datetime) else str(ticket[12])
+    fecha_salida = ticket[13].strftime("%Y-%m-%d | %I:%M:%S %p") if isinstance(ticket[13], datetime) else str(ticket[13])
+    fecha = ticket[13].strftime("%Y-%m-%d") if isinstance(ticket[13], datetime) else str(ticket[13])
+
+    pdf = FPDF('P', 'mm', (101.6, 175))
+    pdf.set_margins(5.5, 5.5, 5.5)
+    pdf.set_display_mode(zoom=100, layout='continuous')
+    pdf.add_page()
+
+    pdf.set_font('Arial', 'B', 30)
+    pdf.set_text_color(0, 0, 0)
+    pdf.set_font('Arial', 'B', 14)
+    pdf.multi_cell(0, 5, 'Compañía Recicladora de Nicaragua', 0, "C")
+    pdf.ln(1)
+    
+    pdf.set_font('Arial', 'B', 7.5)
+    pdf.cell(25, 10, 'No de Boleta: ')
+    pdf.set_font('Arial', '', 7.5)
+    pdf.cell(30, 10, str(ticket[0]))
+    pdf.ln(6)
+    
+    pdf.set_font('Arial', 'B', 7.5)
+    pdf.cell(25, 10, 'Fecha: ')
+    pdf.set_font('Arial', 'B', 7.5)
+    pdf.multi_cell(23, 10, fecha)
+    pdf.ln(4)
+    pdf.set_font('Arial', 'B', 7.5)
+    pdf.cell(20, 10, 'Salida de Material ')
+    pdf.ln(8)  
+
+    pdf.set_font('Arial', 'B', 7.5)
+    pdf.cell(25, 10, 'Placa: ')
+    pdf.set_font('Arial', 'B', 7.5)
+    pdf.cell(20, 10, ticket[3])
+    pdf.ln(6)
+    
+    pdf.set_font('Arial', 'B', 7.5)
+    pdf.cell(25, 10, 'Conductor: ')
+    pdf.set_font('Arial', '', 7.5)
+    pdf.cell(25, 10, ticket[4].upper())
+    pdf.ln(9)
+    
+    pdf.set_font('Arial', 'B', 7.5)
+    pdf.cell(25, 10, 'Cliente: ')
+    pdf.set_font('Arial', 'B', 7.5)
+    pdf.cell(30, 10, ticket[5].upper())
+    pdf.ln(9)
+
+    pdf.set_font('Arial', 'B', 7.5)
+    pdf.cell(25, 10, 'Material: ')
+    pdf.set_font('Arial', 'B', 7.5)
+    pdf.cell(20, 10, ticket[6])
+    pdf.ln(9)
+    
+    pdf.set_font('Arial', 'B', 7.5)
+    pdf.cell(25, 10, 'Peso Total: ')
+    pdf.set_font('Arial', 'B', 7.5)
+    pdf.cell(25, 10, "{:,.2f}".format(float(ticket[7])) + ' lb')
+    pdf.ln(6)
+
+    pdf.set_font('Arial', 'B', 7.5)
+    pdf.cell(25, 10, 'Peso Tara: ')
+    pdf.set_font('Arial', 'B', 7.5)
+    pdf.cell(25, 10, "{:,.2f}".format(float(ticket[8])) + ' lb')
+    pdf.ln(6)
+
+    # pdf.set_font('Arial', 'B', 7.5)
+    # pdf.cell(30, 10, 'Peso Tara Adicional: ')
+    # pdf.set_font('Arial', '', 7.5)
+    # pdf.cell(20, 10,"{:,.2f}".format(float(ticket[9]) - float(ticket[7])) + 'lb')
+    pdf.ln(8)
+
+    pdf.set_font('Arial', 'B', 7.5)
+    pdf.cell(30, 10, 'Peso Bruto: ')
+    pdf.set_font('Arial', '', 7.5)
+    pdf.cell(20, 10, "{:,.2f}".format(float(ticket[10])) + ' lb')
+    kg = float(ticket[10]) / 2.2046
+    pdf.ln(6)
+    
+
+    pdf.set_font('Arial', 'B', 7.5)
+    pdf.cell(30, 10, '')
+    pdf.cell(20, 10, "{:,.2f}".format(kg) + ' kg')
+    pdf.ln(6)
+
+
+
+    pdf.set_font('Arial', 'B', 7.5)
+    pdf.cell(30, 10, 'Fecha y Hora Ingreso: ')
+    pdf.set_font('Arial', '', 7.5)
+    pdf.cell(30, 10, fecha_ingreso)
+    pdf.ln(4)
+
+
+
+    pdf.set_font('Arial', 'B', 7.5)
+    pdf.cell(30, 10, 'Fecha y Hora Salida: ')
+    pdf.set_font('Arial', '', 7.5)
+    pdf.cell(30, 10, fecha_salida)
+    pdf.ln(4)
+
+    
+
+   
+
+    pdf.set_font('Arial', 'B', 7.5)
+    pdf.cell(30, 10, 'Observacion: ')
+    pdf.ln(6)
+    pdf.set_font('Arial', 'B', 7.5)
+    pdf.cell(180, 10, ticket[11].upper())
+    pdf.ln(6)
+
+    # pdf.set_font('Arial', 'B', 7.5)
+    # pdf.cell(30, 10, ticket[12],0, 0, 'C')
+    # pdf.ln(3)
+
+
+    x = 35
+    y = 110
+    width = 30
+    height = 0 
+    imagePath = 'static/img/validado.png'
+
+    pdf.image(imagePath, x, y, width, height)
+
+   
+    pdf.cell(30, 10, '___________________',0, 0, 'C')
+    pdf.cell(30, 10, '___________________',0, 0, 'C')
+    pdf.cell(30, 10, '___________________',0, 0, 'C')
+    pdf.ln(6)
+    pdf.cell(30, 10, 'Digitador',0, 0, 'C')
+    pdf.cell(30, 10, 'Verificador',0, 0, 'C')
+    pdf.cell(30, 10, 'Proveedor',0, 0, 'C')
+
+    # Guardar el PDF como un archivo temporal
+    pdf.output(tempPdfFilePath, 'F')
+
+    # Configurar los detalles del correo
+    from_email = 'bascula@crn.com.ni'
+    to_email = ['maycol.gonzalez@crn.com.ni', 'david.garache@crn.com.ni', 'aurelio.larios@crn.com.ni', 'exportaciones@crn.com.ni']
+    # to_email = ['it@crn.com.ni']
+    cc_emails = ['bryan.oviedo@crn.com.ni']
+    # cc_emails = ['it@crn.com.ni']
+    subject = ticket[3]
+    body = f"Se adjunta el checklist validado de la unidad: <b>{ticket[3]}</b><br> Material: <b>{ticket[6]}</b>"
+
+    # Configurar el servidor SMTP
+    smtp_server = 'smtp.office365.com'
+    smtp_port = 587
+    smtp_user = 'bascula@crn.com.ni'
+    smtp_password = 'Cbasscula23'
+
+    try:
+         # Crear el mensaje de correo
+        msg = MIMEMultipart()
+        msg['From'] = from_email
+        msg['To'] = ', '.join(to_email)  # Corregido: Convertir la lista de destinatarios a cadena
+        msg['Cc'] = ', '.join(cc_emails)
+        msg['Subject'] = subject
+        msg.attach(MIMEText(body, 'html'))
+
+        # Adjuntar el archivo PDF
+        with open(tempPdfFilePath, 'rb') as attachment:
+            part = MIMEBase('application', 'octet-stream')
+            part.set_payload(attachment.read())
+            encoders.encode_base64(part)
+            part.add_header('Content-Disposition', f'attachment; filename={os.path.basename(tempPdfFilePath)}')
+            msg.attach(part)
+
+        # Enviar el correo
+        with smtplib.SMTP(smtp_server, smtp_port) as server:
+            server.starttls()
+            server.login(smtp_user, smtp_password)
+            text = msg.as_string()
+            server.sendmail(from_email, to_email, text)
+
+        # Eliminar el archivo temporal después de enviar el correo
+        os.remove(tempPdfFilePath)
+        print('correo enviado')
+        return 'Correo enviado con éxito'
+
+    except Exception as e:
+        print( {str(e)})
+        return f'Error al enviar el correo: {str(e)}'
+
+
+# FIN ENVIO ORDEN DE COMPRA
 
 # RESTAR PRODUCTO DEL CARRITO
 @bp.route('/borrarProducto', methods=['POST'])
@@ -172,7 +413,7 @@ def borrarProducto():
 
         conn = conectar()
         cursor = conn.cursor()
-        query = 'delete from carrito_compra where id_carrito = ?'
+        query = 'delete from detalle_carrito where cod_detalle = ?'
         cursor.execute(query,(producto))
         conn.commit()
         cursor.close()
@@ -222,7 +463,7 @@ def cargarProductosCarrito():
 
         conn = conectar()
         cursor = conn.cursor()
-        query = 'SELECT cc.id_carrito,p.Imagen, p.nom_producto, cc.cantidad, p.precio, e.NombreEstado FROM carrito_compra AS cc INNER JOIN producto AS p ON cc.cod_producto = p.cod_producto INNER JOIN cliente AS c ON cc.num_cliente = c.num_cliente INNER JOIN estado AS e ON cc.id_estado = e.id_estado where cc.num_cliente = ? GROUP BY p.nom_producto, cc.id_carrito, cc.cantidad, p.precio, e.NombreEstado, p.Imagen;'
+        query = 'SELECT dc.cod_detalle,p.Imagen, p.nom_producto, dc.cantidad, p.precio, e.NombreEstado FROM carrito_compra AS cc inner join detalle_carrito as dc on cc.id_carrito = dc.cod_carrito INNER JOIN producto AS p ON dc.cod_producto = p.cod_producto INNER JOIN cliente AS c ON cc.num_cliente = c.num_cliente INNER JOIN estado AS e ON cc.id_estado = e.id_estado where cc.num_cliente = ? GROUP BY p.nom_producto, dc.cod_detalle, dc.cantidad, p.precio, e.NombreEstado, p.Imagen;'
         cursor.execute(query,(session['id']))
         datos = cursor.fetchall()
         print(datos)
@@ -236,7 +477,7 @@ def cantidadArticulos():
 
         conn = conectar()
         cursor = conn.cursor()
-        query = 'SELECT COUNT(DISTINCT p.cod_producto) AS total_productos FROM carrito_compra AS cc INNER JOIN producto AS p ON cc.cod_producto = p.cod_producto INNER JOIN cliente AS c ON cc.num_cliente = c.num_cliente INNER JOIN estado AS e ON cc.id_estado = e.id_estado WHERE cc.num_cliente = ?;'
+        query = 'SELECT COUNT(DISTINCT p.cod_producto) AS total_productos FROM carrito_compra AS cc INNER JOIN detalle_carrito as dc on cc.id_carrito = dc.cod_carrito inner join producto AS p ON dc.cod_producto = p.cod_producto INNER JOIN cliente AS c ON cc.num_cliente = c.num_cliente INNER JOIN estado AS e ON cc.id_estado = e.id_estado WHERE cc.num_cliente = ?;'
         cursor.execute(query,(session['id']))
         datos = cursor.fetchone()
         print(datos)
@@ -262,27 +503,73 @@ def guardarCarrito():
 
             conn = conectar()
             cursor = conn.cursor()
-            query = 'select * from carrito_compra where num_cliente = ? and cod_producto = ? and id_estado = 2'
-            cursor.execute(query, (session['id'],producto))
+            query = 'select * from carrito_compra where num_cliente = ? and id_estado = 2'
+            cursor.execute(query, (session['id']))
             carrito = cursor.fetchone()
             cursor.close()
             conn.close()
 
+            print(carrito)
 
             if carrito:
+
+
                 conn = conectar()
                 cursor = conn.cursor()
-                query = 'UPDATE carrito_compra set cantidad += ? where id_carrito = ?'
-                cursor.execute(query,(cantidad,carrito[0]))
+                query = 'select * from detalle_carrito where cod_producto = ? and cod_carrito = ?'
+                cursor.execute(query, (producto,carrito[0]))
+                detallecarrito = cursor.fetchone()
+                cursor.close()
+                conn.close()
+
+                print(detallecarrito)
+                if detallecarrito:
+
+                    conn = conectar()
+                    cursor = conn.cursor()
+                    query = 'UPDATE detalle_carrito set cantidad += ? where cod_detalle = ? and cod_producto = ?'
+                    cursor.execute(query,(cantidad,detallecarrito[0],producto))
+                    conn.commit()
+                    cursor.close()
+                    conn.close()
+                else:
+                    print('else')
+                    print()
+                    conn = conectar()
+                    cursor = conn.cursor()
+                    query = 'INSERT INTO detalle_carrito (cod_producto,cantidad,cod_carrito) VALUES (?,?,?)'
+                    cursor.execute(query,(producto,cantidad,carrito[0]))
+                    conn.commit()
+                    cursor.close()
+                    conn.close()
+
+            else:
+
+                #INSERTAMOS EL CARRITO
+                conn = conectar()
+                cursor = conn.cursor()
+                query = 'INSERT INTO carrito_compra (num_cliente,id_estado) VALUES (?,2)'
+                cursor.execute(query,(session['id']))
                 conn.commit()
                 cursor.close()
                 conn.close()
-            else:
+
+                #SELECCIONAMOS EL ULTIMO CARRITO AGREGADO
+                conn = conectar()
+                cursor = conn.cursor()
+                query = 'select TOP 1 * from carrito_compra where num_cliente = ? and id_estado = 2 order by id_carrito desc'
+                cursor.execute(query, (session['id']))
+                car = cursor.fetchone()
+                cursor.close()
+                conn.close()
+
+                print(car[0])
+                #INSERTAMOS EL DETALLE DEL CARRITO
                 
                 conn = conectar()
                 cursor = conn.cursor()
-                query = 'INSERT INTO carrito_compra (cod_producto,num_cliente,cantidad,id_estado) VALUES (?,?,?,2)'
-                cursor.execute(query,(producto,session['id'],cantidad))
+                query = 'INSERT INTO detalle_carrito (cod_producto,cantidad,cod_carrito) VALUES (?,?,?)'
+                cursor.execute(query,(producto,cantidad,car[0]))
                 conn.commit()
                 cursor.close()
                 conn.close()
@@ -338,7 +625,7 @@ def cargarCarrito():
 
             conn = conectar()
             cursor = conn.cursor()
-            query = 'select count(*) from carrito_compra where num_cliente = ?'
+            query = 'select count(*) from carrito_compra  as cc inner join detalle_carrito as dc on cc. id_carrito = dc.cod_carrito where cc.num_cliente = ?'
             cursor.execute(query, session['id'])
             rows = cursor.fetchone()
             cursor.close()
@@ -356,14 +643,14 @@ def cargarTabla():
 
     conn = conectar()
     cursor = conn.cursor()
-    query = 'SELECT cc.id_carrito,p.Imagen, p.nom_producto, cc.cantidad, p.precio, e.NombreEstado FROM carrito_compra AS cc INNER JOIN producto AS p ON cc.cod_producto = p.cod_producto INNER JOIN cliente AS c ON cc.num_cliente = c.num_cliente INNER JOIN estado AS e ON cc.id_estado = e.id_estado where cc.num_cliente = ? GROUP BY p.nom_producto, cc.id_carrito, cc.cantidad, p.precio, e.NombreEstado, p.Imagen;'
+    query = 'SELECT dc.cod_detalle,p.Imagen, p.nom_producto, dc.cantidad, p.precio, e.NombreEstado FROM carrito_compra AS cc inner join detalle_carrito as dc on cc.id_carrito = dc.cod_carrito INNER JOIN producto AS p ON dc.cod_producto = p.cod_producto INNER JOIN cliente AS c ON cc.num_cliente = c.num_cliente INNER JOIN estado AS e ON cc.id_estado = e.id_estado where cc.num_cliente = ? GROUP BY p.nom_producto, dc.cod_detalle, dc.cantidad, p.precio, e.NombreEstado, p.Imagen;'
     cursor.execute(query,(session['id']))
     datos = cursor.fetchall()
 
 
     conn = conectar()
     cursor = conn.cursor()
-    query = 'SELECT SUM(cc.cantidad * p.precio) AS total_factura FROM carrito_compra AS cc INNER JOIN producto AS p ON cc.cod_producto = p.cod_producto INNER JOIN cliente AS c ON cc.num_cliente = c.num_cliente WHERE cc.num_cliente = ?'
+    query = 'SELECT SUM(dc.cantidad * p.precio) AS total_factura FROM carrito_compra AS cc inner join detalle_carrito as dc on cc.id_carrito = dc.cod_carrito INNER JOIN producto AS p ON dc.cod_producto = p.cod_producto INNER JOIN cliente AS c ON cc.num_cliente = c.num_cliente WHERE cc.num_cliente = ?'
     cursor.execute(query,(session['id']))
     total = cursor.fetchone()
     
