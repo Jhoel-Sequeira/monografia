@@ -10,7 +10,7 @@
 <section class="shop" id="shop">
     <div class="justify-content-start">
         <div class="row mt-5" id="cantidadArticulos">
-            <h1>a</h1>
+            
         </div>
         <div class="row">
             <!-- Columna de productos -->
@@ -32,16 +32,36 @@
                             <!-- Contenido del resumen -->
                         </div>
                     </div>
-                    <div class="row bg-danger m-3" style="border-bottom-left-radius: 10px; border-bottom-right-radius: 10px; height: 50px; ">
-                            <button class="btn btn-dark" onclick="generarOrden()" style="font-size: 25px;">GENERAR ORDEN</button>
-                        
+                    <div class="row bg-danger m-3"
+                        style="border-bottom-left-radius: 10px; border-bottom-right-radius: 10px; height: 50px; ">
+                        <button class="btn btn-dark" onclick="generarOrden()" style="font-size: 25px;">GENERAR
+                            ORDEN</button>
+
                     </div>
                     
                 </div>
-                
+                <div class="mt-5" style="border: 1px solid rgb(139, 139, 139); border-radius: 5px;">
+                    <div class="row">
+                        <div class="d-flex col justify-content-center">
+                            <h1 class="m-4">Mis Pedidos</h1>
+                        </div>
+                    </div>
+                    <div class="row over">
+                        <div class="d-flex col-12 justify-content-start" id="pedidos">
+                            <!-- Contenido del resumen -->
+                        </div>
+                    </div>
+                    
+                    
+                </div>
+
             </div>
             
+
         </div>
+        
+
+    </div>
     </div>
 </section>
 
@@ -65,10 +85,26 @@
         traerTabla();
         traerTodo();
         cantidadArticulos();
-
+        traerSeguimiento();
 
     });
-    function generarOrden(){
+    function traerSeguimiento(){
+        $.ajax({
+            url: "{{ url_for('web.seguimiento') }}",
+            type: "POST",
+            data: {
+            },
+            success: function (response) {
+                $("#pedidos").html(response);
+                $("#pedidos").append(response.htmlresponse);
+
+            },
+            error: function (error) {
+                // console.log(error);
+            },
+        });
+    }
+    function generarOrden() {
         $.ajax({
             url: "{{ url_for('web.cargarProductosCarrito') }}",
             type: "POST",

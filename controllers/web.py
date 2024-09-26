@@ -463,7 +463,7 @@ def cargarProductosCarrito():
 
         conn = conectar()
         cursor = conn.cursor()
-        query = 'SELECT dc.cod_detalle,p.Imagen, p.nom_producto, dc.cantidad, p.precio, e.NombreEstado FROM carrito_compra AS cc inner join detalle_carrito as dc on cc.id_carrito = dc.cod_carrito INNER JOIN producto AS p ON dc.cod_producto = p.cod_producto INNER JOIN cliente AS c ON cc.num_cliente = c.num_cliente INNER JOIN estado AS e ON cc.id_estado = e.id_estado where cc.num_cliente = ? GROUP BY p.nom_producto, dc.cod_detalle, dc.cantidad, p.precio, e.NombreEstado, p.Imagen;'
+        query = 'SELECT dc.cod_detalle,p.Imagen, p.nom_producto, dc.cantidad, p.precio, e.NombreEstado FROM carrito_compra AS cc inner join detalle_carrito as dc on cc.id_carrito = dc.cod_carrito INNER JOIN producto AS p ON dc.cod_producto = p.cod_producto INNER JOIN cliente AS c ON cc.num_cliente = c.num_cliente INNER JOIN estado AS e ON cc.id_estado = e.id_estado where cc.num_cliente = ? and cc.id_estado = 2 GROUP BY p.nom_producto, dc.cod_detalle, dc.cantidad, p.precio, e.NombreEstado, p.Imagen;'
         cursor.execute(query,(session['id']))
         datos = cursor.fetchall()
         print(datos)
@@ -472,12 +472,23 @@ def cargarProductosCarrito():
 
         return render_template('web/otros/traer_productos.html', producto=datos)
 
+@bp.route('/seguimiento', methods=['POST'])
+def seguimiento():
+
+        conn = conectar()
+        cursor = conn.cursor()
+        query = 'SELECT cc.id_carrito,e.NombreEstado as estado from carrito_compra as cc inner join estado as e on cc.id_estado = e.id_estado where cc.num_cliente = ? and cc.id_estado != 2 '
+        cursor.execute(query,(session['id']))
+        carrito = cursor.fetchall()
+
+        return render_template('web/otros/seguimiento.html', producto=carrito)
+
 @bp.route('/cantidadArticulos', methods=['POST'])
 def cantidadArticulos():
 
         conn = conectar()
         cursor = conn.cursor()
-        query = 'SELECT COUNT(DISTINCT p.cod_producto) AS total_productos FROM carrito_compra AS cc INNER JOIN detalle_carrito as dc on cc.id_carrito = dc.cod_carrito inner join producto AS p ON dc.cod_producto = p.cod_producto INNER JOIN cliente AS c ON cc.num_cliente = c.num_cliente INNER JOIN estado AS e ON cc.id_estado = e.id_estado WHERE cc.num_cliente = ?;'
+        query = 'SELECT COUNT(DISTINCT p.cod_producto) AS total_productos FROM carrito_compra AS cc INNER JOIN detalle_carrito as dc on cc.id_carrito = dc.cod_carrito inner join producto AS p ON dc.cod_producto = p.cod_producto INNER JOIN cliente AS c ON cc.num_cliente = c.num_cliente INNER JOIN estado AS e ON cc.id_estado = e.id_estado WHERE cc.num_cliente = ? and cc.id_estado = 2;'
         cursor.execute(query,(session['id']))
         datos = cursor.fetchone()
         print(datos)
@@ -625,7 +636,7 @@ def cargarCarrito():
 
             conn = conectar()
             cursor = conn.cursor()
-            query = 'select count(*) from carrito_compra  as cc inner join detalle_carrito as dc on cc. id_carrito = dc.cod_carrito where cc.num_cliente = ?'
+            query = 'select count(*) from carrito_compra  as cc inner join detalle_carrito as dc on cc. id_carrito = dc.cod_carrito where cc.num_cliente = ? and cc.id_estado = 2'
             cursor.execute(query, session['id'])
             rows = cursor.fetchone()
             cursor.close()
@@ -643,7 +654,7 @@ def cargarTabla():
 
     conn = conectar()
     cursor = conn.cursor()
-    query = 'SELECT dc.cod_detalle,p.Imagen, p.nom_producto, dc.cantidad, p.precio, e.NombreEstado FROM carrito_compra AS cc inner join detalle_carrito as dc on cc.id_carrito = dc.cod_carrito INNER JOIN producto AS p ON dc.cod_producto = p.cod_producto INNER JOIN cliente AS c ON cc.num_cliente = c.num_cliente INNER JOIN estado AS e ON cc.id_estado = e.id_estado where cc.num_cliente = ? GROUP BY p.nom_producto, dc.cod_detalle, dc.cantidad, p.precio, e.NombreEstado, p.Imagen;'
+    query = 'SELECT dc.cod_detalle,p.Imagen, p.nom_producto, dc.cantidad, p.precio, e.NombreEstado FROM carrito_compra AS cc inner join detalle_carrito as dc on cc.id_carrito = dc.cod_carrito INNER JOIN producto AS p ON dc.cod_producto = p.cod_producto INNER JOIN cliente AS c ON cc.num_cliente = c.num_cliente INNER JOIN estado AS e ON cc.id_estado = e.id_estado where cc.num_cliente = ? and cc.id_estado = 2 GROUP BY p.nom_producto, dc.cod_detalle, dc.cantidad, p.precio, e.NombreEstado, p.Imagen;'
     cursor.execute(query,(session['id']))
     datos = cursor.fetchall()
 

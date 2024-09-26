@@ -204,6 +204,115 @@ input[type="text"] {
 .info{
   font-size: 20px;
 }
+/* 
+TIMELINE */
+
+.timeline {
+  list-style-type: none;
+  display: flex;
+  padding: 0;
+  text-align: center;
+  justify-content: space-between; /* Distribuir equitativamente las etapas */
+}
+
+.timeline li {
+  transition: all 200ms ease-in;
+}
+
+.timestamp {
+  width: 100%;
+  margin-bottom: 10px;
+  padding: 0px 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-weight: 100;
+}
+
+.status {
+  padding: 0px 20px;
+  display: flex;
+  justify-content: center;
+  border-top: 2px solid #212529;
+  position: relative;
+  transition: all 200ms ease-in;
+}
+
+.status span {
+  font-weight: 600;
+  padding-top: 10px;
+}
+
+/* Estilo para el círculo en estados activos */
+.status.activo span:before {
+  content: '';
+  width: 15px;
+  height: 15px;
+  background-color: #212529;
+  border-radius: 50%;
+  border: 2px solid #212529;
+  position: absolute;
+  top: -10px;
+  left: calc(50% - 7.5px);
+  transition: all 200ms ease-in;
+}
+
+/* Estilo para el círculo en estados inactivos */
+.status.inactivo span:before {
+  content: '';
+  width: 15px;
+  height: 15px;
+  background-color: #e8eeff;
+  border-radius: 50%;
+  border: 2px solid #212529;
+  position: absolute;
+  top: -10px;
+  left: calc(50% - 7.5px);
+  transition: all 200ms ease-in;
+}
+
+.swiper-container {
+  width: 100%;
+  height: 150px;
+  margin: 30px 0;
+  overflow: hidden;
+  padding: 0 10px 20px 10px;
+}
+
+/* Asegurar que todas las etapas tengan el mismo tamaño */
+.swiper-slide {
+  flex: 1 1 auto; /* Todas las slides ocupan el mismo espacio */
+  text-align: center;
+  font-size: 14px;
+  min-width: 150px; /* Ancho mínimo para cada slide */
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .timeline {
+    flex-direction: column;
+  }
+
+  .swiper-slide {
+    width: 100%; /* Ocupa todo el ancho en pantallas pequeñas */
+    margin-bottom: 20px;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 992px) {
+  .swiper-slide {
+    flex: 1 1 auto; /* Mantiene el mismo tamaño en pantallas medianas */
+  }
+}
+
+
+
+
+
+
+
+/* END TIMELINE */
 
 
 
