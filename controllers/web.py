@@ -50,6 +50,51 @@ def home():
 def tienda():
     return render_template('web/tienda.html')
 
+
+# LOGIN 
+
+@bp.route('/login', methods=['POST'])
+def login():
+    if request.method == "POST":
+        usuario = request.form['usuario']
+        contraseña = request.form['pass']
+
+        if usuario == "" or contraseña == "":
+            return render_template('login.html', errorlogin=1)
+        else:
+            conn = conectar()
+            cursor = conn.cursor()
+            query = 'select c.num_cliente,c.nombres_cliente,c.apellidos_cliente,c.correo_cliente,c.telefono,cred.contrasena,r.nombre_rol from credenciales as cred inner join cliente as c on cred.id_credencial = c.id_credencial inner join roles as r on cred.rol = r.cod_rol where cred.usuario = ? AND c.id_estado = 1'
+            cursor.execute(query, usuario)
+            rows = cursor.fetchone()
+            cursor.close()
+            conn.close()
+            print(rows)
+            if rows:
+                if len(rows) == 0 or not check_password_hash(rows[5], contraseña):
+                    return 'error'
+                else:
+                    session['id'] = rows[0]
+                    session['nombre'] = rows[1]
+                    session["pass"] = contraseña
+                    session['rol'] = rows[6]
+
+                    if session['rol'] == 'administrador' or session['rol'] != 'usuario':
+                         return redirect('/sistema')  # Cambia esto por la ruta correcta de sistema.py
+                    else:
+                        #session['last_seen'] = datetime.now()
+                        
+                        return 'exito'
+
+                    
+            else:
+               return 'error'
+    return 'error'
+
+
+
+# FIN LOGIN
+
 # Buscador de la tienda
 @bp.route('/buscarProducto', methods=['POST'])
 def buscarProducto():
@@ -68,7 +113,7 @@ def buscarProducto():
     else:
         return "No"
     
-    return render_template('web/buscador_productos.html')
+    
 
 # Fin buscador de la tienda
 # Llamado detalle del producto
@@ -92,7 +137,7 @@ def detalleProducto():
     else:
         return "No"
     
-    return render_template('web/otros/buscador_productos.html')
+    
 
 # Fin buscador de la tienda
 

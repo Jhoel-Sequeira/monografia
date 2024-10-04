@@ -1,0 +1,251 @@
+<div class="modal fade" id="modalAgregarProducto" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-fullscreen-md-down">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">Agregar Producto</h5>
+                <button type="button" class="btn-close" id="cerrar" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class=" cuerpo-modal" style="background-color: white;">
+                    <div class="row mt-2">
+                        <div class="col">
+                            <label class="form-label breadcrumb" for="form3Example2"><strong>Nombre</strong></label>
+                            <input type="text" id="nombre" class="form-control">
+
+                        </div>
+
+                    </div>
+                    <div class="row mt-2">
+
+                        <div class="col">
+                            <label class="form-label breadcrumb" for="form3Example2"><strong>Proveedor</strong></label>
+                            <select class="form-select" id="proveedor" data-placeholder="Seleccione un rol">
+                                {% for proveedor in proveedores %}
+
+                                <option value="{{ proveedor.cod_proveedor}}">{{ proveedor.nom_proveedor }}</option>
+                                {% endfor %}
+                            </select>
+
+
+
+
+                        </div>
+
+                        <div class="col">
+                            <label class="form-label breadcrumb" for="form3Example2"><strong>
+                                    Categoría</strong></label>
+
+                            <select class="form-select" id="categoria" data-placeholder="Seleccione un rol">
+                                {% for categoria in categorias %}
+
+                                <option value="{{ categoria.cod_tipo }}">{{ categoria.tipos }}</option>
+                                {% endfor %}
+                            </select>
+
+                        </div>
+
+
+
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col">
+                            <label class="form-label breadcrumb" for="form3Example2"
+                                style="margin-top: 20px;"><strong>Precio</strong></label>
+                            <input type="text" id="precio" class="form-control">
+
+
+                        </div>
+                        <div class="col">
+                            <label class="form-label breadcrumb" for="form3Example2"
+                                style="margin-top: 20px;"><strong>Stock <i class="ti ti-login"></i></strong> <i
+                                    class="ti ti-exclamation-mark"></i></label>
+
+
+                            <input type="text" id="stock" class="form-control">
+
+                        </div>
+                        <div class="col" id="bas">
+                            <div class="row">
+                                <div class="col ">
+                                    <label class="form-label breadcrumb" for="form3Example2"
+                                        style="margin-top: 20px;"><strong>Stock critico</strong> </label>
+
+                                    <input type="text" id="stock_critico" class="form-control">
+
+
+                                </div>
+
+
+                            </div>
+
+                        </div>
+                        <div class="col" id="bas">
+                            <div class="row">
+                                <div class="col ">
+                                    <label class="form-label breadcrumb" for="form3Example2"
+                                        style="margin-top: 20px;"><strong>Unidad</strong> </label>
+
+                                    <select class="form-select" id="unidad" data-placeholder="Seleccione un rol">
+                                        {% for unidad in unidades %}
+
+                                        <option value="{{ unidad.cod_unidad }}">{{ unidad.nombre }}</option>
+                                        {% endfor %}
+                                    </select>
+
+                                </div>
+
+
+                            </div>
+
+                        </div>
+
+
+                    </div>
+                    <div class="col" id="bas">
+
+                        <label class="form-label breadcrumb" for="form3Example2"
+                            style="margin-top: 20px;"><strong>Imagen del producto</strong> </label>
+                        <div class="col">
+                            <div class="mb-3">
+                                <input class="form-control" type="file" id="formFile" accept="image/jpeg, image/png"
+                                    onchange="validateImage(this)">
+                                <span id="noAdmitido" class="error d-none">Archivo no admitido</span>
+                            </div>
+
+                        </div>
+                        <div class="col d-flex justify-content-center">
+                            <img id="imagePreview" src="" alt="Vista previa de la imagen" style="display: none; width: 370px; height: 480px;">
+                        </div>
+                        
+
+                    </div>
+                </div>
+            </div>
+            <input type="hidden" id="tienda" value="0">
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" id="uploadBtn" style="display:none;" onclick="uploadImage()">Subir Imagen</button>
+                <button type="button" id="toggle-btn" onclick="habilitar()" class="btn "
+                    style="background-color: blueviolet; color: white;">Habilitar en Página</button>
+                <button type="button" onclick="agregarProducto()" class="btn btn-primary">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function validateImage(input) {
+        const file = input.files[0];
+        const imgPreview = document.getElementById('imagePreview');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        // Verificar que se subió un archivo
+        if (file) {
+            const fileReader = new FileReader();
+
+            // Cuando se lea el archivo, se mostrará la vista previa de la imagen
+            fileReader.onload = function (e) {
+                imgPreview.src = e.target.result;
+                imgPreview.style.display = 'block'; // Mostrar la imagen
+
+                const img = new Image();
+                img.onload = function () {
+                    // Redimensionar la imagen
+                    canvas.width = 370;  // Nuevo ancho
+                    canvas.height = 480; // Nueva altura
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+                    // Mostrar el botón de subir imagen
+                    document.getElementById('uploadBtn').style.display = 'block';
+                }
+                img.src = e.target.result;
+            };
+
+            fileReader.readAsDataURL(file); // Leer el archivo como URL de datos
+        } else {
+            imgPreview.src = '';
+            imgPreview.style.display = 'none'; // Ocultar la imagen si no hay archivo
+        }
+    }
+
+    function uploadImage() {
+        const canvas = document.getElementById('canvas');
+        const dataURL = canvas.toDataURL('image/jpeg'); // Convertir el canvas a URL de datos
+
+        // Aquí puedes enviar `dataURL` al servidor usando fetch o XMLHttpRequest
+        fetch('/upload', { // Cambia esta URL por la ruta de tu servidor
+            method: 'POST',
+            body: JSON.stringify({ image: dataURL }),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => {
+                if (response.ok) {
+                    alert('Imagen subida con éxito');
+                } else {
+                    alert('Error al subir la imagen');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }
+    function habilitar() {
+        if ($('#tienda').val() == 0) {
+            $('#tienda').val(1);
+            $('#toggle-btn').text('Quitar en página')
+        } else {
+            $('#tienda').val(0);
+            $('#toggle-btn').text('Habilitar en Página')
+        }
+        $('#toggle-btn').toggleClass('pressed');
+    }
+    function agregarProducto() {
+        if ($('#nombre').val() == '' || $("#categoria option:selected").val() == '' || $("#proveedor option:selected").val() == '' || $("#unidad option:selected").val() == '' || $("#precio").val() == '' || $("#stock").val() == '' || $("#stock_critico").val() == '') {
+            Swal.fire({ icon: 'error', title: 'Error', confirmButtonText: 'Ok', text: 'Debe rellenar todos los campos' }).then((result) => { /* Read more about isConfirmed, isDenied below */
+                if (result.isConfirmed) {
+
+                }
+            })
+        } else {
+
+            var formData = new FormData();
+            formData.append('nombre', $('#nombre').val());
+            formData.append('stock', $('#stock').val());
+            formData.append('tienda', $('#tienda').val());
+            formData.append('precio', $('#precio').val());
+            formData.append('categoria', $('#categoria option:selected').val());
+            formData.append('unidad', $('#unidad option:selected').val());
+            formData.append('proveedor', $("#proveedor option:selected").val());
+            formData.append('critico', $("#stock_critico ").val());
+            var fileInput = $('#formFile')[0];
+            if (fileInput.files.length > 0) {
+                formData.append('imagen', $('#formFile')[0].files[0]);
+            } else {
+                formData.append('imagen', '-');
+            }
+            $.ajax({
+                url: "{{ url_for('sistema.guardarProducto') }}",
+                type: "POST",
+                data: formData,
+                contentType: false,  // Importante: no configurar el tipo de contenido
+                processData: false,
+
+                success: function (response) {
+                    Swal.fire({ icon: 'success', title: 'Exito', confirmButtonText: 'Ok', text: 'Usuario Actualizado' }).then((result) => { /* Read more about isConfirmed, isDenied below */
+                        if (result.isConfirmed) {
+                            cargarInventario();
+                            $('#cerrar').click();
+                        }
+                    })
+                },
+                error: function (error) { // console.log(error);
+                }
+            });
+
+        }
+    }
+</script>

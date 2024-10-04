@@ -74,16 +74,23 @@
         <div class="icons1">
             <div class="fas fa-bars" id="menu-btn1"></div>
             <!-- onclick="carritoUsuario()" -->
-            <a  href="/carrito" class="fas fa-shopping-cart" >
-                <span  id="cart-count" class="cart-count"></span>
+             {%if session%}
+            
+            <a   href="/carrito"  class="fas fa-shopping-cart" ></a>
+                <span  id="cart-count" class="cart-count">0</span>
             </a>
+            {%else%}
+            <a   onclick="log()" class="fas fa-shopping-cart" ></a>
+                <span  id="cart-count" class="cart-count">0</span>
+            </a>
+            {%endif%}
             <div class="fas fa-user" onclick="log()" id="login-btn"></div>
         </div>
         <!-- inicio de login de usuario -->
         <form action="/login" method="POST" id="login" class="login-form">
             <h3>Inicia Sesion</h3>
-            <input type="text" name="loginUser" placeholder="ingrese su usuario" id="" class="box">
-            <input type="password" name="loginPassword" placeholder="ingrese su contraseña" id="" class="box">
+            <input type="text" name="usuario" placeholder="ingrese su usuario" id="" class="box">
+            <input type="password" name="pass" placeholder="ingrese su contraseña" id="" class="box">
             <div class="remember">
                 <input type="checkbox" name="" id="remember-me">
                 <label for="remember-me">recordarme</label>
@@ -267,6 +274,32 @@
     $(document).ready(function () {
         // cargarChatbot();    
     });
+    function log(){
+        $.ajax({
+            url: "{{ url_for('web.carritoTotal') }}",
+            type: "POST",
+            data: {
+                usuario: ,
+                pass: 
+            },
+            success: function (response) {
+
+                // Cargar el nuevo contenido en el modal
+                $("#modalCarrito").html(response);
+                $("#modalCarrito").append(response.htmlresponse);
+
+                $('#llamarCarrito').click();
+
+
+
+
+
+            },
+            error: function (error) {
+                // console.log(error);
+            },
+        });
+    }
     function cargarChatbot() {
         $.ajax({
             url: "/cargarChatBot",

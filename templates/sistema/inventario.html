@@ -1,0 +1,55 @@
+{% extends "sistema/layout.html" %}
+
+
+{% block contenido %}
+<div class="container-fluid">
+    <!--  Row 1 -->
+    <div class="row">
+    </div>
+    <div class="row" id="mostrar_inventario">
+    </div>
+</div>
+<input id="launchModal" type="hidden" data-bs-toggle="modal" data-bs-target="#modalAgregarProducto">
+<div id="modal-producto"></div>
+<script>
+    $(document).ready(function () {
+
+        cargarInventario();
+
+    });
+    function cargarInventario() {
+        $.ajax({
+            url: "{{ url_for('sistema.tablaProductos') }}",
+            type: "POST",
+            data: {
+            },
+            success: function (response) {
+                $("#mostrar_inventario").html(response);
+                $("#mostrar_inventario").append(response.htmlresponse);
+
+            },
+            error: function (error) {
+                // console.log(error);
+            },
+        });
+    }
+    function agregarProducto() {
+        $.ajax({
+            url: "{{ url_for('sistema.modalAgregarProducto') }}",
+            type: "POST",
+            data: {
+            },
+            success: function (response) {
+                $("#modal-producto").html(response);
+                $("#modal-producto").append(response.htmlresponse);
+                $('#launchModal').click();
+
+            },
+            error: function (error) {
+                // console.log(error);
+            },
+        });
+    }
+</script>
+
+{% endblock %}

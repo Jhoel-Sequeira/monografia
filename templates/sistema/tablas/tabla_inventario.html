@@ -1,0 +1,89 @@
+<div class="col-lg d-flex align-items-stretch">
+    <div class="card w-100">
+        <div class="card-body p-4">
+            <div class="d-sm-flex d-block align-items-center justify-content-between mb-9">
+                <h5 class="card-title fw-semibold mb-4">Productos</h5>
+                <select class="form-select" id="agruparEntrada" data-placeholder="Seleccione una actividad">
+
+
+
+                </select>
+                <button class="btn btn-primary" onclick="agregarProducto()">Agregar</button>
+                
+            </div>
+            
+            <div class="table-responsive">
+                <table class="table text-nowrap mb-0 align-middle">
+                    <thead class="text-dark fs-4">
+                        <tr>
+                            <th class="border-bottom-0">
+                                <h6 class="fw-semibold mb-0">cod</h6>
+                            </th>
+                            <th class="border-bottom-0">
+                                <h6 class="fw-semibold mb-0">Producto</h6>
+                            </th>
+                            <th class="border-bottom-0">
+                                <h6 class="fw-semibold mb-0">Cantidad</h6>
+                            </th>
+                            <th class="border-bottom-0">
+                                <h6 class="fw-semibold mb-0">Stock Critico</h6>
+                            </th>
+                            <th class="border-bottom-0">
+                                <h6 class="fw-semibold mb-0">Unidad</h6>
+                            </th>
+                            <th class="border-bottom-0">
+                                <h6 class="fw-semibold mb-0">Proveedor</h6>
+                            </th>
+                            
+                            <th class="border-bottom-0">
+                                <h6 class="fw-semibold mb-0">Tipo</h6>
+                            </th>
+                            <th class="border-bottom-0">
+                                <h6 class="fw-semibold mb-0">Precio</h6>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {%for producto in productos%}
+                        <tr>
+                            <td class="border-bottom-0">
+                                <span class="fw-normal">{{producto.cod_producto}}</span>   
+                                <!-- <h6 class="fw-semibold mb-0">{{producto.cod_producto}}</h6> -->
+                            </td>
+                            <td class="border-bottom-0">
+                                <span class="fw-normal">{{producto.nom_producto}}</span>   
+                                <!-- <h6 class="fw-semibold mb-1">{{producto.nom_producto}}</h6> -->
+                            </td>
+                            <td class="border-bottom-0">
+                                <span class="fw-normal">{{producto.stock}}</span>  
+                                <!-- <h6 class="fw-semibold mb-1">{{producto.stock}}</h6> -->
+                            </td>
+                            <td class="border-bottom-0">
+                                <span class="fw-normal">{{producto.stock_critico}}</span>  
+                                <!-- <h6 class="fw-semibold mb-1">{{producto.stock_critico}}</h6> -->
+                            </td>
+                            <td class="border-bottom-0">
+                                
+                                <span class="fw-normal">{{producto.unidad}}</span>   
+                                <!-- <h6 class="fw-semibold mb-1">{{producto.nom_proveedor}}</h6> -->
+                            </td>
+                            <td class="border-bottom-0">
+                                <span class="fw-normal">{{producto.nom_proveedor}}</span> 
+                                <!-- <h6 class="fw-semibold mb-1">{{producto.unidad}}</h6> -->
+                            </td>
+                            <td class="border-bottom-0">
+                                <span class="fw-normal">{{producto.tipos}}</span>  
+                                <!-- <h6 class="fw-semibold mb-1">{{producto.tipos}}</h6> -->
+                            </td>
+                            <td class="border-bottom-0">
+                                <span class="fw-normal">{{producto.precio}} C$</span>  
+                                <!-- <h6 class="fw-semibold mb-0 fs-4">{{producto.precio}}</h6> -->
+                            </td>
+                        </tr>
+                        {%endfor%}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
