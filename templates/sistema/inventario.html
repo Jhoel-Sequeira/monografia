@@ -2,15 +2,22 @@
 
 
 {% block contenido %}
-<div class="container-fluid">
+<div class="container-fluid contenedor">
     <!--  Row 1 -->
     <div class="row">
     </div>
     <div class="row" id="mostrar_inventario">
     </div>
 </div>
+<!-- MODALES -->
 <input id="launchModal" type="hidden" data-bs-toggle="modal" data-bs-target="#modalAgregarProducto">
 <div id="modal-producto"></div>
+
+<!-- MODAL DE DETALLE DE PRODUCTOS -->
+<input id="launchDetalle" type="hidden" data-bs-toggle="modal" data-bs-target="#modalDetalleProducto">
+<div id="modal-detalle"></div>
+<!-- FIN DEL MODAL -->
+<!-- FIN DE MODALES -->
 <script>
     $(document).ready(function () {
 

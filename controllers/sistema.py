@@ -102,15 +102,7 @@ def guardarProducto():
     else:
         imagen = request.files['imagen']
 
-    print(Tienda)
-    print(nombre)
-    print(stock1)
-    print(precio)
-    print(unidad)
-    print(categoria)
-    print(proveedor)
-    print(critico)
-    print(imagen)
+   
     if imagen:
             ruta = 'static/web/img/productos/' + imagen.filename
             ruta_completa = os.path.join('static/web/img/productos/', imagen.filename)
@@ -136,5 +128,41 @@ def guardarProducto():
 
 
     return 'Hecho'
+
+# DETALLE DE LOS PRODUCTOS SELECCIONADOS
+@bp.route('/mostrarDetalleProducto', methods=['POST'])
+def mostrarDetalleProducto():
+
+    num = request.form['num']
+
+    conn = conectar()
+    cursor = conn.cursor()
+    query = 'select * from proveedor where id_estado = 1'
+    cursor.execute(query)
+    proveedores = cursor.fetchall()
+
+    conn = conectar()
+    cursor = conn.cursor()
+    query = 'select * from unidades '
+    cursor.execute(query)
+    unidades = cursor.fetchall()
+
+    conn = conectar()
+    cursor = conn.cursor()
+    query = 'select * from tipo '
+    cursor.execute(query)
+    categoria = cursor.fetchall()
+
+    
+
+    conn = conectar()
+    cursor = conn.cursor()
+    query = 'select p.cod_producto,p.nom_producto,p.precio,p.stock,p.stock_critico,prov.nom_proveedor,t.tipos,u.nombre as unidad,e.NombreEstado as estado,p.Imagen,p.tienda from producto as p inner join proveedor as prov on p.cod_proveedor = prov.cod_proveedor inner join tipo as t on p.tipo_producto = t.cod_tipo inner join unidades as u on p.unidad = u.cod_unidad inner join estado as e on p.id_estado = e.id_estado where p.cod_producto = ?'
+    cursor.execute(query,(num))
+    producto = cursor.fetchall()
+
+
+    return render_template('sistema/modales/modal_editar_producto.html', proveedores = proveedores,unidades = unidades,categorias = categoria,producto = producto)
+        
 
 # FIN DEL MODULO DE INVENTARIO

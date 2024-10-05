@@ -447,6 +447,7 @@ code {
 .pressed {
     background-color: #f39c12 !important; /* Cambia el color de fondo cuando esté presionado */
     border-color: #e67e22 !important; /* Cambia el borde */
+    color: white !important;
   }
 
   .pagina{
@@ -19917,6 +19918,10 @@ fieldset:disabled .btn {
     width: 8px;
     height: 8px
 }
+.contenedor{
+    max-width: 1350px !important;
+    margin-left: 80px !important;
+}
 
 @media (max-width:991.98px) {
     .app-header .navbar {
@@ -20100,11 +20105,12 @@ fieldset:disabled .btn {
     }
 
     #main-wrapper[data-layout=vertical][data-header-position=fixed] .app-header {
-        width: calc(100% - 270px)
+        width: calc(100% - 200px);
+        margin-left: 5%;
     }
 
     #main-wrapper[data-layout=vertical][data-sidebartype=full] .body-wrapper {
-        margin-left: 270px
+        margin-left: 150px
     }
 }
 

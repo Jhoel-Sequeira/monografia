@@ -13,7 +13,7 @@
             </div>
             
             <div class="table-responsive">
-                <table class="table text-nowrap mb-0 align-middle">
+                <table class="table text-nowrap mb-0 align-middle" id="tabla_inventario">
                     <thead class="text-dark fs-4">
                         <tr>
                             <th class="border-bottom-0">
@@ -45,7 +45,7 @@
                     </thead>
                     <tbody>
                         {%for producto in productos%}
-                        <tr>
+                        <tr id="{{producto.cod_producto}}">
                             <td class="border-bottom-0">
                                 <span class="fw-normal">{{producto.cod_producto}}</span>   
                                 <!-- <h6 class="fw-semibold mb-0">{{producto.cod_producto}}</h6> -->
@@ -87,3 +87,28 @@
         </div>
     </div>
 </div>
+
+<script>
+    $("#tabla_inventario tr").click(function () {
+        // MANDAMOS A TRAER LOS DATOS
+        var id = $(this).attr("id");
+
+        $.ajax({
+            url: "{{ url_for('sistema.mostrarDetalleProducto') }}",
+            type: "POST",
+            data: {
+                num: id
+
+            },
+            success: function (response) {
+               
+                $('#modal-detalle').html(response);
+                $('#modal-detalle').append(response.htmlresponse);
+                $('#launchDetalle').click();
+            },
+            error: function (error) { // console.log(error);
+            }
+        });
+
+    });
+</script>
