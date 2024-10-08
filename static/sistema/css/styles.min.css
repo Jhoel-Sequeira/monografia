@@ -5407,6 +5407,9 @@ fieldset:disabled .btn {
     cursor: default
 }
 
+div .dataTables_wrapper div.dataTables_filter label{
+	display: none !important;
+}
 .nav-tabs {
     --bs-nav-tabs-border-width: var(--bs-border-width);
     --bs-nav-tabs-border-color: var(--bs-border-color);
@@ -19918,10 +19921,10 @@ fieldset:disabled .btn {
     width: 8px;
     height: 8px
 }
-.contenedor{
+/* .contenedor{
     max-width: 1350px !important;
     margin-left: 80px !important;
-}
+} */
 
 @media (max-width:991.98px) {
     .app-header .navbar {
@@ -20105,12 +20108,12 @@ fieldset:disabled .btn {
     }
 
     #main-wrapper[data-layout=vertical][data-header-position=fixed] .app-header {
-        width: calc(100% - 200px);
-        margin-left: 5%;
+        width: calc(100% - 250px);
+        /* margin-left: 5%; */
     }
 
     #main-wrapper[data-layout=vertical][data-sidebartype=full] .body-wrapper {
-        margin-left: 150px
+        margin-left: 250px
     }
 }
 

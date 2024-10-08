@@ -1,19 +1,19 @@
-{%for producto in producto%}
-<div class="modal fade" id="modalDetalleProducto" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+<div class="modal fade" id="modalAgregarVenta" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"data-bs-focus="false"
     aria-labelledby="staticBackdropLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-fullscreen-md-down">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="staticBackdropLabel">Detalle Producto</h5>
+                <h5 class="modal-title" id="staticBackdropLabel">Agregar Venta</h5>
                 <button type="button" class="btn-close" id="cerrar" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <input type="hidden" name="" value="{{producto.cod_producto}}" id="id">
                 <div class=" cuerpo-modal" style="background-color: white;">
                     <div class="row mt-2">
                         <div class="col">
-                            <label class="form-label breadcrumb" for="form3Example2"><strong>Nombre</strong></label>
-                            <input type="text" id="nombre" value="{{producto.nom_producto}}" class="form-control">
+                            <label class="form-label breadcrumb" for="form3Example2"><strong>Cliente</strong>
+                                <i class="ti ti-circle-plus" style="color: red;" data-bs-target="#unidadNuevoModal"
+                                data-bs-toggle="modal" data-bs-dismiss="modal"></i></label>
+                            <input type="text" id="nombre" class="form-control">
 
                         </div>
 
@@ -24,12 +24,8 @@
                             <label class="form-label breadcrumb" for="form3Example2"><strong>Proveedor</strong></label>
                             <select class="form-select" id="proveedor" data-placeholder="Seleccione un rol">
                                 {% for proveedor in proveedores %}
-                                {% if producto.nom_proveedor in proveedor %}
-                                <option value="{{ proveedor.cod_proveedor }}" selected>{{ proveedor.nom_proveedor }}
-                                </option>
-                                {% else %}
-                                <option value="{{ proveedor.cod_proveedor }}">{{ proveedor.nom_proveedor }}</option>
-                                {% endif %}
+
+                                <option value="{{ proveedor.cod_proveedor}}">{{ proveedor.nom_proveedor }}</option>
                                 {% endfor %}
                             </select>
 
@@ -44,12 +40,8 @@
 
                             <select class="form-select" id="categoria" data-placeholder="Seleccione un rol">
                                 {% for categoria in categorias %}
-                                {% if producto.tipos in categoria %}
-                                <option value="{{ categoria.cod_tipo }}" selected>{{ categoria.tipos }}
-                                </option>
-                                {% else %}
+
                                 <option value="{{ categoria.cod_tipo }}">{{ categoria.tipos }}</option>
-                                {% endif %}
                                 {% endfor %}
                             </select>
 
@@ -62,7 +54,7 @@
                         <div class="col">
                             <label class="form-label breadcrumb" for="form3Example2"
                                 style="margin-top: 20px;"><strong>Precio</strong></label>
-                            <input type="text" id="precio" value="{{producto.precio}}" class="form-control">
+                            <input type="text" id="precio" class="form-control">
 
 
                         </div>
@@ -72,7 +64,7 @@
                                     class="ti ti-exclamation-mark"></i></label>
 
 
-                            <input type="text" id="stock" value="{{producto.stock}}" class="form-control">
+                            <input type="text" id="stock" class="form-control">
 
                         </div>
                         <div class="col" id="bas">
@@ -81,8 +73,7 @@
                                     <label class="form-label breadcrumb" for="form3Example2"
                                         style="margin-top: 20px;"><strong>Stock critico</strong> </label>
 
-                                    <input type="text" id="stock_critico" value="{{producto.stock_critico}}"
-                                        class="form-control">
+                                    <input type="text" id="stock_critico" class="form-control">
 
 
                                 </div>
@@ -99,12 +90,8 @@
 
                                     <select class="form-select" id="unidad" data-placeholder="Seleccione un rol">
                                         {% for unidad in unidades %}
-                                        {% if producto.unidad in unidad %}
-                                        <option value="{{ unidad.cod_unidad }}" selected>{{ unidad.nombre }}
-                                        </option>
-                                        {% else %}
+
                                         <option value="{{ unidad.cod_unidad }}">{{ unidad.nombre }}</option>
-                                        {% endif %}
                                         {% endfor %}
                                     </select>
 
@@ -119,141 +106,42 @@
                     </div>
                     <div class="col" id="bas">
 
-                        <label class="form-label breadcrumb" for="form3Example2" style="margin-top: 20px;">
-                            <strong>Imagen del producto</strong>
-                        </label>
+                        <label class="form-label breadcrumb" for="form3Example2"
+                            style="margin-top: 20px;"><strong>Imagen del producto</strong> </label>
                         <div class="col">
                             <div class="mb-3">
                                 <input class="form-control" type="file" id="formFile" accept="image/jpeg, image/png"
                                     onchange="validateImage(this)">
                                 <span id="noAdmitido" class="error d-none">Archivo no admitido</span>
                             </div>
-                            <!-- Campo oculto para almacenar la imagen original -->
-                            <input type="hidden" id="originalImage" name="originalImage" value="{{producto.Imagen}}">
+
                         </div>
                         <div class="col d-flex justify-content-center">
-                            <img id="imagePreview" src="{{producto.Imagen}}" alt="Vista previa de la imagen"
-                                style="width: 370px; height: 480px;">
+                            <img id="imagePreview" src="" alt="Vista previa de la imagen" style="display: none; width: 370px; height: 480px;">
                         </div>
-
+                        
 
                     </div>
                 </div>
             </div>
-            <input type="hidden" id="tienda" value="0">
+           <input type="hidden" id="tienda" value="0">
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 <button type="button" id="uploadBtn" style="display:none;" onclick="uploadImage()">Subir Imagen</button>
-                <button type="button" id="desbloquear" class="btn "
-                    style="background-color: rgb(47, 133, 155); color: white;">Desbloquear</button>
-                {%if producto.tienda == 'No'%}
                 <button type="button" id="toggle-btn" onclick="habilitar()" class="btn "
                     style="background-color: blueviolet; color: white;">Habilitar en Página</button>
-                {%else%}
-                <button type="button" id="toggle-btn" onclick="habilitar()" class="btn pressed">Quitar en
-                    Página</button>
-                {%endif%}
-                <button type="button" id="guardar" onclick="guardar()" class="btn btn-primary">Actualizar</button>
-                <!-- <button type="button" id="agregar" onclick="agregarProducto()" class="btn btn-primary">Guardar</button> -->
+                <button type="button" onclick="agregarProducto()" class="btn btn-primary">Guardar</button>
             </div>
         </div>
     </div>
 </div>
-{%endfor%}
+<!-- MODALES -->
+
+  <!-- FIN MODALES -->
+
+
 
 <script>
-    document.querySelectorAll('.cuerpo-modal input, .cuerpo-modal select, .cuerpo-modal file').forEach(element => {
-        element.disabled = true;
-    });
-    var isDisabled = false; // Iniciamos con los elementos desactivados
-
-    // Verifica si la variable ya está definida
-    if (typeof isDisabled === 'undefined') {
-        var isDisabled = false; // Iniciamos con los elementos desactivados
-    }
-
-    document.querySelectorAll('.cuerpo-modal input, .cuerpo-modal select, .cuerpo-modal file').forEach(element => {
-        element.disabled = true;
-    });
-
-    document.getElementById('desbloquear').addEventListener('click', function () {
-        // Alternar entre bloqueado y desbloqueado
-        document.querySelectorAll('.cuerpo-modal input, .cuerpo-modal select, .cuerpo-modal file').forEach(element => {
-            element.disabled = isDisabled;
-        });
-
-        // Cambiar el texto del botón según el estado
-        if (isDisabled) {
-            this.textContent = 'Desbloquear'; // Cambia el texto a "Bloquear"
-        } else {
-            this.textContent = 'Bloquear'; // Cambia el texto a "Desbloquear"
-        }
-
-        // Invertir el valor de isDisabled
-        isDisabled = !isDisabled;
-    });
-
-
-    function guardar() {
-        if ($('#nombre').val() == '' || $("#categoria option:selected").val() == '' || $("#proveedor option:selected").val() == '' || $("#unidad option:selected").val() == '' || $("#precio").val() == '' || $("#stock").val() == '' || $("#stock_critico").val() == '') {
-            Swal.fire({ icon: 'error', title: 'Error', confirmButtonText: 'Ok', text: 'Debe rellenar todos los campos' }).then((result) => {
-                if (result.isConfirmed) {
-                    // Acciones si el usuario confirma
-                }
-            });
-        } else {
-            var formData = new FormData();
-            formData.append('nombre', $('#nombre').val());
-            formData.append('num', $('#id').val());
-            formData.append('stock', $('#stock').val());
-            formData.append('tienda', $('#tienda').val());
-            formData.append('precio', $('#precio').val());
-            formData.append('categoria', $('#categoria option:selected').val());
-            formData.append('unidad', $('#unidad option:selected').val());
-            formData.append('proveedor', $('#proveedor option:selected').val());
-            formData.append('critico', $('#stock_critico').val());
-
-            var fileInput = $('#formFile')[0];
-
-            // Si no hay imagen seleccionada, no enviamos el campo 'imagen'
-            if (fileInput.files.length > 0) {
-                // Si hay una nueva imagen seleccionada, la añadimos al formData
-                formData.append('imagen', fileInput.files[0]);
-            }
-
-            // Para verificar qué datos se están enviando
-            formData.forEach((value, key) => {
-                console.log(key + ': ' + value);
-            });
-
-            $.ajax({
-                url: "{{ url_for('sistema.actualizarProducto') }}",  // Ajusta esta URL según tu ruta
-                type: "POST",
-                data: formData,
-                contentType: false,  // No configuramos el tipo de contenido
-                processData: false,   // Evitamos que jQuery procese los datos
-
-                success: function (response) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Éxito',
-                        confirmButtonText: 'Ok',
-                        text: 'Producto Actualizado'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            cargarInventario();  // Recargar el inventario
-                            $('#cerrar').click();  // Cerrar el modal
-                        }
-                    });
-                },
-                error: function (error) {
-                    console.log(error);
-                }
-            });
-        }
-    }
-
-
     function validateImage(input) {
         const file = input.files[0];
         const imgPreview = document.getElementById('imagePreview');
@@ -347,7 +235,7 @@
                 formData.append('imagen', '-');
             }
             $.ajax({
-                url: "{{ url_for('sistema.mostrarDetalleProducto') }}",
+                url: "{{ url_for('sistema.guardarProducto') }}",
                 type: "POST",
                 data: formData,
                 contentType: false,  // Importante: no configurar el tipo de contenido

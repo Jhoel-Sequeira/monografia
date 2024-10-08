@@ -2,9 +2,9 @@
     <div class="card w-100">
         <div class="card-body p-4">
             <div class="d-sm-flex d-block align-items-center justify-content-between mb-9">
-                <h5 class="card-title fw-semibold mb-4">Productos</h5>
+                <h5 class="card-title fw-semibold mb-4">Ventas</h5>
                 
-                <button class="btn btn-primary" onclick="agregarProducto()">Agregar</button>
+                <button class="btn btn-primary" onclick="agregarVenta()">Nueva</button>
 
             </div>
 
@@ -16,65 +16,49 @@
                                 <h6 class="fw-semibold mb-0">cod</h6>
                             </th>
                             <th class="border-bottom-0">
-                                <h6 class="fw-semibold mb-0">Producto</h6>
+                                <h6 class="fw-semibold mb-0">Cliente</h6>
                             </th>
                             <th class="border-bottom-0">
-                                <h6 class="fw-semibold mb-0">Cantidad</h6>
+                                <h6 class="fw-semibold mb-0">Vendedor</h6>
                             </th>
                             <th class="border-bottom-0">
-                                <h6 class="fw-semibold mb-0">Stock Critico</h6>
+                                <h6 class="fw-semibold mb-0">Total</h6>
                             </th>
                             <th class="border-bottom-0">
-                                <h6 class="fw-semibold mb-0">Unidad</h6>
-                            </th>
-                            <th class="border-bottom-0">
-                                <h6 class="fw-semibold mb-0">Proveedor</h6>
-                            </th>
-
-                            <th class="border-bottom-0">
-                                <h6 class="fw-semibold mb-0">Tipo</h6>
-                            </th>
-                            <th class="border-bottom-0">
-                                <h6 class="fw-semibold mb-0">Precio</h6>
+                                <h6 class="fw-semibold mb-0">Estado</h6>
                             </th>
                         </tr>
                     </thead>
                     <tbody>
-                        {%for producto in productos%}
-                        <tr id="{{producto.cod_producto}}">
+                        {%for venta in ventas%}
+                        <tr id="{{venta.cod_producto}}">
                             <td class="border-bottom-0">
-                                <span class="fw-normal">{{producto.cod_producto}}</span>
+                                <span class="fw-normal">{{venta.cod_producto}}</span>
                                 <!-- <h6 class="fw-semibold mb-0">{{producto.cod_producto}}</h6> -->
                             </td>
                             <td class="border-bottom-0">
-                                <span class="fw-normal">{{producto.nom_producto}}</span>
+                                <span class="fw-normal">{{venta.cliente}}</span>
                                 <!-- <h6 class="fw-semibold mb-1">{{producto.nom_producto}}</h6> -->
                             </td>
                             <td class="border-bottom-0">
-                                <span class="fw-normal">{{producto.stock}}</span>
+                                <span class="fw-normal">{{venta.fecha_venta}}</span>
                                 <!-- <h6 class="fw-semibold mb-1">{{producto.stock}}</h6> -->
                             </td>
                             <td class="border-bottom-0">
-                                <span class="fw-normal">{{producto.stock_critico}}</span>
+                                <span class="fw-normal">{{venta.vendedor}}</span>
                                 <!-- <h6 class="fw-semibold mb-1">{{producto.stock_critico}}</h6> -->
                             </td>
                             <td class="border-bottom-0">
 
-                                <span class="fw-normal">{{producto.unidad}}</span>
+                                <span class="fw-normal">{{venta.total}}</span>
                                 <!-- <h6 class="fw-semibold mb-1">{{producto.nom_proveedor}}</h6> -->
                             </td>
                             <td class="border-bottom-0">
-                                <span class="fw-normal">{{producto.nom_proveedor}}</span>
-                                <!-- <h6 class="fw-semibold mb-1">{{producto.unidad}}</h6> -->
+
+                                <span class="fw-normal">{{venta.estado}}</span>
+                                <!-- <h6 class="fw-semibold mb-1">{{producto.nom_proveedor}}</h6> -->
                             </td>
-                            <td class="border-bottom-0">
-                                <span class="fw-normal">{{producto.tipos}}</span>
-                                <!-- <h6 class="fw-semibold mb-1">{{producto.tipos}}</h6> -->
-                            </td>
-                            <td class="border-bottom-0">
-                                <span class="fw-normal">{{producto.precio}} C$</span>
-                                <!-- <h6 class="fw-semibold mb-0 fs-4">{{producto.precio}}</h6> -->
-                            </td>
+                            
                         </tr>
                         {%endfor%}
                     </tbody>
@@ -83,6 +67,39 @@
         </div>
     </div>
 </div>
+<div class="modal fade" id="exampleModalToggle" aria-hidden="true" aria-labelledby="exampleModalToggleLabel" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalToggleLabel">Modal 1</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          Show a second modal and hide this one with the button below.
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-primary" data-bs-target="#exampleModalToggle2" data-bs-toggle="modal" data-bs-dismiss="modal">Open second modal</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="exampleModalToggle2" aria-hidden="true" aria-labelledby="exampleModalToggleLabel2" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalToggleLabel2">Modal 2</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          Hide this modal and show the first with the button below.
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-primary" data-bs-target="#exampleModalToggle" data-bs-toggle="modal" data-bs-dismiss="modal">Back to first</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <button class="btn btn-primary" data-bs-target="#exampleModalToggle" data-bs-toggle="modal" data-bs-dismiss="modal">Open second modal</button>
 
 <script>
     var table = $('#tabla_inventario').DataTable({

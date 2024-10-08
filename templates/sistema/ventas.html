@@ -6,11 +6,11 @@
     <!--  Row 1 -->
     <div class="row">
     </div>
-    <div class="row" id="mostrar_inventario">
+    <div class="row" id="mostrar_ventas">
     </div>
 </div>
 <!-- MODALES -->
-<input id="launchModal" type="hidden" data-bs-toggle="modal" data-bs-target="#modalAgregarProducto">
+<input id="launchModal" type="hidden" data-bs-toggle="modal" data-bs-target="#modalAgregarVenta">
 <div id="modal-producto"></div>
 
 <!-- MODAL DE DETALLE DE PRODUCTOS -->
@@ -21,7 +21,7 @@
 <script>
     $(document).ready(function () {
 
-        cargarInventario();
+        cargarCompras();
 
     });
     function buscarRegistros() {
@@ -31,15 +31,15 @@
         $('#tabla_inventario').DataTable().search(searchTerm).draw();
     };
     $('#Buscador').on('keyup', buscarRegistros)
-    function cargarInventario() {
+    function cargarCompras() {
         $.ajax({
-            url: "{{ url_for('sistema.tablaProductos') }}",
+            url: "{{ url_for('sistema.tablaCompras') }}",
             type: "POST",
             data: {
             },
             success: function (response) {
-                $("#mostrar_inventario").html(response);
-                $("#mostrar_inventario").append(response.htmlresponse);
+                $("#mostrar_ventas").html(response);
+                $("#mostrar_ventas").append(response.htmlresponse);
 
             },
             error: function (error) {
@@ -47,9 +47,9 @@
             },
         });
     }
-    function agregarProducto() {
+    function agregarVenta() {
         $.ajax({
-            url: "{{ url_for('sistema.modalAgregarProducto') }}",
+            url: "{{ url_for('sistema.modalAgregarVenta') }}",
             type: "POST",
             data: {
             },

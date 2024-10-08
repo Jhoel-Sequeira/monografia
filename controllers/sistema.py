@@ -163,6 +163,122 @@ def mostrarDetalleProducto():
 
 
     return render_template('sistema/modales/modal_editar_producto.html', proveedores = proveedores,unidades = unidades,categorias = categoria,producto = producto)
+
+# EDITAR PRODUCTOS
+@bp.route('/actualizarProducto', methods=['POST'])
+def actualizarProducto():
+    try:
+        # Recoger datos del formulario
+        nombre = request.form['nombre']
+        num = request.form['num']
+        stock1 = request.form['stock']
+        tienda = request.form['tienda']
+        precio = request.form['precio']
+        unidad = request.form['unidad']
+        categoria = request.form['categoria']
+        proveedor = request.form['proveedor']
+        critico = request.form['critico']
         
+        # Recoger la imagen (si está disponible)
+        imagen = request.files.get('imagen')  # Usar get para evitar errores si no existe
+
+        # Determinar si es para la tienda
+        Tienda = 'Si' if tienda == '1' else 'No'
+
+        # Conectar a la base de datos
+        conn = conectar()
+        cursor = conn.cursor()
+
+        # Verificar si se ha subido una nueva imagen
+        if imagen and imagen.filename != '':
+            # Crear la ruta completa para guardar la imagen
+            ruta = os.path.join('static', 'web', 'img', 'productos', imagen.filename)
+            imagen.save(ruta)
+        else:
+            # Si no se sube imagen, mantener la imagen anterior del producto
+            cursor.execute("SELECT imagen FROM producto WHERE cod_producto = ?", (num,))
+            ruta = cursor.fetchone()[0]  # Obtener la ruta de la imagen actual
+
+        # Query de actualización del producto
+        query = '''
+        UPDATE producto
+        SET nom_producto = ?, id_estado = ?, cod_proveedor = ?, tipo_producto = ?, 
+            precio = ?, stock_critico = ?, stock = ?, imagen = ?, unidad = ?, tienda = ?
+        WHERE cod_producto = ?
+        '''
+        
+        # Ejecutar la consulta SQL
+        cursor.execute(query, (nombre, 1, proveedor, categoria, precio, critico, stock1, ruta, unidad, Tienda, num))
+        conn.commit()
+
+        # Cerrar la conexión
+        cursor.close()
+        conn.close()
+
+        return 'Producto actualizado correctamente'
+
+    except Exception as e:
+        # Manejo de errores
+        print(f"Error al actualizar el producto: {e}")
+        return 'Error al actualizar el producto', 500
+
+# FIN DE EDITAR      
 
 # FIN DEL MODULO DE INVENTARIO
+
+# INICIO DEL MODULO DE VENTAS
+@bp.route('/ventas')
+@login_required
+def ventas():
+    return render_template('sistema/ventas.html')
+
+
+# INICIO DE LA CARGA DE LA TABLA
+@bp.route('/tablaCompras', methods=['POST'])
+def tablaCompras():
+
+    if request.method == "POST":
+
+        conn = conectar()
+        cursor = conn.cursor()
+        query = 'select v.cod_venta,c.nombres_cliente + ' ' + c.apellidos_cliente as cliente,v.fecha_venta,cred.usuario as vendedor,v.total,e.NombreEstado as estado from Det_venta as dv inner join venta as v on v.cod_venta = dv.cod_venta_1 inner join cliente as vendedor on v.vendedor = vendedor.num_cliente inner join credenciales as cred on vendedor.id_credencial = cred.id_credencial inner join cliente as c on v.num_cliente = c.num_cliente inner join producto  as p on dv.cod_producto_1 = p.cod_producto inner join estado as e on v.cod_estado = e.id_estado'
+        cursor.execute(query)
+        ventas = cursor.fetchall()
+
+        return render_template('sistema/tablas/tabla_ventas.html', ventas=ventas)
+        
+    else:
+        return "No"
+
+#  FIN CARGA DE LA TABLA
+# INICIO DEL MODAL DE REGISTRAR UNA VENTA
+@bp.route('/modalAgregarVenta', methods=['POST'])
+def modalAgregarVenta():
+
+    if request.method == "POST":
+
+        conn = conectar()
+        cursor = conn.cursor()
+        query = 'select * from proveedor where id_estado = 1'
+        cursor.execute(query)
+        proveedores = cursor.fetchall()
+
+        conn = conectar()
+        cursor = conn.cursor()
+        query = 'select * from unidades '
+        cursor.execute(query)
+        unidades = cursor.fetchall()
+
+        conn = conectar()
+        cursor = conn.cursor()
+        query = 'select * from tipo '
+        cursor.execute(query)
+        categoria = cursor.fetchall()
+
+        
+        return render_template('sistema/modales/modal_agregar_venta.html', proveedores = proveedores,unidades = unidades,categorias = categoria)
+        
+    else:
+        return "No"
+# FIN DEL AGREGAR VENTA
+# FIN MODULO DE VENTAS
