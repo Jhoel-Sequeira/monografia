@@ -104,7 +104,7 @@ def buscarProducto():
 
         conn = conectar()
         cursor = conn.cursor()
-        query = 'select  cod_producto,precio,Imagen,stock,nom_producto from producto where nom_producto like ?'
+        query = "select cod_producto,precio,Imagen,stock,nom_producto from producto where nom_producto like ? and Tienda = 'Si'"
         cursor.execute(query,(producto + '%'))
         productos = cursor.fetchall()
         print(productos)

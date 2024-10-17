@@ -20014,7 +20014,11 @@ fieldset:disabled .btn {
 }
 
 .arrow-none.dropdown-toggle:after {
-    display: none
+    display: block;
+	position: absolute;
+	top: 50%;
+	right: 20px;
+	transform: translateY(-50%);
 }
 
 .navbar-nav .dropdown-menu {

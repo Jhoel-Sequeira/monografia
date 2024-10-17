@@ -222,7 +222,15 @@ def actualizarProducto():
         print(f"Error al actualizar el producto: {e}")
         return 'Error al actualizar el producto', 500
 
-# FIN DE EDITAR      
+# FIN DE EDITAR     
+
+# EDITAR PRODUCTOS
+@bp.route('/importarPrecios', methods=['GET','POST'])
+def importarPrecios():
+    return render_template('sistema/importarPrecio.html')
+
+
+# FIN DE EDITAR     
 
 # FIN DEL MODULO DE INVENTARIO
 

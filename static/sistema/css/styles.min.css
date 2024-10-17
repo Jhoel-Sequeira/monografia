@@ -20060,7 +20060,7 @@ div .dataTables_wrapper div.dataTables_filter label{
 .body-wrapper>.container-sm,
 .body-wrapper>.container-xl,
 .body-wrapper>.container-xxl {
-    max-width: 1200px;
+    /* max-width: 1200px; */
     margin: 0 auto;
     padding: 24px;
     -webkit-transition: 0.2s ease-in;
