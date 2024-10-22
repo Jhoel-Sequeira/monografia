@@ -8,39 +8,183 @@
         <div class="container text-center mb-5 mt-5">
             <div class="row">
                 <div class="col-md-12">
-                    <h4><a href="https://plugins.krajee.com/file-input" target="_blank"><b>File Upload With Sortable, Remove Options</b></a></h4>
+                    <h4><a href="" target="_blank"><b>Sube tu lista de precio,
+                                actualizada</b></a><i onclick="plantilla()" class="ti ti-file-download"
+                            class="btn btn-secondary" style="color: #2580e8;" data-bs-toggle="tooltip"
+                            data-bs-placement="top" title="Descargar PLantilla!"></i></i></h4>
                 </div>
             </div>
         </div>
-        
+
         <section class="bg-diffrent">
             <div class="container">
                 <div class="row justify-content-center">
                     <div class="col-xl-8">
                         <div class="file-upload-contain">
-                            <input id="multiplefileupload" type="file" accept=".jpg,.gif,.png" multiple />
+                            <input id="multiplefileupload" type="file" accept=".xlsx" multiple />
                         </div>
                     </div>
                 </div>
             </div>
         </section>
+        <div class="row m-5">
+            <div id="excelPreview" class="mt-3"></div>
+        </div>
+        <div class="row m-5">
+            <button id="btnSubir" class="btn btn-primary">Subir</button>
+        </div>
+
     </div>
-    
+
 </div>
 <script>
-    $(document).ready(function() {
+    function plantilla() {
+        alert('s')
+        $.ajax({
+            url: "{{ url_for('sistema.descargarPLantilla') }}",
+            type: "POST",
+            beforeSend: function () {
+                Swal.fire({
+                    html: '<div class="col-lg-12" style="z-index:99999; display:absolute; width"><img src="../static/img/loading1.gif" heigth="500" width="300" alt="loading" /><br/>Generando el reporte...</div>'
+                })
+
+            },
+            data: {
+                
+
+            },
+            success: function (response) {
+                if (response == 'NO'){
+                    Swal.fire({ icon: 'warning', title: 'Sin datos', confirmButtonText: 'Ok', text: 'No se encontraron datos' }).then((result) => { /* Read more about isConfirmed, isDenied below */
+                    if (result.isConfirmed) {
+
+
+                    }
+                })
+                }else{
+                    swal.close();
+                    // Generar la exportacion del archivo para descargarlo
+                    var link = document.createElement('a');
+                    link.href = response.url;
+                    link.download = 'ejemplo.xlsx';
+                    link.target = '_blank';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                }
+                
+            },
+            error: function (error) { // console.log(error);
+            }
+        });
+        
+    }
+    $("#btnSubir").on("click", function (e) {
+        e.preventDefault();
+        var fileInput = document.getElementById('multiplefileupload');
+        var file = fileInput.files[0]; // Tomar el primer archivo seleccionado
+
+        if (file) {
+            var formData = new FormData();
+            formData.append("file", file);
+
+            $.ajax({
+                url: "{{ url_for('sistema.actualizarPrecios') }}", // Cambia esta URL por la correcta
+                type: "POST",
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function (response) {
+                    Swal.fire({ icon: 'success', title: 'Exito', confirmButtonText: 'Ok', text: 'Precios Actualizados' }).then((result) => { /* Read more about isConfirmed, isDenied below */
+                        if (result.isConfirmed) {
+                            $("#multiplefileupload").val(""); // Limpiar el input de archivo
+
+                            // Limpiar la vista previa
+                            $("#excelPreview").html("");
+                        }
+                    })
+
+                },
+                error: function (error) {
+                    console.error("Error al subir el archivo:", error);
+                    alert("Hubo un error al subir el archivo.");
+                }
+            });
+        } else {
+            alert("Por favor, selecciona un archivo primero.");
+        }
+    });
+    $(document).ready(function () {
         $("#multiplefileupload").fileinput({
             theme: 'fas', // Puedes elegir el tema que prefieras
-            uploadUrl: "/path/to/upload", // URL para subir los archivos
+            uploadUrl: "../static/sistema/reportes/", // URL para subir los archivos
             allowedFileExtensions: ['xlsx'], // Extensiones permitidas
             maxFileCount: 1, // Número máximo de archivos
-            showUpload: true, // Ocultar botón de subir
-            showRemove: false, // Mostrar botón de eliminar
+            showUpload: false, // Ocultar botón de subir
+            showRemove: true, // Mostrar botón de eliminar
             showCancel: false, // Ocultar botón de cancelar
             showPreview: true, // Mostrar vista previa de los archivos
             previewFileType: '.xlsx', // Tipo de archivo para la vista previa
             layoutTemplates: { actionDelete: '', actionUpload: '' } // Personalización de la interfaz
         });
+
+        // Selector del input de archivo
+        var fileInput = document.getElementById('multiplefileupload');
+
+        // Evento para seleccionar archivos manualmente
+        fileInput.addEventListener("change", handleFileUpload);
+
+        // Eventos de arrastrar y soltar
+        var dropzone = document.getElementById('dropzone');
+
+        dropzone.addEventListener('dragover', function (e) {
+            e.preventDefault();
+            dropzone.classList.add('file-highlighted');
+        });
+
+        dropzone.addEventListener('dragleave', function (e) {
+            e.preventDefault();
+            dropzone.classList.remove('file-highlighted');
+        });
+
+        dropzone.addEventListener('drop', function (e) {
+            e.preventDefault();
+            dropzone.classList.remove('file-highlighted');
+
+            var files = e.dataTransfer.files;
+            if (files.length > 0) {
+                fileInput.files = files;  // Asigna los archivos arrastrados al input de archivo
+                handleFileUpload();       // Llama a la función de manejo de archivo
+            }
+        });
+
+        // Función para procesar el archivo
+        function handleFileUpload() {
+            var file = fileInput.files[0]; // Tomar el primer archivo
+            if (file) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    var data = new Uint8Array(e.target.result);
+                    var workbook = XLSX.read(data, { type: "array" });
+                    var firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                    var jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
+
+                    // Generar la vista previa
+                    var table = "<table class='table table-bordered'>";
+                    jsonData.forEach(function (row) {
+                        table += "<tr>";
+                        row.forEach(function (cell) {
+                            table += "<td>" + (cell || "") + "</td>";
+                        });
+                        table += "</tr>";
+                    });
+                    table += "</table>";
+
+                    $("#excelPreview").html(table);
+                };
+                reader.readAsArrayBuffer(file);
+            }
+        }
     });
 </script>
 <style>

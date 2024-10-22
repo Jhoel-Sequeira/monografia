@@ -1,14 +1,22 @@
 # controllers/sistema.py
+from datetime import datetime
 import os
-from flask import Blueprint, render_template, request,session
+from flask import Blueprint, jsonify, render_template, request,session,redirect
 from functools import wraps
 from conexion import conectar
+import pandas as pd
+
+from controllers.excel import GenerarExcel_3
+
+def capturarHora():
+    hi = datetime.now()
+    return hi
 
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if 'id' not in session:  # Verifica si el usuario está en la sesión
-            return render_template('sistema/error.html')  # Redirige a la página de error si no está autenticado
+            return redirect('/')  # Redirige a la página de error si no está autenticado
         return f(*args, **kwargs)  # Si la sesión es válida, ejecuta la función original
     return decorated_function
 
@@ -230,6 +238,85 @@ def importarPrecios():
     return render_template('sistema/importarPrecio.html')
 
 
+@bp.route('/actualizarPrecios', methods=['GET', 'POST'])
+def actualizarPrecios():
+    if request.method == 'POST':
+        # Verificar si el archivo está en la solicitud
+        if 'file' not in request.files:
+            return 'No'
+
+        file = request.files['file']
+
+        # Verificar si se seleccionó algún archivo
+        if file.filename == '':
+            return 'No'
+
+        if file and file.filename.endswith('.xlsx'):
+            # Guardar el archivo en el servidor temporalmente
+            filepath = os.path.join('static/sistema/reportes/', file.filename)
+            file.save(filepath)
+
+            # Procesar el archivo Excel
+            try:
+                df = pd.read_excel(filepath)  # Leer el archivo Excel con pandas
+
+                # Lógica para actualizar los precios (ejemplo)
+                for index, row in df.iterrows():
+                    # Suponiendo que tienes columnas 'producto' y 'nuevo_precio' en el archivo
+                    nombre = row['producto']
+                    precio = row['precio']
+                    num = row['id_producto']
+                    
+                    conn = conectar()
+                    cursor = conn.cursor()
+
+                    
+                    # Query de actualización del producto
+                    query = '''
+                    UPDATE producto
+                    SET nom_producto = ?, precio = ?
+                    WHERE cod_producto = ?
+                    '''
+                    
+                    # Ejecutar la consulta SQL
+                    cursor.execute(query, (nombre, precio, num))
+                    conn.commit()
+
+                    # Cerrar la conexión
+                    cursor.close()
+                    conn.close()
+
+                return 'Hecho'
+
+            except Exception as e:
+                return 'Error: {e}'
+
+@bp.route('/descargarPLantilla', methods=['GET','POST'])
+def descargarPLantilla():
+
+    array_datos = []
+    resultadosVar = []
+    conn = conectar()
+    cursor = conn.cursor()
+    query = 'select cod_producto,nom_producto,precio,stock,stock_critico from Producto'
+    cursor.execute(query)
+    resultados = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    print('RESULTADOS ',resultados)
+
+    resultadosVar += resultados
+    print('arreglo con los datos: ',resultadosVar)
+    array_datos.append(resultadosVar)
+    if array_datos:
+        retorno = GenerarExcel_3(array_datos)
+
+
+        return jsonify({'url': ''+retorno})
+    else:
+            return 'NO'
+
+
 # FIN DE EDITAR     
 
 # FIN DEL MODULO DE INVENTARIO
@@ -240,6 +327,157 @@ def importarPrecios():
 def ventas():
     return render_template('sistema/ventas.html')
 
+@bp.route('/caja')
+@login_required
+def caja():
+
+    conn = conectar()
+    cursor = conn.cursor()
+    query = "select c.num_cliente, c.nombres_cliente + ' '+ c.apellidos_cliente as Nombre from cliente as c inner join credenciales as cred on c.id_credencial = cred.id_credencial inner join roles as r on cred.rol = r.cod_rol where r.nombre_rol = 'CLIENTE'"
+    cursor.execute(query)
+    clientes = cursor.fetchall()
+
+
+    return render_template('sistema/caja.html',clientes = clientes)
+
+@bp.route('/traerId', methods=['POST'])
+@login_required
+def traerId():
+
+    conn = conectar()
+    cursor = conn.cursor()
+    query = "select top 1 cod_venta from venta where cod_estado = 7 order by cod_venta desc "
+    cursor.execute(query)
+    ultimaventa = cursor.fetchone()
+    if ultimaventa:
+        print('ultimaventa : ',ultimaventa)
+        return str(ultimaventa[0]+1)
+    else:
+        return str(1)
+    
+    
+@bp.route('/buscarProductoCaja', methods=['POST'])
+def buscarProductoCaja():
+
+    if request.method == "POST":
+        producto = request.form['producto']
+
+        conn = conectar()
+        cursor = conn.cursor()
+        query = "select cod_producto,precio,Imagen,stock,nom_producto from producto where nom_producto like ? and Tienda = 'Si'"
+        cursor.execute(query,(producto + '%'))
+        productos = cursor.fetchall()
+        print(productos)
+        return render_template('sistema/otros/buscador_caja.html', productos=productos)
+        
+    else:
+        return "No"
+    
+@bp.route('/crearFactura', methods=['POST'])
+def crearFactura():
+    if request.method == "POST":
+        FechaActual = capturarHora()
+        cliente1 = request.form['cliente']
+    
+        print(cliente1)
+        if cliente1:
+            conn = conectar()
+            cursor = conn.cursor()
+            query = 'INSERT INTO venta (fecha_venta,Total,num_cliente,vendedor,cod_estado) VALUES (?,?,?,?,8)'
+            cursor.execute(query, (FechaActual,0,cliente1,session['id']))
+            conn.commit()
+            cursor.close()
+            conn.close()
+        else:
+            conn = conectar()
+            cursor = conn.cursor()
+            query = 'INSERT INTO venta (fecha_venta,Total,vendedor,cod_estado) VALUES (?,?,?,8)'
+            cursor.execute(query, (FechaActual,0,session['id']))
+            conn.commit()
+            cursor.close()
+            conn.close()
+        
+        
+       
+       
+
+    return 'hecho'
+# SE INGRESA EL MEDICAMENTO A LA FACTURA CREADA
+@bp.route('/ingresarMedicamento', methods=['POST'])
+def ingresarMedicamento():
+    if request.method == "POST":
+        venta = request.form['venta']
+        medicamento = request.form['medicamento']
+        cantidad = request.form['cantidad']
+
+        print('aquiii')
+        print(venta)
+        print(medicamento)
+        print(cantidad)
+    
+        conn = conectar()
+        cursor = conn.cursor()
+        query = 'INSERT INTO Det_venta (cod_producto_1,cod_venta_1,Cantidad,precio_venta) VALUES (?,?,?,0)'
+        cursor.execute(query, (medicamento,venta,cantidad))
+        conn.commit()
+        cursor.close()
+        conn.close()
+        
+       
+       
+
+    return 'hecho'
+# FIN DE LA INSERCION DE MEDICAMENTOS EN LA FACTURA
+
+@bp.route('/totalCaja', methods=['POST'])
+def totalCaja():
+
+    num = request.form['num']
+
+    print(num)
+    conn = conectar()
+    cursor = conn.cursor()
+    query = "SELECT SUM(dv.cantidad * p.precio) AS total_venta FROM Det_venta AS dv INNER JOIN producto AS p ON dv.cod_producto_1 = p.cod_producto where dv.cod_venta_1 = ?"
+    cursor.execute(query,(num))
+    total = cursor.fetchone()
+    print(total)
+    if total[0]:
+        return str(total[0])
+    else:
+        return '0'
+
+@bp.route('/listadoProductosCaja', methods=['POST'])
+def listadoProductosCaja():
+
+    num = request.form['num']
+    print(num)
+
+
+    conn = conectar()
+    cursor = conn.cursor()
+    query = "select dv.cod_detalle,p.nom_producto,dv.cantidad,p.precio,p.stock,p.stock_critico,dv.precio_venta as descuento from Det_venta as dv inner join producto as p on dv.cod_producto_1 = p.cod_producto where dv.cod_venta_1 = ?"
+    cursor.execute(query,(num))
+    medicamentos = cursor.fetchall()
+    
+
+    return render_template('sistema/tablas/tabla-caja.html',medicamentos = medicamentos)
+
+
+@bp.route('/validarFactura', methods=['POST'])
+def validarFactura():
+    if request.method == "POST":
+        num = request.form['num']
+    
+        conn = conectar()
+        cursor = conn.cursor()
+        query = "select *  from venta where cod_venta = ? and cod_estado = 8"
+        cursor.execute(query,(num))
+        tiene = cursor.fetchone()
+        
+        if tiene:
+            return 'si'
+        else:
+            return 'no'
 
 # INICIO DE LA CARGA DE LA TABLA
 @bp.route('/tablaCompras', methods=['POST'])

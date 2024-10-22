@@ -1,0 +1,629 @@
+{% extends "sistema/layout.html" %}
+{%block head%}
+
+<!-- endinject -->
+<!-- plugin css for this page -->
+<!-- End plugin css for this page -->
+<!-- inject:css -->
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="../../../static/sistema/css/assets/css/caja.css">
+
+
+{%endblock%}
+
+
+{% block contenido %}
+<div class="container" style="margin-top:75px;">
+    <div class="row m-0 p-0 " style="height: 90%;">
+        <div class="col-12 col-md-6  sombra-lateral ">
+      
+          <div class="">
+            <div class="row">
+                <div class="col">
+                    <label class="form-label " for="form3Example2"><strong>Cod Factura</strong></label>
+          
+                    <input type="text" id="facturaId" disabled class="form-control" placeholder="">
+                  </div>
+              <div class="col">
+                <label class="form-label"><strong>Ya es cliente?</strong></label>
+                <div class="d-flex align-items-center justify-content-start">
+                  <label class="form-check-label " for="flexSwitchCheckDefault">No</label>
+                  <div class="form-check form-switch " style="margin: 0 10px 0 35px;">
+      
+                    <input class="form-check-input" type="checkbox" id="clienteExistente">
+      
+                  </div>
+                  <label class="form-check-label" for="flexSwitchCheckDefault">Si</label>
+                </div>
+      
+              </div>
+            </div>
+           
+            <div class="row mt-3 clienteViejo">
+              <div class="col d-flex">
+                <label class="form-label " for="form3Example2"><strong>Cliente</strong></label>
+                <i id="btnGuardarNuevoConductor" class="fas fa-plus-circle mt-1" aria-hidden="true" title="Agregar Nuevo Conductor"
+                  data-bs-toggle="modal" data-bs-target="#exampleModal"
+                  style="margin-right:5px; cursor: pointer; color:red;"></i>
+                <!-- <input type="text" id="NombreCliente" class="form-control" placeholder="Nombre...">
+                <input type="hidden" id="Idcliente"> -->
+      
+              </div>
+              <div class="">
+                <select class="form-control select2" name="" id="clientes">
+                  {%for cliente in clientes%}
+                  <option value="{{cliente.num_cliente}}">{{cliente.Nombre}}</option>
+                  {%endfor%}
+                </select>
+              </div>
+              <!-- <div class="" style="background-color:#fff;position: relative; height: 15%; width: 100%; margin-left: 0px;"
+                id="totalclientes">
+                <div class="info" id="listaClientes">
+                </div>
+              </div> -->
+      
+            </div>
+            <div class="row mt-3">
+              <div class="col">
+                <label class="form-label " for="form3Example2"><strong>Fecha</strong></label>
+      
+                <input type="text" id="fecha" class="form-control" placeholder="07/01/2024" disabled>
+              </div>
+              <div class="col">
+                <label class="form-label " for="form3Example2"><strong>Hora</strong></label>
+      
+                <input type="text" id="hora" class="form-control" placeholder="04:15 pm" disabled>
+              </div>
+            </div>
+            <div class="" id="productos">
+      
+      
+              <div class="row justify-content-center mt-4">
+                <label for=""><strong> Añadir productos</strong></label>
+              </div>
+              <hr>
+              <label for="barcode" class="d-none">Código de Barras:</label>
+              <input type="hidden" id="barcode" name="barcode" required>
+              <div class="row " id="Materiales">
+                <div class="col-7">
+                  <label class="form-label " for="form3Example2"><strong>Producto</strong></label>
+      
+                  <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                      <button class="btn btn-primary boton-input" type="button"><i class="fas fa-search"></i></button>
+                    </div>
+                    <input type="text" class="form-control" placeholder="buscar..." aria-label="Username"
+                      aria-describedby="basic-addon1" id="producto" autofocus>
+                    <input type="hidden" class="form-control" placeholder="Codigo receta" aria-label="Username"
+                      aria-describedby="basic-addon1" id="Idproducto">
+                  </div>
+                  <div class="" style="background-color:#fff;position: relative; height: 15%; width: 100%; margin-left: 0px;"
+                    id="totalmedicamentos">
+                    <div class="info" id="listaMedicamentos">
+                    </div>
+                  </div>
+                </div>
+                <div class="col-2 ">
+                  <label class="form-label " for="form3Example2"><strong>Cantidad</strong></label>
+      
+                  <input type="text" class="form-control" id="cantidad" value="1" placeholder="10">
+                </div>
+                <div class="col " style="margin-top: 30px;">
+                  <button id="agregar" class="btn btn-success" onclick="ingresarMedicamento()"><i class="ti ti-shopping-cart"></i> Añadir
+                  </button>
+                </div>
+              </div>
+      
+              <div class="row mt-3">
+                <div class="col">
+                  <!-- <img  src="../../../static/web/img/Logo.png" style="background-color: rgb(14, 95, 77); max-width: 50%;" alt=""> -->
+                </div>
+              </div>
+            </div>
+      
+            <input type="hidden" id="codigoBarra">
+            <div class="row mt-3">
+              <div class="col-5 ">
+                <label class="form-label " for="form3Example2"><strong>Descuento</strong></label>
+      
+                <input type="text" class="form-control" id="cantidad" value="1" placeholder="10">
+      
+              </div>
+              <div class="col-4 ">
+                <label class="form-label " for="form3Example2"><strong>Tipo</strong></label>
+      
+                <select name="" class="form-select" id="">
+                  <option value="1">%</option>
+                  <option value="2">C$</option>
+                </select>
+      
+              </div>
+              <div class="col " style="margin-top: 30px;">
+                <button class="btn btn-primary boton-crear-factura ">Descuento</button>
+      
+              </div>
+             
+      
+      
+            </div>
+            <div class="row">
+              <div class="col " style="margin-top: 30px;">
+                <button class="btn btn-success boton-crear-factura w-100">Facturar</button>
+      
+              </div>
+            </div>
+      
+          </div>
+        </div>
+        <div class="col-12 col-md-6">
+          <div class="row" style="background-color: #f8f9fa; ">
+            <div class="col tabla-productos" id="tabla-caja">
+      
+            </div>
+          </div>
+          <div class="row">
+            <div class="col">
+              <div class="flex flex-col  h-screen bg-background">
+                <div class="">
+      
+      
+                  <div class="mt-2 bg-light p-4 rounded-3">
+      
+                    <div class="d-flex justify-content-between mb-2">
+                      <span class="text-secondary"><strong>Total:</strong></span>
+                      <span style="font-size: 50px;" id="total">C$ -</span>
+                    </div>
+                    <div data-orientation="horizontal" role="none" class="shrink-0 bg-border h-[1px] w-full"></div>
+                    <div class="flex justify-between mt-2"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      
+      
+      </div>
+      
+</div>
+
+
+
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Cliente Nuevo</h5>
+        <button type="button" id="cerrar" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+
+        <div class="row">
+          <div class="col">
+            <label class="form-label " for="form3Example2"><strong>Nombre Cliente</strong></label>
+
+            <input type="text" class="form-control" id="nombre" placeholder="Nombre...">
+          </div>
+          <!-- <div class="col">
+            <label class="form-label " for="form3Example2"><strong>Conductor</strong></label>
+  
+            <input type="text" class="form-control" placeholder="Last name">
+          </div> -->
+        </div>
+        <div class="row">
+          <div class="col">
+            <label class="form-label " for="form3Example2"><strong>Telefono</strong></label>
+
+            <input type="text" class="form-control" id="telefono" placeholder="Ex: 12345678">
+          </div>
+          <div class="col">
+            <label class="form-label " for="form3Example2"><strong>Correo</strong></label>
+
+            <input type="text" class="form-control" id="correo" placeholder="Ex: persona@gmail.com">
+          </div>
+        </div>
+
+
+        <div class="row">
+          <div class="col">
+            <label class="form-label " for="form3Example2"><strong>Dirección</strong></label>
+
+            <textarea class="form-control" rows="3" id="direccion" style="text-transform:uppercase;"
+              value=""></textarea>
+          </div>
+
+        </div>
+
+
+
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+        <button type="button" class="btn btn-primary" onclick="RegistrarNuevo()">Registrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+  $('.select2').select2();
+  $('#multiple-select-field').select2({
+    theme: "bootstrap-5",
+    width: $(this).data('width') ? $(this).data('width') : $(this).hasClass('w-100') ? '100%' : 'style',
+    placeholder: $(this).data('placeholder'),
+    closeOnSelect: false,
+  });
+  $(document).ready(function () {
+    
+
+    traerId();
+    $('.clienteViejo').addClass('d-none');
+
+
+  });
+  $('#clienteExistente').change(function () {
+    if ($(this).is(':checked')) {
+      $('.clienteViejo').removeClass('d-none');
+      toggleInputs(true);
+    } else {
+      $('.clienteViejo').addClass('d-none');
+      toggleInputs(false);
+
+    }
+  });
+  var barcodeInput = document.getElementById('barcode');
+  barcodeInput.addEventListener('input', function () {
+    // Verificar longitud típica de un código de barras
+    if (barcodeInput.value.length >= 5) {  // Ajusta según el largo típico de tus códigos
+      $('#agregar').click();  // Enviar el formulario automáticamente si se escanea
+    }
+  });
+
+
+
+
+  // Aqui va la parte de ingreso de medicamento con el lector de barra
+  function ingresarMedicamentos() {
+    $.ajax({
+      url: "/ingresarMedicamento",
+      type: "POST",
+      data: {
+        venta: $('#facturaId').val(),
+        cantidad: $('#cantidad').val(),
+        medicamento: $('#Idproducto').val()
+      },
+      success: function (response) {
+        cargarCaja();
+        total();
+      },
+      error: function (error) {
+        // console.log(error);
+      },
+    });
+  }
+
+
+  function ingresarMedicamento() {
+    validarFactura(function (existe) {
+      alert(existe)
+      if (existe === 'existe') {
+        ingresarMedicamentos();
+        $('#producto').val('');
+        $('#Idproducto').val('');
+        $('#cantidad').val('');
+      } else {
+        alert($('#clientes option:selected').val())
+        if ($('#clienteExistente').is(':checked')) {
+          crearFactura($('#clientes option:selected').val());
+          alert('con cliente')
+        } else {
+          crearFactura('');
+        }
+        
+        ingresarMedicamentos();
+        $('#producto').val('');
+        $('#Idproducto').val('');
+        $('#cantidad').val('');
+      }
+    });
+  }
+  // Aqui va la parte de ingreso de medicamento con el lector de barra
+
+  function toggleInputs(disable) {
+    // Deshabilitar o habilitar todos los inputs
+    document.getElementById('producto').disabled = disable;
+    document.getElementById('Idproducto').disabled = disable;
+    document.getElementById('cantidad').disabled = disable; // Para el campo de cantidad
+    document.querySelector('#Materiales .btn-success').disabled = disable; // Botón de ingresar medicamento
+  }
+
+  $('#clientes').on('change', function () {
+    // Solo habilitar si hay un cliente seleccionado
+    if ($(this).val()) {
+      toggleInputs(false); // Habilitar los inputs y el botón
+    } else {
+      toggleInputs(true); // Deshabilitar si no hay selección
+    }
+  });
+
+  // Llamar a la función con true para deshabilitar
+
+
+
+
+  function formatDate(date) {
+    // Formato de fecha en "DD/MM/YYYY"
+    return ('0' + date.getDate()).slice(-2) + '/' +
+      ('0' + (date.getMonth() + 1)).slice(-2) + '/' +
+      date.getFullYear();
+  }
+
+  function formatTime(date) {
+    // Formato de hora en "hh:mm am/pm"
+    let hours = date.getHours();
+    const minutes = ('0' + date.getMinutes()).slice(-2);
+    const ampm = hours >= 12 ? 'pm' : 'am';
+    hours = hours % 12;
+    hours = hours ? hours : 12; // el "0" debería ser "12"
+    return hours + ':' + minutes + ' ' + ampm;
+  }
+
+  function updateDateTime() {
+    const now = new Date();
+    document.getElementById('fecha').value = formatDate(now);
+    document.getElementById('hora').value = formatTime(now);
+  }
+
+  // Actualiza la fecha y hora inmediatamente al cargar la página
+  updateDateTime();
+
+  // Actualiza cada segundo
+  setInterval(updateDateTime, 1000);
+
+  function traerId() {
+    $.ajax({
+      url: "{{ url_for('sistema.traerId') }}",
+      type: "POST",
+      data: {
+      },
+      success: function (response) {
+        $('#facturaId').val(response);
+        cargarCaja();
+        total();
+      },
+      error: function (error) { // console.log(error);
+      }
+    });
+  }
+
+  function total() {
+
+    $.ajax({
+      url: "{{ url_for('sistema.totalCaja') }}",
+      type: "POST",
+      data: {
+        num: $('#facturaId').val(),
+      },
+      success: function (response) {
+        $('#total').text('C$ ' + response);
+      },
+      error: function (error) { // console.log(error);
+      }
+    });
+  }
+
+  function crearFactura(cliente) {
+    $.ajax({
+      url: "{{ url_for('sistema.crearFactura') }}",
+      type: "POST",
+      data: {
+        cliente: cliente,
+      },
+      success: function (response) {
+
+
+      },
+      error: function (error) { // console.log(error);
+      }
+    });
+  }
+
+
+  function validarFactura(callback) {
+    $.ajax({
+      url: "{{ url_for('sistema.validarFactura') }}",
+      type: "POST",
+      data: {
+        num: $('#facturaId').val(),
+      },
+      success: function (response) {
+        callback(response);
+      },
+      error: function (error) { // console.log(error);
+      }
+    });
+  }
+
+
+  function RegistrarNuevo() {
+    $.ajax({
+      url: "/guardarClienteNuevo",
+      type: "POST",
+      data: {
+        nombre: $('#nombre').val(),
+        telefono: $('#telefono').val(),
+        correo: $('#correo').val(),
+        direccion: $('#direccion').val()
+      },
+      success: function (response) {
+        Swal.fire({ icon: 'success', title: 'Éxito', confirmButtonText: 'Ok', text: 'Cliente guardado' }).then((result) => { /* Read more about isConfirmed, isDenied below */
+          if (result.isConfirmed) {
+            $('#Idcliente').val(response);
+            $('#NombreCliente').val($('#nombre').val()).prop('disabled', true);
+            $('#productos').removeClass('d-none');
+            // SE DEBE CREAR LA FACTURA
+            crearFactura();
+            $('#cerrar').click();
+
+          }
+        })
+
+
+
+
+
+
+      },
+      error: function (error) { // console.log(error);
+      }
+    });
+  }
+
+  function NuevoConductor() {
+    $.ajax({
+      url: "/guardarConductorNuevo",
+      type: "POST",
+      data: {
+        nombre: $('#conductorNuevo').val()
+      },
+      success: function (response) {
+        $('#conductor').val($('#conductorNuevo').val());
+        $('#conductoresId').val(response);
+        $('#regresar').click();
+
+      },
+      error: function (error) { // console.log(error);
+      }
+    });
+  }
+
+
+
+
+
+  $('#CodigoBarra').on('input keyup change paste', function () {
+    $.ajax({
+      url: "/buscarMedicamento",
+      type: "POST",
+      data: {
+        proveedor: $("#producto").val(),
+      },
+      success: function (response) {
+        $("#listaMedicamentos").html(response);
+        $("#listaMedicamentos").append(response.htmlresponse);
+        $("#listaMedicamentos").show();
+        $("#totalmedicamentos").show();
+        $("#busqueda button[name=det]").click(function () {
+          $("#conductor").val($(this).text());
+          $("#conductoresId").val($(this).attr("value"));
+          $("#listaMedicamentos").hide();
+          $("#totalmedicamentos").hide();
+
+        });
+      },
+      error: function (error) {
+        // console.log(error);
+      },
+    });
+  })
+
+
+
+
+  // var buscarMedicamento = function () {
+  //   if ($("#producto").val() != "") {
+  //     $.ajax({
+  //       url: "/buscarMedicamento",
+  //       type: "POST",
+  //       data: {
+  //         producto: $("#producto").val(),
+  //       },
+  //       success: function (response) {
+  //         $("#listaMedicamentos").html(response);
+  //         $("#listaMedicamentos").append(response.htmlresponse);
+  //         $("#listaMedicamentos").show();
+  //         $("#totalmedicamentos").show();
+  //         $("#busqueda button[name=det]").click(function () {
+  //           $("#producto").val($(this).text());
+  //           $("#Idproducto").val($(this).attr("value"));
+  //           $("#listaMedicamentos").hide();
+  //           $("#totalmedicamentos").hide();
+  //           alert('done')
+
+  //         });
+  //       },
+  //       error: function (error) {
+  //         // console.log(error);
+  //       },
+  //     });
+  //   } else {
+  //     $("#listaMedicamentos").hide();
+  //     $("#totalmedicamentos").hide();
+  //   }
+
+  // }
+  // $("#producto").on('keyup', buscarMedicamento);
+
+
+  var buscarProducto = function () {
+    if ($("#producto").val() != "") {
+      $.ajax({
+        url: "/buscarProductoCaja",
+        type: "POST",
+        data: {
+          producto: $("#producto").val(),
+        },
+        success: function (response) {
+          $("#listaMedicamentos").html(response);
+          $("#listaMedicamentos").append(response.htmlresponse);
+          $("#listaMedicamentos").show();
+          $("#totalmedicamentos").show();
+          $("#busqueda button[name=det]").click(function () {
+
+            $("#producto").val($(this).text());
+            $("#Idproducto").val($(this).attr("value"));
+            $("#listaMedicamentos").hide();
+            $("#totalmedicamentos").hide();
+
+          });
+        },
+        error: function (error) {
+          // console.log(error);
+        },
+      });
+    } else {
+      $("#listaMedicamentos").hide();
+      $("#totalmedicamentos").hide();
+    }
+
+  }
+  $("#producto").on('keyup', buscarProducto);
+
+
+
+
+
+  function cargarCaja() {
+    $.ajax({
+      url: "{{ url_for('sistema.listadoProductosCaja') }}",
+      type: "POST",
+      data: {
+        num: $('#facturaId').val(),
+      },
+      success: function (response) {
+        $('#tabla-caja').html(response);
+        $('#tabla-caja').append(response.htmlresponse);
+      },
+      error: function (error) { // console.log(error);
+      }
+    });
+  }
+</script>
+
+
+
+
+
+{%endblock%}
