@@ -122,27 +122,24 @@
             </div>
       
             <input type="hidden" id="codigoBarra">
+            <hr>
             <div class="row mt-3">
-              <div class="col-5 ">
+              <div class="col-6 ">
                 <label class="form-label " for="form3Example2"><strong>Descuento</strong></label>
       
-                <input type="text" class="form-control" id="cantidad" value="1" placeholder="10">
+                <input type="number" class="form-control" id="descuento" value="0" placeholder="10">
       
               </div>
-              <div class="col-4 ">
+              <div class="col-6">
                 <label class="form-label " for="form3Example2"><strong>Tipo</strong></label>
       
-                <select name="" class="form-select" id="">
+                <select name="" class="form-select" id="tipo_descuento">
                   <option value="1">%</option>
                   <option value="2">C$</option>
                 </select>
       
               </div>
-              <div class="col " style="margin-top: 30px;">
-                <button class="btn btn-primary boton-crear-factura ">Descuento</button>
-      
-              </div>
-             
+              
       
       
             </div>
@@ -286,13 +283,21 @@
 
   // Aqui va la parte de ingreso de medicamento con el lector de barra
   function ingresarMedicamentos() {
+    if($('#tipo_descuento').val() == 1 && $('#descuento').val() > 0){
+      descuento = $('#descuento').val() / 100;
+    }else if($('#tipo_descuento').val() == 2 && $('#descuento').val() > 0){
+      descuento = $('#descuento').val();
+    }else{
+      descuento = 0
+    }
     $.ajax({
       url: "/ingresarMedicamento",
       type: "POST",
       data: {
         venta: $('#facturaId').val(),
         cantidad: $('#cantidad').val(),
-        medicamento: $('#Idproducto').val()
+        medicamento: $('#Idproducto').val(),
+        descuento: descuento
       },
       success: function (response) {
         cargarCaja();
@@ -307,14 +312,12 @@
 
   function ingresarMedicamento() {
     validarFactura(function (existe) {
-      alert(existe)
       if (existe === 'existe') {
         ingresarMedicamentos();
         $('#producto').val('');
         $('#Idproducto').val('');
         $('#cantidad').val('');
       } else {
-        alert($('#clientes option:selected').val())
         if ($('#clienteExistente').is(':checked')) {
           crearFactura($('#clientes option:selected').val());
           alert('con cliente')

@@ -409,19 +409,40 @@ def ingresarMedicamento():
         venta = request.form['venta']
         medicamento = request.form['medicamento']
         cantidad = request.form['cantidad']
+        descuento = request.form['descuento']
 
         print('aquiii')
+        print(descuento)
         print(venta)
         print(medicamento)
         print(cantidad)
-    
+
+        # BUSCAMOS EL MEDICAMENTO ESTA EN LA FACTURA
+
         conn = conectar()
         cursor = conn.cursor()
-        query = 'INSERT INTO Det_venta (cod_producto_1,cod_venta_1,Cantidad,precio_venta) VALUES (?,?,?,0)'
-        cursor.execute(query, (medicamento,venta,cantidad))
-        conn.commit()
-        cursor.close()
-        conn.close()
+        query = "select * from Det_venta where cod_venta_1 = ? and cod_producto_1 = ? and precio_venta = ?"
+        cursor.execute(query,(venta,medicamento,descuento))
+        existe = cursor.fetchone()
+
+        if existe:
+
+            conn = conectar()
+            cursor = conn.cursor()
+            query = 'UPDATE Det_venta set cantidad += ? where cod_detalle = ?'
+            cursor.execute(query, (cantidad,existe[0]))
+            conn.commit()
+            cursor.close()
+            conn.close()
+        else:
+
+            conn = conectar()
+            cursor = conn.cursor()
+            query = 'INSERT INTO Det_venta (cod_producto_1,cod_venta_1,Cantidad,precio_venta) VALUES (?,?,?,?)'
+            cursor.execute(query, (medicamento,venta,cantidad,descuento))
+            conn.commit()
+            cursor.close()
+            conn.close()
         
        
        

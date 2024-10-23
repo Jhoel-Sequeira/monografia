@@ -20254,3 +20254,7 @@ ul {
 .timeline-widget .timeline-item .timeline-badge.badge-primary {
     border: 2px solid #5D87FF
 }
+
+::-webkit-scrollbar {
+    display: none;
+  }
