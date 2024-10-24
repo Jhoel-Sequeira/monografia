@@ -1,7 +1,8 @@
 # controllers/sistema.py
 from datetime import datetime
 import os
-from flask import Blueprint, jsonify, render_template, request,session,redirect
+from fpdf import FPDF
+from flask import Blueprint, jsonify, render_template, request,session,redirect,make_response
 from functools import wraps
 from conexion import conectar
 import pandas as pd
@@ -378,7 +379,17 @@ def crearFactura():
     if request.method == "POST":
         FechaActual = capturarHora()
         cliente1 = request.form['cliente']
-    
+        num = request.form['num']
+
+        conn = conectar()
+        cursor = conn.cursor()
+        query = "select * from venta where cod_venta = ? "
+        cursor.execute(query,(num))
+        existe = cursor.fetchone()
+
+        if existe:
+            return 'ya'
+        
         print(cliente1)
         if cliente1:
             conn = conectar()
@@ -403,6 +414,145 @@ def crearFactura():
 
     return 'hecho'
 # SE INGRESA EL MEDICAMENTO A LA FACTURA CREADA
+
+
+@bp.route('/facturar', methods=['POST', 'GET'])
+def facturar():
+    num = request.args.get('id')
+
+    conn = conectar()
+    cursor = conn.cursor()
+
+    # Consulta SQL para obtener los datos del ticket
+    query = """
+    	select v.cod_venta,v.fecha_venta,c.nombres_cliente + ' ' + c.apellidos_cliente as cliente, vendedor.nombres_cliente + ' ' +vendedor.apellidos_cliente as vendedor  from venta as v inner join cliente as c on v.num_cliente = c.num_cliente  INNER JOIN cliente as vendedor on vendedor.num_cliente = v.vendedor
+    where v.cod_venta = ?
+    """
+
+    cursor.execute(query, (num))
+    ticket = cursor.fetchone()
+    no_tiene = 1
+    if not ticket:
+        no_tiene = 0
+        conn = conectar()
+        cursor = conn.cursor()
+
+        # Consulta SQL para obtener los datos del ticket
+        query = """
+            	select v.cod_venta,v.fecha_venta, vendedor.nombres_cliente + ' ' +vendedor.apellidos_cliente as vendedor  from venta as v INNER JOIN cliente as vendedor on vendedor.num_cliente = v.vendedor
+        where v.cod_venta = ?
+        """
+
+
+        cursor.execute(query, (num))
+        ticket = cursor.fetchone()
+
+    conn = conectar()
+    cursor = conn.cursor()
+    query = "select p.nom_producto,dv.cantidad,p.precio,p.stock,p.stock_critico,dv.precio_venta as descuento from Det_venta as dv inner join producto as p on dv.cod_producto_1 = p.cod_producto where dv.cod_venta_1 = ?"
+    cursor.execute(query,(num))
+    detalle = cursor.fetchall()
+
+    fecha_factura = ticket[1].strftime("%Y-%m-%d") if isinstance(ticket[1], datetime) else str(ticket[1])
+    hora_factura = ticket[1].strftime("%I:%M:%S %p") if isinstance(ticket[1], datetime) else str(ticket[1])
+    
+
+    pdf = FPDF('P', 'mm',  (101.6, 175))
+    pdf.set_margins(5.5, 5.5, 5.5)
+    pdf.set_display_mode(zoom=100, layout='continuous')
+    pdf.add_page()
+    
+
+    pdf.set_font('Arial', 'B', 30)
+    pdf.set_text_color(0, 0, 0)
+    pdf.set_font('Arial', 'B', 14)
+    pdf.multi_cell(0, 5, 'Veterinaria El Buen Productor', 0, "C")
+    pdf.ln(1)
+    
+    pdf.set_font('Arial', 'B', 7.5)
+    pdf.cell(25, 10, 'Factura No: ')
+    pdf.set_font('Arial', '', 7.5)
+    pdf.cell(30, 10, str(ticket[0]))
+    pdf.ln(6)
+    
+    pdf.set_font('Arial', 'B', 7.5)
+    pdf.cell(25, 10, 'Fecha: ')
+    pdf.set_font('Arial', '', 7.5)  # Cambia a fuente normal si lo prefieres
+    pdf.cell(30, 10, fecha_factura)  # Espacio suficiente para la fecha
+
+    pdf.set_font('Arial', 'B', 7.5)
+    pdf.cell(15, 10, 'Hora: ')
+    pdf.set_font('Arial', '', 7.5)
+    pdf.cell(30, 10, hora_factura)  # Espacio suficiente para la hora
+
+    pdf.ln(10)  
+    
+    if no_tiene ==1:
+
+        pdf.set_font('Arial', 'B', 7.5)
+        pdf.cell(25, 10, 'Cliente: ')
+        pdf.set_font('Arial', 'B', 7.5)
+        pdf.cell(20, 10, ticket[1])
+        pdf.ln(6)
+    
+        
+    
+    pdf.set_font('Arial', 'B', 7.5)
+    pdf.cell(25, 10, 'Vendedor: ')
+    pdf.set_font('Arial', '', 7.5)
+    pdf.cell(25, 10, ticket[2].upper())
+    pdf.ln(9)
+
+
+    
+        # Encabezados de la tabla
+    pdf.cell(40, 10, 'Producto')
+    pdf.cell(30, 10, 'Cantidad')
+    pdf.cell(30, 10, 'Precio')
+    pdf.cell(30, 10, 'Descuento')
+    pdf.ln(9)  # Salto de línea
+
+    # Iterar sobre los resultados y calcular el descuento
+    for fila in detalle:
+        nom_producto = str(fila[0]).upper()  # Nombre del producto en mayúsculas
+        cantidad = float(fila[1])  # Cantidad comprada
+        precio = float(fila[2])  # Precio unitario
+        descuento_raw = float(fila[3])  # Descuento aplicado en porcentaje o monto
+
+        # Calcular el descuento
+        subtotal = cantidad * precio
+        if descuento_raw == 0.0:
+            descuento_aplicado = 0
+        elif descuento_raw < 1:
+            descuento_aplicado = subtotal * descuento_raw  # Aplicar descuento en porcentaje
+        else:
+            descuento_aplicado = descuento_raw  # Aplicar descuento directo
+
+        total = subtotal - descuento_aplicado
+
+        # Imprimir los datos en el PDF
+        pdf.set_font('Arial', '', 7.5)
+        pdf.cell(40, 10, nom_producto)
+        pdf.cell(30, 10, str(cantidad))
+        pdf.cell(30, 10, f"C$ {precio:.2f}")  # Mostrar precio con dos decimales
+        pdf.cell(30, 10, f"C$ {descuento_aplicado:.2f}")  # Mostrar descuento con dos decimales
+        pdf.ln(9)  # Salto de línea entre filas
+        
+    pdf_output = pdf.output(dest='S').encode('latin1') 
+
+    response = make_response(pdf_output)
+    response.headers['Content-Type'] = 'application/pdf'
+    response.headers['Content-Disposition'] = 'inline; filename=ticket.pdf'
+
+    return response
+
+
+
+
+
+
+
+
 @bp.route('/ingresarMedicamento', methods=['POST'])
 def ingresarMedicamento():
     if request.method == "POST":
