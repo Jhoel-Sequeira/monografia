@@ -311,16 +311,21 @@
 
 
   function ingresarMedicamento() {
-    validarFactura(function (existe) {
+    if($('#Idproducto').val() == '' || $('#cantidad').val() == ''){
+      Swal.fire({ icon: 'warning', title: 'Error', confirmButtonText: 'Ok', text: 'Debe seleccionar un Producto válido' }).then((result) => { /* Read more about isConfirmed, isDenied below */
+                if (result.isConfirmed) {
+                }
+            })
+    }else{
+      validarFactura(function (existe) {
       if (existe === 'existe') {
         ingresarMedicamentos();
         $('#producto').val('');
         $('#Idproducto').val('');
-        $('#cantidad').val('');
+        $('#cantidad').val(1);
       } else {
         if ($('#clienteExistente').is(':checked')) {
           crearFactura($('#clientes option:selected').val());
-          alert('con cliente')
         } else {
           crearFactura('');
         }
@@ -328,9 +333,11 @@
         ingresarMedicamentos();
         $('#producto').val('');
         $('#Idproducto').val('');
-        $('#cantidad').val('');
+        $('#cantidad').val(1);
       }
     });
+    } 
+    
   }
   // Aqui va la parte de ingreso de medicamento con el lector de barra
 
@@ -533,8 +540,44 @@
   })
   
   function Facturar(){
-    printTicket($('#facturaId').val());
+
+    validarProductos(function (existe) {
+      if (existe === 'existe') {
+        printTicket($('#facturaId').val());
+        traerId();
+      } else {
+        Swal.fire({ icon: 'warning', title: 'Error', confirmButtonText: 'Ok', text: 'Debe ingresar Productos para generar la factura' }).then((result) => { /* Read more about isConfirmed, isDenied below */
+                if (result.isConfirmed) {
+                }
+            })
+      }
+    });
+
+
+
+
+    
   }
+  function validarProductos(callback) {
+    $.ajax({
+      url: "{{ url_for('sistema.validarProductos') }}",
+      type: "POST",
+      data: {
+        num: $('#facturaId').val(),
+      },
+      success: function (response) {
+        callback(response);
+      },
+      error: function (error) { // console.log(error);
+      }
+    });
+  }
+
+
+
+
+
+
   function printTicket(id) {
         // Construye la URL con el ID
         var url = '/facturar?id=' + id;

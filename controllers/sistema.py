@@ -439,8 +439,27 @@ def facturar():
 
         # Consulta SQL para obtener los datos del ticket
         query = """
-            	select v.cod_venta,v.fecha_venta, vendedor.nombres_cliente + ' ' +vendedor.apellidos_cliente as vendedor  from venta as v INNER JOIN cliente as vendedor on vendedor.num_cliente = v.vendedor
-        where v.cod_venta = ?
+            	SELECT 
+                    v.cod_venta, 
+                    v.fecha_venta, 
+                    vendedor.nombres_cliente + ' ' + vendedor.apellidos_cliente AS vendedor,
+                    SUM(dv.cantidad * p.precio - dv.precio_venta) AS total_venta
+                FROM 
+                    venta AS v 
+                INNER JOIN 
+                    cliente AS vendedor ON vendedor.num_cliente = v.vendedor 
+                INNER JOIN 
+                    Det_venta AS dv ON v.cod_venta = dv.cod_venta_1
+                INNER JOIN 
+                    producto AS p ON dv.cod_producto_1 = p.cod_producto
+                where v.cod_venta = ?
+                GROUP BY 
+                    v.cod_venta, 
+                    v.fecha_venta, 
+                    vendedor.nombres_cliente, 
+                    vendedor.apellidos_cliente
+
+        
         """
 
 
@@ -453,8 +472,10 @@ def facturar():
     cursor.execute(query,(num))
     detalle = cursor.fetchall()
 
+    print(detalle)
+
     fecha_factura = ticket[1].strftime("%Y-%m-%d") if isinstance(ticket[1], datetime) else str(ticket[1])
-    hora_factura = ticket[1].strftime("%I:%M:%S %p") if isinstance(ticket[1], datetime) else str(ticket[1])
+    hora_factura = ticket[1].strftime("%I:%M %p") if isinstance(ticket[1], datetime) else str(ticket[1])
     
 
     pdf = FPDF('P', 'mm',  (101.6, 175))
@@ -462,7 +483,14 @@ def facturar():
     pdf.set_display_mode(zoom=100, layout='continuous')
     pdf.add_page()
     
+    x = 35
+    y = 0
+    width = 30
+    height = 0 
+    imagePath = 'static/sistema/images/logos/logo.png'
 
+    pdf.image(imagePath, x, y, width, height)
+    pdf.ln(20)
     pdf.set_font('Arial', 'B', 30)
     pdf.set_text_color(0, 0, 0)
     pdf.set_font('Arial', 'B', 14)
@@ -479,13 +507,14 @@ def facturar():
     pdf.cell(25, 10, 'Fecha: ')
     pdf.set_font('Arial', '', 7.5)  # Cambia a fuente normal si lo prefieres
     pdf.cell(30, 10, fecha_factura)  # Espacio suficiente para la fecha
+    pdf.ln(6)
 
     pdf.set_font('Arial', 'B', 7.5)
-    pdf.cell(15, 10, 'Hora: ')
+    pdf.cell(25, 10, 'Hora: ')
     pdf.set_font('Arial', '', 7.5)
     pdf.cell(30, 10, hora_factura)  # Espacio suficiente para la hora
 
-    pdf.ln(10)  
+    pdf.ln(5)  
     
     if no_tiene ==1:
 
@@ -503,21 +532,22 @@ def facturar():
     pdf.cell(25, 10, ticket[2].upper())
     pdf.ln(9)
 
-
+    pdf.set_line_width(0.2) 
+    pdf.set_font('Arial', 'B', 7.5)
     
         # Encabezados de la tabla
-    pdf.cell(40, 10, 'Producto')
-    pdf.cell(30, 10, 'Cantidad')
-    pdf.cell(30, 10, 'Precio')
-    pdf.cell(30, 10, 'Descuento')
-    pdf.ln(9)  # Salto de línea
+    pdf.cell(30, 10, 'Producto', 1)
+    pdf.cell(15, 10, 'Cantidad', 1)
+    pdf.cell(15, 10, 'Descuento', 1)
+    pdf.cell(30, 10, 'Subtotal', 1)
+    pdf.ln(10)  # Salto de línea
 
     # Iterar sobre los resultados y calcular el descuento
     for fila in detalle:
         nom_producto = str(fila[0]).upper()  # Nombre del producto en mayúsculas
         cantidad = float(fila[1])  # Cantidad comprada
         precio = float(fila[2])  # Precio unitario
-        descuento_raw = float(fila[3])  # Descuento aplicado en porcentaje o monto
+        descuento_raw = float(fila[5])  # Descuento aplicado en porcentaje o monto
 
         # Calcular el descuento
         subtotal = cantidad * precio
@@ -531,18 +561,55 @@ def facturar():
         total = subtotal - descuento_aplicado
 
         # Imprimir los datos en el PDF
+        pdf.set_line_width(0.0)  # Establecer un borde más fino
+
         pdf.set_font('Arial', '', 7.5)
-        pdf.cell(40, 10, nom_producto)
-        pdf.cell(30, 10, str(cantidad))
-        pdf.cell(30, 10, f"C$ {precio:.2f}")  # Mostrar precio con dos decimales
-        pdf.cell(30, 10, f"C$ {descuento_aplicado:.2f}")  # Mostrar descuento con dos decimales
-        pdf.ln(9)  # Salto de línea entre filas
+
+        # Fila de datos
+        pdf.cell(30, 10, nom_producto, 1, 0)  # Borde para la celda de producto
+        pdf.cell(15, 10, str(cantidad), 1, 0, 'C')  # Cantidad centrada con borde fino
+        if descuento_aplicado == 0:
+
+            pdf.cell(15, 10, "", 1, 0, 'C')  # Precio centrado con borde fino
+        else:
+            pdf.cell(15, 10, f"C$ {descuento_aplicado:.2f}", 1, 0, 'C')  # Precio centrado con borde fino
+        pdf.cell(30, 10, f"C$ {total:.2f}", 1, 0, 'C')  # Descuento centrado con borde y nueva línea
+
+        pdf.ln(10)  # Aumenta el espacio entre filas a 6 unidades
+
+    pdf.set_font('Arial', 'B', 7.5)  # Título "Total"
+    pdf.cell(25, 30, 'Total: ')
+    pdf.set_font('Arial', '', 30)  # Aumentar el tamaño de la fuente para el valor
+    pdf.cell(65, 30, 'C$ '+str(ticket[3]), 0, 1, 'R')  # Alinear a la derecha
+    pdf.ln(9)  # Salto de línea
+
         
     pdf_output = pdf.output(dest='S').encode('latin1') 
 
     response = make_response(pdf_output)
     response.headers['Content-Type'] = 'application/pdf'
     response.headers['Content-Disposition'] = 'inline; filename=ticket.pdf'
+
+
+    conn = conectar()
+    cursor = conn.cursor()
+
+                    
+                    # Query de actualización del producto
+    query = '''
+            UPDATE venta
+            SET cod_estado = 7
+            WHERE cod_venta = ?
+    '''
+                    
+                    # Ejecutar la consulta SQL
+    cursor.execute(query, (num))
+    conn.commit()
+
+                    # Cerrar la conexión
+    cursor.close()
+    conn.close()
+
 
     return response
 
@@ -642,6 +709,22 @@ def validarFactura():
         conn = conectar()
         cursor = conn.cursor()
         query = "select *  from venta where cod_venta = ? and cod_estado = 8"
+        cursor.execute(query,(num))
+        tiene = cursor.fetchone()
+        
+        if tiene:
+            return 'si'
+        else:
+            return 'no'
+        
+@bp.route('/validarProductos', methods=['POST'])
+def validarProductos():
+    if request.method == "POST":
+        num = request.form['num']
+    
+        conn = conectar()
+        cursor = conn.cursor()
+        query = "select dv.cod_detalle,p.nom_producto,dv.cantidad,p.precio,p.stock,p.stock_critico,dv.precio_venta as descuento from Det_venta as dv inner join producto as p on dv.cod_producto_1 = p.cod_producto where dv.cod_venta_1 = ?"
         cursor.execute(query,(num))
         tiene = cursor.fetchone()
         
