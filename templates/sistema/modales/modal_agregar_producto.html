@@ -12,7 +12,7 @@
                     
                     <div class="row mt-2">
                         <div class="col">
-                            <label class="form-label breadcrumb" for="form3Example2"><strong>Nombre</strong></label>
+                            <label class="form-label " for="form3Example2"><strong>Nombre</strong></label>
                             <input type="text" id="nombre" class="form-control">
 
                         </div>
@@ -21,7 +21,7 @@
                     <div class="row mt-2">
 
                         <div class="col">
-                            <label class="form-label breadcrumb" for="form3Example2"><strong>Proveedor</strong></label>
+                            <label class="form-label " for="form3Example2"><strong>Proveedor</strong></label>
                             <select class="form-select" id="proveedor" data-placeholder="Seleccione un rol">
                                 {% for proveedor in proveedores %}
 
@@ -35,7 +35,7 @@
                         </div>
 
                         <div class="col">
-                            <label class="form-label breadcrumb" for="form3Example2"><strong>
+                            <label class="form-label " for="form3Example2"><strong>
                                     Categoría</strong></label>
 
                             <select class="form-select" id="categoria" data-placeholder="Seleccione un rol">
@@ -52,14 +52,14 @@
                     </div>
                     <div class="row mt-2">
                         <div class="col">
-                            <label class="form-label breadcrumb" for="form3Example2"
+                            <label class="form-label " for="form3Example2"
                                 style="margin-top: 20px;"><strong>Precio</strong></label>
                             <input type="text" id="precio" class="form-control">
 
 
                         </div>
                         <div class="col">
-                            <label class="form-label breadcrumb" for="form3Example2"
+                            <label class="form-label " for="form3Example2"
                                 style="margin-top: 20px;"><strong>Stock <i class="ti ti-login"></i></strong> <i
                                     class="ti ti-exclamation-mark"></i></label>
 
@@ -70,7 +70,7 @@
                         <div class="col" id="bas">
                             <div class="row">
                                 <div class="col ">
-                                    <label class="form-label breadcrumb" for="form3Example2"
+                                    <label class="form-label " for="form3Example2"
                                         style="margin-top: 20px;"><strong>Stock critico</strong> </label>
 
                                     <input type="text" id="stock_critico" class="form-control">
@@ -85,7 +85,7 @@
                         <div class="col" id="bas">
                             <div class="row">
                                 <div class="col ">
-                                    <label class="form-label breadcrumb" for="form3Example2"
+                                    <label class="form-label " for="form3Example2"
                                         style="margin-top: 20px;"><strong>Unidad</strong> </label>
 
                                     <select class="form-select" id="unidad" data-placeholder="Seleccione un rol">
@@ -107,7 +107,7 @@
                     <hr>
                     <div class="col" id="bas">
 
-                        <label class="form-label breadcrumb" for="form3Example2"
+                        <label class="form-label " for="form3Example2"
                             style="margin-top: 20px;"><strong>Imagen del producto</strong> </label>
                         <div class="col">
                             <div class="mb-3">
@@ -131,7 +131,7 @@
                 <button type="button" id="uploadBtn" style="display:none;" onclick="uploadImage()">Subir Imagen</button>
                 <button type="button" id="toggle-btn" onclick="habilitar()" class="btn "
                     style="background-color: blueviolet; color: white;">Habilitar en Página</button>
-                <button type="button" onclick="agregarProducto()" class="btn btn-primary">Guardar</button>
+                <button type="button" onclick="agregarProductoN()" class="btn btn-primary">Guardar</button>
             </div>
         </div>
     </div>
@@ -206,7 +206,7 @@
         }
         $('#toggle-btn').toggleClass('pressed');
     }
-    function agregarProducto() {
+    function agregarProductoN() {
         if ($('#nombre').val() == '' || $("#categoria option:selected").val() == '' || $("#proveedor option:selected").val() == '' || $("#unidad option:selected").val() == '' || $("#precio").val() == '' || $("#stock").val() == '' || $("#stock_critico").val() == '') {
             Swal.fire({ icon: 'error', title: 'Error', confirmButtonText: 'Ok', text: 'Debe rellenar todos los campos' }).then((result) => { /* Read more about isConfirmed, isDenied below */
                 if (result.isConfirmed) {

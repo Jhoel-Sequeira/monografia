@@ -356,6 +356,33 @@ def traerId():
     else:
         return str(1)
     
+
+
+@bp.route('/cancelarFactura', methods=['POST'])
+@login_required
+def cancelarFactura():
+
+    num = request.form['id']
+
+    conn = conectar()
+    cursor = conn.cursor()
+                    # Query de actualización del producto
+    query = '''
+            UPDATE venta
+            SET cod_estado = 9
+            WHERE cod_venta = ?
+    '''
+                    
+                    # Ejecutar la consulta SQL
+    cursor.execute(query, (num))
+    conn.commit()
+
+                    # Cerrar la conexión
+    cursor.close()
+    conn.close()
+
+    return 'Hecho'
+    
     
 @bp.route('/buscarProductoCaja', methods=['POST'])
 def buscarProductoCaja():
@@ -425,8 +452,19 @@ def facturar():
 
     # Consulta SQL para obtener los datos del ticket
     query = """
-    	select v.cod_venta,v.fecha_venta,c.nombres_cliente + ' ' + c.apellidos_cliente as cliente, vendedor.nombres_cliente + ' ' +vendedor.apellidos_cliente as vendedor  from venta as v inner join cliente as c on v.num_cliente = c.num_cliente  INNER JOIN cliente as vendedor on vendedor.num_cliente = v.vendedor
-    where v.cod_venta = ?
+    	select v.cod_venta,v.fecha_venta,c.nombres_cliente + ' ' + c.apellidos_cliente as cliente, vendedor.nombres_cliente + ' ' +vendedor.apellidos_cliente as vendedor,SUM(dv.cantidad * p.precio - dv.precio_venta) AS total_venta  from venta as v inner join cliente as c on v.num_cliente = c.num_cliente  INNER JOIN cliente as vendedor on vendedor.num_cliente = v.vendedor
+    INNER JOIN 
+                    Det_venta AS dv ON v.cod_venta = dv.cod_venta_1
+                INNER JOIN 
+                    producto AS p ON dv.cod_producto_1 = p.cod_producto
+                where v.cod_venta = ?
+                GROUP BY 
+                    v.cod_venta, 
+                    v.fecha_venta, 
+                    c.nombres_cliente,
+                    c.apellidos_cliente,
+                    vendedor.nombres_cliente, 
+                    vendedor.apellidos_cliente
     """
 
     cursor.execute(query, (num))
@@ -521,7 +559,7 @@ def facturar():
         pdf.set_font('Arial', 'B', 7.5)
         pdf.cell(25, 10, 'Cliente: ')
         pdf.set_font('Arial', 'B', 7.5)
-        pdf.cell(20, 10, ticket[1])
+        pdf.cell(20, 10, ticket[2])
         pdf.ln(6)
     
         
@@ -529,7 +567,7 @@ def facturar():
     pdf.set_font('Arial', 'B', 7.5)
     pdf.cell(25, 10, 'Vendedor: ')
     pdf.set_font('Arial', '', 7.5)
-    pdf.cell(25, 10, ticket[2].upper())
+    pdf.cell(25, 10, ticket[3].upper())
     pdf.ln(9)
 
     pdf.set_line_width(0.2) 
@@ -580,7 +618,7 @@ def facturar():
     pdf.set_font('Arial', 'B', 7.5)  # Título "Total"
     pdf.cell(25, 30, 'Total: ')
     pdf.set_font('Arial', '', 30)  # Aumentar el tamaño de la fuente para el valor
-    pdf.cell(65, 30, 'C$ '+str(ticket[3]), 0, 1, 'R')  # Alinear a la derecha
+    pdf.cell(65, 30, 'C$ '+str(ticket[4]), 0, 1, 'R')  # Alinear a la derecha
     pdf.ln(9)  # Salto de línea
 
         
@@ -741,7 +779,7 @@ def tablaCompras():
 
         conn = conectar()
         cursor = conn.cursor()
-        query = 'select v.cod_venta,c.nombres_cliente + ' ' + c.apellidos_cliente as cliente,v.fecha_venta,cred.usuario as vendedor,v.total,e.NombreEstado as estado from Det_venta as dv inner join venta as v on v.cod_venta = dv.cod_venta_1 inner join cliente as vendedor on v.vendedor = vendedor.num_cliente inner join credenciales as cred on vendedor.id_credencial = cred.id_credencial inner join cliente as c on v.num_cliente = c.num_cliente inner join producto  as p on dv.cod_producto_1 = p.cod_producto inner join estado as e on v.cod_estado = e.id_estado'
+        query = "SELECT v.cod_venta, CONVERT(DATE, v.fecha_venta) AS fecha,FORMAT(v.fecha_venta, 'HH:mm') AS hora, cred.usuario AS vendedor, SUM(dv.cantidad * p.precio - dv.precio_venta) AS total_venta, e.NombreEstado AS estado FROM venta AS v INNER JOIN cliente AS vendedor ON vendedor.num_cliente = v.vendedor INNER JOIN Det_venta AS dv ON v.cod_venta = dv.cod_venta_1 INNER JOIN producto AS p ON dv.cod_producto_1 = p.cod_producto INNER JOIN estado AS e ON v.cod_estado = e.id_estado INNER JOIN credenciales as cred on vendedor.id_credencial = cred.id_credencial GROUP BY v.cod_venta, CONVERT(DATE, v.fecha_venta), FORMAT(v.fecha_venta, 'HH:mm'), vendedor.nombres_cliente, vendedor.apellidos_cliente, e.NombreEstado, cred.usuario;"
         cursor.execute(query)
         ventas = cursor.fetchall()
 
@@ -751,6 +789,35 @@ def tablaCompras():
         return "No"
 
 #  FIN CARGA DE LA TABLA
+
+# DETALLE DE LA FACTURA
+@bp.route('/detalleFactura', methods=['POST'])
+def detalleFactura():
+
+    if request.method == "POST":
+
+        num = request.form['num']
+
+        conn = conectar()
+        cursor = conn.cursor()
+        query = "select p.nom_producto,d.cantidad,d.precio_venta as descuento,p.precio from Det_venta as d  inner join producto as p on d.cod_producto_1 = p.cod_producto where d.cod_venta_1 = ?"
+        cursor.execute(query,(num))
+        detalle = cursor.fetchall()
+
+
+        conn = conectar()
+        cursor = conn.cursor()
+        query = "SELECT v.cod_venta, CONVERT(DATE, v.fecha_venta) AS fecha,FORMAT(v.fecha_venta, 'HH:mm') AS hora,c.nombres_cliente + ' ' + c.apellidos_cliente AS cliente, vendedor.nombres_cliente + ' ' + vendedor.apellidos_cliente AS vendedor, SUM(dv.cantidad * p.precio - dv.precio_venta) AS total_venta, e.NombreEstado AS estado FROM venta AS v INNER JOIN cliente AS vendedor ON vendedor.num_cliente = v.vendedor INNER JOIN Det_venta AS dv ON v.cod_venta = dv.cod_venta_1 INNER JOIN producto AS p ON dv.cod_producto_1 = p.cod_producto INNER JOIN estado AS e ON v.cod_estado = e.id_estado INNER JOIN cliente AS c on v.num_cliente = c.num_cliente where cod_venta = ? GROUP BY v.cod_venta, CONVERT(DATE, v.fecha_venta), FORMAT(v.fecha_venta, 'HH:mm'),c.nombres_cliente,c.apellidos_cliente, vendedor.nombres_cliente, vendedor.apellidos_cliente, e.NombreEstado;"
+        cursor.execute(query,(num))
+        general = cursor.fetchall()
+
+        return render_template('sistema/modales/modal_detalle_factura.html', detalle=detalle, general = general)
+        
+    else:
+        return "No"
+
+# FIN DETALLE DE LA FACTURA
+
 # INICIO DEL MODAL DE REGISTRAR UNA VENTA
 @bp.route('/modalAgregarVenta', methods=['POST'])
 def modalAgregarVenta():

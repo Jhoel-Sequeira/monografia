@@ -20258,3 +20258,63 @@ ul {
 ::-webkit-scrollbar {
     display: none;
   }
+
+  <style>
+  /* Contenedor de la tabla */
+  table thead th {
+    background-color: rgba(92, 92, 92, 0.486) !important;
+    color: white;
+    text-align: start !important;
+  }
+
+  .table-container {
+    width: 100%;
+    max-height: 70vh;
+    /* Ajusta la altura según lo necesites */
+    overflow-y: auto;
+    /* Permite que solo el tbody se desplace */
+    border: 1px solid #ddd;
+    -ms-overflow-style: none;
+    /* IE y Edge */
+    scrollbar-width: none;
+    /* Firefox */
+  }
+
+  .table-container ::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* La tabla debe tener el ancho completo */
+  .table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+    /* Garantiza que las columnas mantengan su tamaño */
+  }
+
+  /* Estilo para los encabezados */
+  .table thead {
+    background-color: white;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    /* Mantiene los encabezados sobre el contenido al hacer scroll */
+  }
+
+  /* Ancho de las columnas */
+  .table th,
+  .table td {
+    padding: 8px;
+    text-align: start !important;
+    width: 20%;
+    /* Ajusta este valor si es necesario */
+    box-sizing: border-box;
+    border-bottom: 1px solid #ddd;
+  }
+
+  /* Opcional: estilo para hacer más visible el encabezado */
+  .table thead th {
+    border-bottom: 2px solid #ddd;
+    background-color: #f9f9f9;
+  }
+</style>

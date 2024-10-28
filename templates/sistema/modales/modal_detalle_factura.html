@@ -1,0 +1,252 @@
+{%for general in general%}
+<div class="modal fade" id="modalDetalleFactura" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-fullscreen-md-down">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">Detalle Producto</h5>
+                <button type="button" class="btn-close" id="cerrarDet" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" name="" value="{{general.cod_venta}}" id="id">
+                <div class=" cuerpo-modal" style="background-color: white;">
+                    <div class="row mt-2">
+                        <div class="col" style="margin-top: 20px;">
+                            <label class="form-label " for="form3Example2"><strong>Cliente</strong></label>
+                            <input type="text" id="nombre" value="{{general.cliente}}" class="form-control">
+
+                        </div>
+                        <div class="col" id="bas">
+                            <div class="row">
+                                <div class="col ">
+                                    <label class="form-label " for="form3Example2"
+                                        style="margin-top: 20px;"><strong>Vendedor</strong> </label>
+
+                                    <input type="text" id="stock_critico" value="{{general.vendedor}}"
+                                        class="form-control">
+
+
+                                </div>
+
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="row mt-2">
+                        <div class="col">
+                            <label class="form-label " for="form3Example2"
+                                style="margin-top: 20px;"><strong>Fecha</strong></label>
+                            <input type="text" id="precio" value="{{general.fecha}}" class="form-control">
+
+
+                        </div>
+                        <div class="col">
+                            <label class="form-label " for="form3Example2" style="margin-top: 20px;"><strong>Hora
+                            </label>
+
+
+                            <input type="text" id="stock" value="{{general.hora}}" class="form-control">
+
+                        </div>
+
+                        <div class="col" id="bas">
+                            <div class="row">
+                                <div class="col ">
+                                    <label class="form-label " for="form3Example2"
+                                        style="margin-top: 20px;"><strong>Estado</strong> </label>
+
+                                    <input type="text" id="stock_critico" value="{{general.estado}}"
+                                        class="form-control">
+
+
+                                </div>
+
+
+                            </div>
+
+                        </div>
+
+
+
+                    </div>
+
+
+                </div>
+                <div class="row mt-3">
+                    <div class="table-container">
+                        <table class="table" id="tabla-caja">
+                            <thead style="background-color: white !important;">
+                                <tr>
+                                    <th style="width: 180px;">Producto</th>
+                                    <th>Cantidad</th>
+                                    <th>Descuento</th>
+                                    <th style="width: 100px;">Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody style="background-color: transparent !important" class="overflow-hidden">
+                                {% for medicamento in detalle %}
+                                <tr id="{{medicamento.cod_detalle}}" style="background-color: transparent!important">
+                                    <td>{{medicamento.nom_producto}}</td>
+                                    <td>{{medicamento.cantidad}}</td>
+                                    <td>
+                                        {% if medicamento.descuento == 0.0 %}
+                                        <!-- No mostrar nada si el descuento es 0.0 -->
+                                        {% elif medicamento.descuento < 1 %} {{ medicamento.descuento * 100 }}% <!-- Si
+                                            es porcentaje -->
+                                            {% else %}
+                                            C$ {{ medicamento.descuento }} <!-- Si es cantidad -->
+                                            {% endif %}
+                                    </td>
+                                    <td>
+                                        {% set subtotal = medicamento.precio * medicamento.cantidad %}
+
+                                        {% if medicamento.descuento == 0.0 %}
+                                        {% set descuento_aplicado = 0 %}
+                                        {% elif medicamento.descuento < 1 %} {% set descuento_aplicado=subtotal *
+                                            medicamento.descuento %} {% else %} {% set
+                                            descuento_aplicado=medicamento.descuento %} {% endif %} {% set
+                                            total=subtotal - descuento_aplicado %} C$ {{ total }} </td>
+
+                                </tr>
+                                {% endfor %}
+
+
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+                <div class="row mt-3">
+                    <div class="col">
+                        <div class="flex flex-col  h-screen bg-background">
+                            <div class="">
+
+
+                                <div class="mt-2 bg-light p-4 rounded-3">
+
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span class="text-secondary"><strong>Total:</strong></span>
+                                        <span style="font-size: 50px;" id="total">C$ {{general.total_venta}}</span>
+                                    </div>
+                                    <div data-orientation="horizontal" role="none"
+                                        class="shrink-0 bg-border h-[1px] w-full"></div>
+                                    <div class="flex justify-between mt-2"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <input type="hidden" id="tienda" value="0">
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" id="uploadBtn" class="btn"
+                    style="background-color: rgb(178, 13, 13); color: white;" onclick="cancelar()"><i
+                        class="ti ti-x"></i> Cancelar</button>
+                <button type="button" id="desbloquear" class="btn "
+                    style="background-color: rgb(47, 133, 155); color: white;" onclick="printTicket($('#id').val())"><i
+                        class="ti ti-printer"></i> Imprimir</button>
+
+            </div>
+        </div>
+    </div>
+</div>
+{%endfor%}
+
+<script>
+
+    function printTicket(id) {
+        // Construye la URL con el ID
+        var url = '/facturar?id=' + id;
+        // Abre una nueva ventana sin barras de herramientas
+        var newWindow = window.open(url, '_blank', "toolbar=no,scrollbars=yes,resizable=yes,location=no");
+        if (newWindow) {
+            // Si se pudo abrir la nueva ventana, enfócala
+            newWindow.focus();
+        } else {
+            // Si no se pudo abrir la nueva ventana (debido a un bloqueador de ventanas emergentes), muestra un mensaje
+            alert("No se pudo abrir la nueva ventana. Asegúrate de desactivar el bloqueador de ventanas emergentes.");
+        }
+    }
+
+    function cancelar() {
+
+
+
+        Swal.fire({
+            title: "Anular Factura",
+            text: "Desea anular la factura.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Si"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: "{{ url_for('sistema.cancelarFactura') }}",
+                    type: "POST",
+                    data: {
+                        id: $('#id').val(),
+                    },
+
+
+                    success: function (response) {
+                        Swal.fire({
+                            title: "Anulada!",
+                            text: "Se ha anulado la factura.",
+                            icon: "success"
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                $('#cerrarDet').click();
+                                cargarCompras();  // Recargar el inventario
+
+                            }
+                        });
+                    },
+                    error: function (error) {
+                        console.log(error);
+                    }
+                });
+
+
+
+
+
+
+            }
+        });
+
+
+
+
+
+
+
+
+    }
+
+
+
+
+
+    document.querySelectorAll('.cuerpo-modal input, .cuerpo-modal select, .cuerpo-modal file').forEach(element => {
+        element.disabled = true;
+    });
+    var isDisabled = false; // Iniciamos con los elementos desactivados
+
+    // Verifica si la variable ya está definida
+    if (typeof isDisabled === 'undefined') {
+        var isDisabled = false; // Iniciamos con los elementos desactivados
+    }
+
+    document.querySelectorAll('.cuerpo-modal input, .cuerpo-modal select, .cuerpo-modal file').forEach(element => {
+        element.disabled = true;
+    });
+
+    
+</script>
