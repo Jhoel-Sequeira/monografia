@@ -1,0 +1,241 @@
+{% extends "sistema/layout.html" %}
+
+
+{% block contenido %}
+<div class="container-fluid">
+    <div class="col-lg d-flex p-0">
+        <div class="card w-100">
+            <div class="row p-3" >
+                <div class="row mt-2">
+                    <div class="col">
+                        <label class="form-label " for="form3Example2"><strong>Cliente</strong><i class="ti ti-circle-plus-filled" aria-hidden="true"
+                            title="Agregar Nuevo Conductor" data-bs-target="#agregarCliente"
+                            data-bs-toggle="modal" data-bs-dismiss="modal" style="color: red; font-size: 15px;"></i></label>
+                        <input type="text" id="nombre" class="form-control">
+        
+                    </div>
+                    <div class="col">
+                        <label class="form-label " for="form3Example2"><strong>Mascota</strong><i class="ti ti-circle-plus-filled" aria-hidden="true"
+                            title="Agregar Nuevo Conductor" data-bs-target="#agregarMascota"
+                            data-bs-toggle="modal" data-bs-dismiss="modal" style="color: red; font-size: 15px;"></i></label>
+                        <input type="text" id="nombre" class="form-control">
+        
+                    </div>
+        
+                </div>
+                <div class="row mt-2">
+        
+                    <div class="col">
+                        <label class="form-label " for="form3Example2"><strong>Tipo Atención</strong></label>
+                        <select class="form-select" id="proveedor" data-placeholder="Seleccione un rol">
+                            {% for proveedor in proveedores %}
+        
+                            <option value="{{ proveedor.cod_proveedor}}">{{ proveedor.nom_proveedor }}</option>
+                            {% endfor %}
+                        </select>
+        
+        
+        
+        
+                    </div>
+        
+                    <div class="col">
+                        <label class="form-label " for="form3Example2"><strong>
+                                Peso</strong></label>
+        
+                        <select class="form-select" id="categoria" data-placeholder="Seleccione un rol">
+                            {% for categoria in categorias %}
+        
+                            <option value="{{ categoria.cod_tipo }}">{{ categoria.tipos }}</option>
+                            {% endfor %}
+                        </select>
+        
+                    </div>
+                    <div class="col">
+                        <label class="form-label " for="form3Example2"><strong>
+                                Altura</strong></label>
+        
+                        <select class="form-select" id="categoria" data-placeholder="Seleccione un rol">
+                            {% for categoria in categorias %}
+        
+                            <option value="{{ categoria.cod_tipo }}">{{ categoria.tipos }}</option>
+                            {% endfor %}
+                        </select>
+        
+                    </div>
+                    
+                    <div class="col">
+                        <label class="form-label " for="form3Example2"><strong>
+                                Temperatura</strong></label>
+        
+                        <select class="form-select" id="categoria" data-placeholder="Seleccione un rol">
+                            {% for categoria in categorias %}
+        
+                            <option value="{{ categoria.cod_tipo }}">{{ categoria.tipos }}</option>
+                            {% endfor %}
+                        </select>
+        
+                    </div>
+        
+        
+        
+                </div>
+                
+                <div class="row mt-2">
+        
+                    <div class="col">
+                        <label class="form-label " for="form3Example2"><strong>Fecha</strong></label>
+                        <select class="form-select" id="proveedor" data-placeholder="Seleccione un rol">
+                            {% for proveedor in proveedores %}
+        
+                            <option value="{{ proveedor.cod_proveedor}}">{{ proveedor.nom_proveedor }}</option>
+                            {% endfor %}
+                        </select>
+        
+        
+        
+        
+                    </div>
+                    <div class="col">
+                        <label class="form-label " for="form3Example2"><strong>Hora</strong></label>
+                        <select class="form-select" id="proveedor" data-placeholder="Seleccione un rol">
+                            {% for proveedor in proveedores %}
+        
+                            <option value="{{ proveedor.cod_proveedor}}">{{ proveedor.nom_proveedor }}</option>
+                            {% endfor %}
+                        </select>
+        
+        
+        
+        
+                    </div>
+        
+                    
+        
+        
+        
+                </div>
+                <div class="row mt-2">
+        
+                    <div class="col">
+                        <label class="form-label " for="form3Example2"><strong>Observación</strong></label>
+                       <textarea name="" class="form-control" rows="4" id=""></textarea>
+        
+        
+        
+                    </div>
+                   
+                </div>
+                
+            </div>
+            <div class="row m-3">
+                <div class="modal-footer ">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" id="uploadBtn" style="display:none;" onclick="uploadImage()">Subir Imagen</button>
+                    <button type="button" id="toggle-btn" onclick="habilitar()" class="btn "
+                        style="background-color: blueviolet; color: white;">Habilitar en Página</button>
+                    <button type="button" onclick="agregarProducto()" class="btn btn-primary">Agendar</button>
+                </div>
+            </div>
+
+
+        </div> 
+    </div> 
+    
+</div>
+<!-- MODALES -->
+<div class="modal fade" id="agregarCliente" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog ">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalToggleLabel2">Agregar Cliente</h5>
+                <!-- <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> -->
+            </div>
+            <div class="modal-body">
+                <div class="row mt-3">
+                    <div class="col">
+                        <div class="form-group" id="camionModal">
+                            <label for="txtPlacaV" class=" form-label">Nombres</label>
+
+                            <input type="text" id="nombreCliente" class="form-control">
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-group" id="camionModal">
+                            <label for="txtPlacaV" class=" form-label">Apellidos</label>
+
+                            <input type="text" id="apellidoCliente" class="form-control">
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col">
+                        <div class="form-group" id="camionModal">
+                            <label for="txtPlacaV" class=" form-label">Correo</label>
+
+                            <input type="text" id="nombreCliente" class="form-control">
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-group" id="camionModal">
+                            <label for="txtPlacaV" class=" form-label">Teléfono</label>
+
+                            <input type="text" id="apellidoCliente" class="form-control">
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col">
+                        <div class="form-group" id="camionModal">
+                            <label for="txtPlacaV" class=" form-label">Dirección</label>
+
+                            <textarea name="" class="form-control" id=""></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-target="#capturarPeso" id="regresar" data-bs-toggle="modal"
+                    data-bs-dismiss="modal">Regresar</button>
+                <button class="btn btn-primary" onclick="NuevoConductor()">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="agregarMascota" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalToggleLabel2">Agregar Mascota</h5>
+                <!-- <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> -->
+            </div>
+            <div class="modal-body">
+                <div class="row mt-3">
+                    <div class="col-lg-12">
+                        <div class="form-group" id="camionModal">
+                            <label for="txtPlacaV" class=" form-label">Placa</label>
+
+                            <input type="text" id="PlacaNueva" class="form-control">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-target="#capturarPeso" id="regresar1" data-bs-toggle="modal"
+                    data-bs-dismiss="modal">Regresar</button>
+                <button class="btn btn-primary" onclick="NuevaPlaca()">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- FIN DEL MODAL -->
+<!-- FIN DE MODALES -->
+<script>
+    
+</script>
+
+{% endblock %}

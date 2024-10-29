@@ -807,7 +807,7 @@ def detalleFactura():
 
         conn = conectar()
         cursor = conn.cursor()
-        query = "SELECT v.cod_venta, CONVERT(DATE, v.fecha_venta) AS fecha,FORMAT(v.fecha_venta, 'HH:mm') AS hora,c.nombres_cliente + ' ' + c.apellidos_cliente AS cliente, vendedor.nombres_cliente + ' ' + vendedor.apellidos_cliente AS vendedor, SUM(dv.cantidad * p.precio - dv.precio_venta) AS total_venta, e.NombreEstado AS estado FROM venta AS v INNER JOIN cliente AS vendedor ON vendedor.num_cliente = v.vendedor INNER JOIN Det_venta AS dv ON v.cod_venta = dv.cod_venta_1 INNER JOIN producto AS p ON dv.cod_producto_1 = p.cod_producto INNER JOIN estado AS e ON v.cod_estado = e.id_estado INNER JOIN cliente AS c on v.num_cliente = c.num_cliente where cod_venta = ? GROUP BY v.cod_venta, CONVERT(DATE, v.fecha_venta), FORMAT(v.fecha_venta, 'HH:mm'),c.nombres_cliente,c.apellidos_cliente, vendedor.nombres_cliente, vendedor.apellidos_cliente, e.NombreEstado;"
+        query = "SELECT v.cod_venta, CONVERT(DATE, v.fecha_venta) AS fecha,FORMAT(v.fecha_venta, 'HH:mm') AS hora,c.nombres_cliente + ' ' + c.apellidos_cliente AS cliente, cred.usuario AS vendedor, SUM(dv.cantidad * p.precio - dv.precio_venta) AS total_venta, e.NombreEstado AS estado FROM venta AS v INNER JOIN cliente AS vendedor ON vendedor.num_cliente = v.vendedor INNER JOIN Det_venta AS dv ON v.cod_venta = dv.cod_venta_1 INNER JOIN producto AS p ON dv.cod_producto_1 = p.cod_producto INNER JOIN estado AS e ON v.cod_estado = e.id_estado INNER JOIN cliente AS c on v.num_cliente = c.num_cliente INNER JOIN credenciales as cred on vendedor.id_credencial = cred.id_credencial where cod_venta = ? GROUP BY v.cod_venta, CONVERT(DATE, v.fecha_venta), FORMAT(v.fecha_venta, 'HH:mm'),c.nombres_cliente,c.apellidos_cliente, vendedor.nombres_cliente, vendedor.apellidos_cliente, e.NombreEstado,cred.usuario ;"
         cursor.execute(query,(num))
         general = cursor.fetchall()
 
@@ -849,3 +849,11 @@ def modalAgregarVenta():
         return "No"
 # FIN DEL AGREGAR VENTA
 # FIN MODULO DE VENTAS
+
+# INICIO DEL MODULO DE CONSULTAS
+@bp.route('/nuevaConsulta')
+@login_required
+def nuevaConsulta():
+    return render_template('sistema/agendar_consulta.html')
+
+# FIN DEL MODULO DE CONSULTAS
