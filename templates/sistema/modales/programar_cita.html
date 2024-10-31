@@ -1,0 +1,283 @@
+{% block contenido %}
+<div class="modal fade" id="agendarConsulta" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-fullscreen-md-down">
+        <div class="modal-content">
+            <div class="row p-3">
+                <div class="row mt-2">
+                    <div class="col">
+                        <label class="form-label " for="form3Example2"><strong>Cliente</strong><i
+                                class="ti ti-circle-plus-filled" aria-hidden="true" title="Agregar Nuevo Conductor"
+                                data-bs-target="#agregarCliente" data-bs-toggle="modal" data-bs-dismiss="modal"
+                                style="color: red; font-size: 15px;"></i></label>
+                        <input type="text" id="nombre" class="form-control">
+
+                    </div>
+                    <div class="col">
+                        <label class="form-label " for="form3Example2"><strong>Mascota</strong><i
+                                class="ti ti-circle-plus-filled" aria-hidden="true" title="Agregar Nuevo Conductor"
+                                data-bs-target="#agregarMascota" data-bs-toggle="modal" data-bs-dismiss="modal"
+                                style="color: red; font-size: 15px;"></i></label>
+                        <input type="text" id="nombre" class="form-control">
+
+                    </div>
+
+                </div>
+                <div class="row mt-2">
+
+                    <div class="col">
+                        <label class="form-label " for="form3Example2"><strong>Tipo Atención</strong></label>
+                        <select class="form-select" id="proveedor" data-placeholder="Seleccione un rol">
+                            {% for proveedor in proveedores %}
+
+                            <option value="{{ proveedor.cod_proveedor}}">{{ proveedor.nom_proveedor }}</option>
+                            {% endfor %}
+                        </select>
+
+
+
+
+                    </div>
+
+                    <div class="col">
+                        <label class="form-label " for="form3Example2"><strong>
+                                Peso</strong></label>
+
+                        <select class="form-select" id="categoria" data-placeholder="Seleccione un rol">
+                            {% for categoria in categorias %}
+
+                            <option value="{{ categoria.cod_tipo }}">{{ categoria.tipos }}</option>
+                            {% endfor %}
+                        </select>
+
+                    </div>
+                    <div class="col">
+                        <label class="form-label " for="form3Example2"><strong>
+                                Altura</strong></label>
+
+                        <select class="form-select" id="categoria" data-placeholder="Seleccione un rol">
+                            {% for categoria in categorias %}
+
+                            <option value="{{ categoria.cod_tipo }}">{{ categoria.tipos }}</option>
+                            {% endfor %}
+                        </select>
+
+                    </div>
+
+                    <div class="col">
+                        <label class="form-label " for="form3Example2"><strong>
+                                Temperatura</strong></label>
+
+                        <select class="form-select" id="categoria" data-placeholder="Seleccione un rol">
+                            {% for categoria in categorias %}
+
+                            <option value="{{ categoria.cod_tipo }}">{{ categoria.tipos }}</option>
+                            {% endfor %}
+                        </select>
+
+                    </div>
+
+
+
+                </div>
+
+                <div class="row mt-2">
+
+                    <div class="col">
+                        <label class="form-label " for="form3Example2"><strong>Fecha</strong></label>
+                        <input type="date" class="form-control" value="{{fecha}}" disabled>
+
+
+
+
+                    </div>
+                    <div class="col">
+                        <label class="form-label" for="timePicker"><strong>Hora</strong></label>
+                        <input type="text" id="timePicker" class="form-control" placeholder="Selecciona una hora">
+                    </div>
+
+
+
+
+
+                </div>
+                <div class="row mt-2">
+
+                    <div class="col">
+                        <label class="form-label " for="form3Example2"><strong>Observación</strong></label>
+                        <textarea name="" class="form-control" rows="4" id=""></textarea>
+
+
+
+                    </div>
+
+                </div>
+
+            </div>
+            <div class="row m-3">
+                <div class="modal-footer ">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" id="uploadBtn" style="display:none;" onclick="uploadImage()">Subir
+                        Imagen</button>
+                    <button type="button" id="toggle-btn" onclick="habilitar()" class="btn "
+                        style="background-color: blueviolet; color: white;">Habilitar en Página</button>
+                    <button type="button" onclick="agregarProducto()" class="btn btn-primary">Agendar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+<!-- MODALES -->
+<div class="modal fade" id="agregarCliente" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalToggleLabel2">Agregar Cliente</h5>
+                <!-- <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> -->
+            </div>
+            <div class="modal-body">
+                <div class="row mt-3">
+                    <div class="col">
+                        <div class="form-group" id="camionModal">
+                            <label for="txtPlacaV" class=" form-label">Nombres</label>
+
+                            <input type="text" id="nombreCliente" class="form-control">
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-group" id="camionModal">
+                            <label for="txtPlacaV" class=" form-label">Apellidos</label>
+
+                            <input type="text" id="apellidoCliente" class="form-control">
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col">
+                        <div class="form-group" id="camionModal">
+                            <label for="txtPlacaV" class=" form-label">Correo</label>
+
+                            <input type="text" id="nombreCliente" class="form-control">
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-group" id="camionModal">
+                            <label for="txtPlacaV" class=" form-label">Teléfono</label>
+
+                            <input type="text" id="apellidoCliente" class="form-control">
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col">
+                        <div class="form-group" id="camionModal">
+                            <label for="txtPlacaV" class=" form-label">Dirección</label>
+
+                            <textarea name="" class="form-control" id=""></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-target="#capturarPeso" id="regresar" data-bs-toggle="modal"
+                    data-bs-dismiss="modal">Regresar</button>
+                <button class="btn btn-primary" onclick="NuevoConductor()">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="agregarMascota" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalToggleLabel2">Agregar Mascota</h5>
+                <!-- <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> -->
+            </div>
+            <div class="modal-body">
+                <div class="row mt-3">
+                    <div class="col-lg-12">
+                        <div class="form-group" id="camionModal">
+                            <label for="txtPlacaV" class=" form-label">Placa</label>
+
+                            <input type="text" id="PlacaNueva" class="form-control">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-target="#capturarPeso" id="regresar1" data-bs-toggle="modal"
+                    data-bs-dismiss="modal">Regresar</button>
+                <button class="btn btn-primary" onclick="NuevaPlaca()">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- FIN DEL MODAL -->
+<style>
+    .hora-disponible {
+        cursor: pointer;
+        padding: 10px;
+        border: 1px solid #28a745;
+        margin: 5px 0;
+    }
+    .hora-ocupada {
+        cursor: not-allowed;
+        padding: 10px;
+        border: 1px solid #dc3545;
+        margin: 5px 0;
+        color: #dc3545;
+    }
+</style>
+<!-- FIN DE MODALES -->
+<script>
+        // Horas ocupadas como ejemplo
+        const eventos = [
+        { start: new Date("2024-11-01T09:00:00") },
+        { start: new Date("2024-11-01T11:00:00") },
+        { start: new Date("2024-11-01T14:00:00") }
+    ];
+
+    // Extraer horas ocupadas
+    const horasOcupadas = eventos.map(evento => {
+        return evento.start.toISOString().split('T')[1].substring(0, 5); // Formato "HH:mm"
+    });
+
+    $(document).ready(function () {
+        $('#timePicker').clockpicker({
+            placement: 'bottom',
+            align: 'left',
+            donetext: 'Listo',
+            canceltext: 'Cancelar',
+            autoclose: true
+        });
+
+        // Validar la hora seleccionada
+        $('#timePicker').on('change', function () {
+            const selectedTime = $(this).val();
+
+            // Comprobar si la hora seleccionada está ocupada
+            if (horasOcupadas.includes(selectedTime)) {
+                // Mostrar mensaje de error
+                $('#error-message').text("Esta hora ya está ocupada. Por favor, elige otra.").show();
+                $(this).val(''); // Limpiar el campo
+            } else {
+                $('#error-message').hide(); // Ocultar mensaje si la hora es válida
+            }
+        });
+    });
+</script>
+
+{% endblock %}

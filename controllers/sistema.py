@@ -856,4 +856,12 @@ def modalAgregarVenta():
 def nuevaConsulta():
     return render_template('sistema/agendar_consulta.html')
 
+
+@bp.route('/modalAgendar', methods=['POST'])
+@login_required
+def modalAgendar():
+    fecha = request.form['fecha']
+    evento = request.form['event']
+    return render_template('sistema/modales/programar_cita.html', fecha = fecha,eventos = evento)
+
 # FIN DEL MODULO DE CONSULTAS

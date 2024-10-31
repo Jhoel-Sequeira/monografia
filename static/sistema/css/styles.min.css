@@ -10,6 +10,7 @@
 
 :root,
 [data-bs-theme=light] {
+    --light-green: #0da10d;
     --bs-blue: #5D87FF;
     --bs-indigo: #6610f2;
     --bs-purple: #6f42c1;
