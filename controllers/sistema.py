@@ -1,5 +1,5 @@
 # controllers/sistema.py
-from datetime import datetime
+from datetime import datetime, timedelta
 import os
 from fpdf import FPDF
 from flask import Blueprint, jsonify, render_template, request,session,redirect,make_response
@@ -857,11 +857,97 @@ def nuevaConsulta():
     return render_template('sistema/agendar_consulta.html')
 
 
+@bp.route('/traerCitas')
+def traerCitas():
+    
+    conn = conectar()
+    cursor = conn.cursor()
+    query = "select a.cod_atencion,c.nombres_cliente,a.fecha_atencion,e.NombreEstado from atencion as a inner join cliente as c on a.num_cliente = c.num_cliente INNER JOIN estado as e on a.id_estado = e.id_estado where e.NombreEstado = 'AGENDADO'"
+    cursor.execute(query)
+    agendas = cursor.fetchall()
+    agenda= []
+    for fila in agendas:
+        fecha_inicio = fila[2]
+        fecha_fin = fecha_inicio + timedelta(minutes=30)  # Suma 30 minutos a la hora de inicio
+
+        agendas = {
+            'numero': fila[0],
+            'cliente': fila[1],
+            'estado': fila[3],
+            'fecha': fecha_inicio.strftime('%Y-%m-%d %H:%M:%S'),  
+            'fechafin': fecha_fin.strftime('%Y-%m-%d %H:%M:%S') 
+        }
+        agenda.append(agendas)
+
+    return ''+str(agenda)
+
+
 @bp.route('/modalAgendar', methods=['POST'])
 @login_required
 def modalAgendar():
     fecha = request.form['fecha']
-    evento = request.form['event']
-    return render_template('sistema/modales/programar_cita.html', fecha = fecha,eventos = evento)
+
+    conn = conectar()
+    cursor = conn.cursor()
+    query = "select num_cliente,nombres_cliente + ' ' + apellidos_cliente as Nombre from cliente "
+    cursor.execute(query)
+    clientes = cursor.fetchall()
+
+    
+
+    return render_template('sistema/modales/programar_cita.html', fecha = fecha,clientes = clientes)
+
+
+@bp.route('/horasDisponibles', methods=['POST', 'GET'])
+@login_required
+def horasDisponibles():
+    fecha = request.form['fecha']  # Fecha en formato 'YYYY-MM-DD'
+
+    conn = conectar()
+    cursor = conn.cursor()
+    
+    # Obtener las horas ocupadas en el día seleccionado
+    query = """
+        SELECT CONVERT(varchar(5), fecha_atencion, 108) AS hora_atencion 
+        FROM atencion 
+        WHERE CONVERT(date, fecha_atencion) = ?;
+    """
+    cursor.execute(query, (fecha,))
+    ocupadas = cursor.fetchall()
+
+    # Convertir a una lista de horas ocupadas en formato datetime
+    horas_ocupadas = [datetime.strptime(hora[0], '%H:%M') for hora in ocupadas]
+
+    # Definir los intervalos de horario de apertura
+    horarios = [
+        ('08:00', '12:00'),  # Bloque de la mañana
+        ('13:00', '17:00')   # Bloque de la tarde
+    ]
+
+    # Generar lista de horas posibles en intervalos de 45 minutos en formato de 12 horas
+    intervalos_disponibles = []
+    for inicio, fin in horarios:
+        hora_actual = datetime.strptime(inicio, '%H:%M')
+        hora_fin = datetime.strptime(fin, '%H:%M')
+
+        while hora_actual + timedelta(minutes=45) <= hora_fin:
+            # Verificar si el intervalo está ocupado
+            intervalo_ocupado = any(
+                ocupada <= hora_actual < ocupada + timedelta(minutes=45)
+                for ocupada in horas_ocupadas
+            )
+            if not intervalo_ocupado:
+                # Convertir a formato de 12 horas con AM/PM
+                intervalos_disponibles.append(hora_actual.strftime('%I:%M %p'))
+            hora_actual += timedelta(minutes=45)
+
+    # Cerrar la conexión
+    cursor.close()
+    conn.close()
+
+    return jsonify({"horas_disponibles": intervalos_disponibles})
+
+    
+
 
 # FIN DEL MODULO DE CONSULTAS

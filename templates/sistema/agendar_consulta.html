@@ -195,7 +195,6 @@
             type: "POST",
             data: {
                 fecha: fechaSeleccionada,
-                event:  horasOcupadas.length > 0 ? horasOcupadas : null  // Enviar también la hora seleccionada
             },
             success: function (response) {
                 $('#agendar-modal').html(response);
@@ -211,7 +210,6 @@
     
     function cale() {
 
-        //console.log('entro')
         /* initialize the calendar
          -----------------------------------------------------------------*/
         //Date for the calendar events (dummy data)
@@ -243,6 +241,21 @@
             },
             hiddenDays: [0], // Esconde los domingos
             events: consultas, // Eventos predeterminados
+
+            eventTimeFormat: {
+                hour: '2-digit',
+                minute: '2-digit',
+                meridiem: false
+            },
+
+            views: {
+                dayGridMonth: {
+                    displayEventTime: true // Muestra la hora en la vista mensual
+                },
+                timeGridDay: {
+                    displayEventTime: true // Muestra la hora en la vista diaria
+                }
+            },
 
             dateClick: function (info) {
                 // Filtrar eventos en la fecha seleccionada
@@ -280,15 +293,15 @@
 
     }
     $(document).ready(function () {
-        cale();
-
+        
+        cargareventos();
 
     });
 
     function cargareventos() {
 
         $.ajax({
-            url: "/TraerPendientes",
+            url: "{{ url_for('sistema.traerCitas') }}",
             type: "GET",
             data: {
 
@@ -304,12 +317,10 @@
                 $.each(json, (index, evento) => {
                     var color;
                     console.log(evento.estado)
-                    if (evento.importancia < 4 && evento.importancia > 0 && (evento.estado != 'COMPLETADO')) {
-                        color = '#e9d41d';  // Amarillo para pendientes
-                    } else if (evento.estado === 'COMPLETADO') {
-                        color = '#0da10d';  // Verde para completados
-                    } else if ((evento.estado == 'EN PROCESO')) {
-                        color = '#FFCE26'; // Otro color por defecto
+                    if (evento.estado === 'AGENDADO') {
+                        color = 'var(--bs-info)';  // Verde para completados
+                    } else if ((evento.estado == 'COMPLETADOS')) {
+                        color = '#0da10d';
                     } else if ((evento.estado == 'RETRASADO')) {
                         color = 'var(--red)'; // Otro color por defecto
                     } else if ((evento.estado == 'PLANIFICADO')) {
@@ -319,8 +330,9 @@
                     // fechaFinActual.setDate(fechaFinActual.getDate() + 1);
 
                     // Actualizar la propiedad fechafin con la nueva fecha
+                    
                     consultas.push({
-                        title: evento.numero + ' - ' + evento.maquina + ' - ' + evento.asignado,
+                        title: evento.cliente,
                         start: evento.fecha,
                         end: evento.fechafin,
                         backgroundColor: color,

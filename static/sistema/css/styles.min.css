@@ -404,7 +404,7 @@ sup {
 
 a {
     color: rgba(var(--bs-link-color-rgb), var(--bs-link-opacity, 1));
-    text-decoration: none!important;
+    text-decoration: none !important;
 }
 
 a:hover {
@@ -446,16 +446,18 @@ code {
 }
 
 .pressed {
-    background-color: #f39c12 !important; /* Cambia el color de fondo cuando esté presionado */
-    border-color: #e67e22 !important; /* Cambia el borde */
+    background-color: #f39c12 !important;
+    /* Cambia el color de fondo cuando esté presionado */
+    border-color: #e67e22 !important;
+    /* Cambia el borde */
     color: white !important;
-  }
+}
 
-  .pagina{
-    background-color: var(--bs-purple) ;
-    border: 1px solid var(--bs-purple) ;
-  }
-  
+.pagina {
+    background-color: var(--bs-purple);
+    border: 1px solid var(--bs-purple);
+}
+
 
 a>code {
     color: inherit
@@ -5408,9 +5410,10 @@ fieldset:disabled .btn {
     cursor: default
 }
 
-div .dataTables_wrapper div.dataTables_filter label{
-	display: none !important;
+div .dataTables_wrapper div.dataTables_filter label {
+    display: none !important;
 }
+
 .nav-tabs {
     --bs-nav-tabs-border-width: var(--bs-border-width);
     --bs-nav-tabs-border-color: var(--bs-border-color);
@@ -19922,6 +19925,7 @@ div .dataTables_wrapper div.dataTables_filter label{
     width: 8px;
     height: 8px
 }
+
 /* .contenedor{
     max-width: 1350px !important;
     margin-left: 80px !important;
@@ -20067,14 +20071,17 @@ div .dataTables_wrapper div.dataTables_filter label{
     -webkit-transition: 0.2s ease-in;
     transition: 0.2s ease-in
 }
+
 .sombra-lateral {
-	z-index: 1;
-	border-radius: 5px;
-    box-shadow: 10px 0 15px -5px rgba(0, 0, 0, 0.3); /* Sombra lateral derecha */
-    
-  }
-  .tabla-productos{
-	height: 65vh;
+    z-index: 1;
+    border-radius: 5px;
+    box-shadow: 10px 0 15px -5px rgba(0, 0, 0, 0.3);
+    /* Sombra lateral derecha */
+
+}
+
+.tabla-productos {
+    height: 65vh;
 }
 
 @media (max-width:767.98px) {
@@ -20258,64 +20265,16 @@ ul {
 
 ::-webkit-scrollbar {
     display: none;
-  }
+}
 
-  <style>
-  /* Contenedor de la tabla */
-  table thead th {
-    background-color: rgba(92, 92, 92, 0.486) !important;
-    color: white;
-    text-align: start !important;
-  }
 
-  .table-container {
-    width: 100%;
-    max-height: 70vh;
-    /* Ajusta la altura según lo necesites */
-    overflow-y: auto;
-    /* Permite que solo el tbody se desplace */
-    border: 1px solid #ddd;
-    -ms-overflow-style: none;
-    /* IE y Edge */
-    scrollbar-width: none;
-    /* Firefox */
-  }
 
-  .table-container ::-webkit-scrollbar {
-    display: none;
-  }
+.select2 {
+    width: 100% !important;
+}
 
-  /* La tabla debe tener el ancho completo */
-  .table {
-    width: 100%;
-    border-collapse: collapse;
-    table-layout: fixed;
-    /* Garantiza que las columnas mantengan su tamaño */
-  }
-
-  /* Estilo para los encabezados */
-  .table thead {
-    background-color: white;
-    position: sticky;
-    top: 0;
-    z-index: 1;
-    /* Mantiene los encabezados sobre el contenido al hacer scroll */
-  }
-
-  /* Ancho de las columnas */
-  .table th,
-  .table td {
-    padding: 8px;
-    text-align: start !important;
-    width: 20%;
-    /* Ajusta este valor si es necesario */
-    box-sizing: border-box;
-    border-bottom: 1px solid #ddd;
-  }
-
-  /* Opcional: estilo para hacer más visible el encabezado */
-  .table thead th {
-    border-bottom: 2px solid #ddd;
-    background-color: #f9f9f9;
-  }
-</style>
+/* Agrega un estilo personalizado para alinear horizontalmente las selecciones */
+.select2-selection__choice {
+    display: inline-block !important;
+    margin-right: 5px;
+}

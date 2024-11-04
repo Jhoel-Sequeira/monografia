@@ -10,7 +10,12 @@
                                 class="ti ti-circle-plus-filled" aria-hidden="true" title="Agregar Nuevo Conductor"
                                 data-bs-target="#agregarCliente" data-bs-toggle="modal" data-bs-dismiss="modal"
                                 style="color: red; font-size: 15px;"></i></label>
-                        <input type="text" id="nombre" class="form-control">
+                        <select class="form-select" id="cliente" data-placeholder="Seleccione un rol">
+                            {% for cliente in clientes %}
+
+                            <option value="{{ cliente.num_cliente}}">{{ cliente.Nombre }}</option>
+                            {% endfor %}
+                        </select>
 
                     </div>
                     <div class="col">
@@ -18,7 +23,12 @@
                                 class="ti ti-circle-plus-filled" aria-hidden="true" title="Agregar Nuevo Conductor"
                                 data-bs-target="#agregarMascota" data-bs-toggle="modal" data-bs-dismiss="modal"
                                 style="color: red; font-size: 15px;"></i></label>
-                        <input type="text" id="nombre" class="form-control">
+                        <select class="form-select" id="mascota" data-placeholder="Seleccione un rol">
+                            {% for cliente in clientes %}
+
+                            <option value="{{ cliente.num_cliente}}">{{ cliente.Nombre }}</option>
+                            {% endfor %}
+                        </select>
 
                     </div>
 
@@ -85,7 +95,7 @@
 
                     <div class="col">
                         <label class="form-label " for="form3Example2"><strong>Fecha</strong></label>
-                        <input type="date" class="form-control" value="{{fecha}}" disabled>
+                        <input type="date" class="form-control" id="fecha" value="{{fecha}}" disabled>
 
 
 
@@ -93,7 +103,9 @@
                     </div>
                     <div class="col">
                         <label class="form-label" for="timePicker"><strong>Hora</strong></label>
-                        <input type="text" id="timePicker" class="form-control" placeholder="Selecciona una hora">
+                        <select class="form-select" id="hora" data-placeholder="Seleccione una hora">
+
+                        </select>
                     </div>
 
 
@@ -189,7 +201,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary" data-bs-target="#capturarPeso" id="regresar" data-bs-toggle="modal"
+                <button class="btn btn-secondary" data-bs-target="#agendarConsulta" id="regresar" data-bs-toggle="modal"
                     data-bs-dismiss="modal">Regresar</button>
                 <button class="btn btn-primary" onclick="NuevoConductor()">Guardar</button>
             </div>
@@ -217,9 +229,10 @@
                     </div>
                 </div>
             </div>
+
             <div class="modal-footer">
-                <button class="btn btn-secondary" data-bs-target="#capturarPeso" id="regresar1" data-bs-toggle="modal"
-                    data-bs-dismiss="modal">Regresar</button>
+                <button class="btn btn-secondary" data-bs-target="#agendarConsulta" id="regresar1"
+                    data-bs-toggle="modal" data-bs-dismiss="modal">Regresar</button>
                 <button class="btn btn-primary" onclick="NuevaPlaca()">Guardar</button>
             </div>
         </div>
@@ -233,6 +246,7 @@
         border: 1px solid #28a745;
         margin: 5px 0;
     }
+
     .hora-ocupada {
         cursor: not-allowed;
         padding: 10px;
@@ -243,40 +257,41 @@
 </style>
 <!-- FIN DE MODALES -->
 <script>
-        // Horas ocupadas como ejemplo
-        const eventos = [
-        { start: new Date("2024-11-01T09:00:00") },
-        { start: new Date("2024-11-01T11:00:00") },
-        { start: new Date("2024-11-01T14:00:00") }
-    ];
-
-    // Extraer horas ocupadas
-    const horasOcupadas = eventos.map(evento => {
-        return evento.start.toISOString().split('T')[1].substring(0, 5); // Formato "HH:mm"
+    $('#cliente').select2({
+        width: $(this).data('width') ? $(this).data('width') : $(this).hasClass('w-100') ? '150%' : 'style',
+        placeholder: $(this).data('placeholder'),
+        closeOnSelect: false,
     });
 
+    function HorasDisponibles() {
+        $.ajax({
+            url: "{{ url_for('sistema.horasDisponibles') }}",
+            type: "POST",
+            data: {
+                fecha: $('#fecha').val(),
+            },
+            success: function (response) {
+                $('#hora').empty();
+
+                // Agregar la opción por defecto
+                $('#hora').append('<option value="" disabled selected>Seleccione una hora</option>');
+
+                // Iterar sobre las horas disponibles y agregarlas como opciones
+                response.horas_disponibles.forEach(function (hora) {
+                    $('#hora').append('<option value="' + hora + '">' + hora + '</option>');
+                });
+            },
+            error: function (error) {
+                console.error("Error en la solicitud AJAX:", error);
+            },
+        });
+
+    }
+
+
+
     $(document).ready(function () {
-        $('#timePicker').clockpicker({
-            placement: 'bottom',
-            align: 'left',
-            donetext: 'Listo',
-            canceltext: 'Cancelar',
-            autoclose: true
-        });
-
-        // Validar la hora seleccionada
-        $('#timePicker').on('change', function () {
-            const selectedTime = $(this).val();
-
-            // Comprobar si la hora seleccionada está ocupada
-            if (horasOcupadas.includes(selectedTime)) {
-                // Mostrar mensaje de error
-                $('#error-message').text("Esta hora ya está ocupada. Por favor, elige otra.").show();
-                $(this).val(''); // Limpiar el campo
-            } else {
-                $('#error-message').hide(); // Ocultar mensaje si la hora es válida
-            }
-        });
+        HorasDisponibles();
     });
 </script>
 
