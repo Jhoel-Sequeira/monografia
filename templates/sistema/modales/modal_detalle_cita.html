@@ -1,0 +1,286 @@
+{% for dato in datos%}
+<div class="modal fade" id="detalleCita" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-fullscreen-md-down">
+        <div class="modal-content">
+            <div class="row p-3">
+                <div class="row mt-2">
+                    <div class="col">
+                        <label class="form-label " for="form3Example2"><strong>Cliente</strong></label>
+                        <input type="text" class="form-control" value="{{dato.Nombre}}" disabled>
+
+                    </div>
+                    <div class="col">
+                        <label class="form-label " for="form3Example2"><strong>Mascota</strong><i
+                                class="ti ti-circle-plus-filled" aria-hidden="true" title="Agregar Nuevo Conductor"
+                                data-bs-target="#agregarMascota" data-bs-toggle="modal" data-bs-dismiss="modal"
+                                style="color: red; font-size: 15px;"></i></label>
+                        <input type="text" class="form-control desbloquear" value="{{dato.Nombre_mascota}}" disabled>
+
+                    </div>
+
+                </div>
+                <div class="row mt-2">
+
+                    <div class="col">
+                        <label class="form-label " for="form3Example2"><strong>Tipo Atención</strong></label>
+                        <input type="text" class="form-control desbloquear" value="{{dato.tipo}}" disabled>
+
+
+
+
+                    </div>
+
+                    <div class="col">
+                        <label class="form-label " for="form3Example2"><strong>
+                                Peso</strong></label>
+
+                        <input type="number" name="" value="{{dato.peso}}" class="form-control desbloquear" id="peso" disabled>
+
+                    </div>
+                    <div class="col">
+                        <label class="form-label " for="form3Example2"><strong>
+                                Altura</strong></label>
+
+                        <input type="number" name="" value="{{dato.altura}}" class="form-control desbloquear" id="altura" disabled>
+
+                    </div>
+
+                    <div class="col">
+                        <label class="form-label " for="form3Example2"><strong>
+                                Temperatura</strong></label>
+
+                        <input type="number" name="" value="{{dato.temperatura}}" class="form-control desbloquear" id="temperatura"
+                            disabled>
+
+                    </div>
+
+
+
+                </div>
+
+                <div class="row mt-2">
+
+                    <div class="col">
+                        <label class="form-label " for="form3Example2"><strong>Fecha</strong></label>
+                        <input type="date" class="form-control" id="fecha" value="{{dato.fecha_atencion}}" disabled>
+
+
+
+
+                    </div>
+                    <div class="col">
+                        <label class="form-label" for="timePicker"><strong>Hora</strong></label>
+                        <input type="hidden" id="hora" value="{{dato.hora_atencion}}" disabled>
+                        <select class="form-select form-control desbloquear" id="horasDisponibles" data-placeholder="Seleccione una hora" disabled>
+
+                        </select>
+                    </div>
+
+
+
+
+
+                </div>
+                <div class="row mt-2">
+
+                    <div class="col">
+                        <label class="form-label " for="form3Example2"><strong>Observación</strong></label>
+                        <textarea name="" class="form-control desbloquear" rows="4" id="observacion" disabled></textarea>
+
+
+
+                    </div>
+
+                </div>
+
+            </div>
+            <div class="row m-3">
+                <div class="modal-footer ">
+                    <button type="button" class="btn btn-secondary" id="cerrar" data-bs-dismiss="modal">Close</button>
+                    <button type="button" onclick="desbloquear()" id="bloquear" class="btn btn-primary"><i
+                            class="ti ti-lock-open-2"></i> Desbloquear</button>
+
+                    <button type="button" class="btn btn-danger" id="cerrar" data-bs-dismiss="modal"><i
+                            class="ti ti-cancel"></i> Cancelar</button>
+
+                    <button type="button" onclick="guardarConsulta()" class="btn btn-success"><i
+                            class="ti ti-circle-check"></i> Guadar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{%endfor%}
+
+
+
+
+<!-- FIN DEL MODAL -->
+<style>
+    .hora-disponible {
+        cursor: pointer;
+        padding: 10px;
+        border: 1px solid #28a745;
+        margin: 5px 0;
+    }
+
+    .hora-ocupada {
+        cursor: not-allowed;
+        padding: 10px;
+        border: 1px solid #dc3545;
+        margin: 5px 0;
+        color: #dc3545;
+    }
+</style>
+<!-- FIN DE MODALES -->
+<script>
+    var isDisabled = false; // Iniciamos con los elementos desactivados
+
+    function desbloquear() {
+
+        document.querySelectorAll('#detalleCita .desbloquear').forEach(element => {
+            element.disabled = isDisabled;
+        });
+
+        // Cambiar el texto del botón según el estado
+        if (isDisabled) {
+            $('#bloquear').html('<i class="ti ti-lock-open-2"></i> Desbloquear'); // Cambia el texto a "Bloquear"
+        } else {
+            $('#bloquear').html('<i class="ti ti-lock"></i> Bloquear'); // Cambia el texto a "Desbloquear"
+        }
+
+        // Invertir el valor de isDisabled
+        isDisabled = !isDisabled;
+
+    }
+
+    $("#cliente").change(function () {
+        $.ajax({
+            url: "{{ url_for('sistema.traerMascotas') }}",
+            type: "POST",
+            data: {
+                cliente: $('#cliente option:selected').val(),
+            },
+            success: function (response) {
+                console.log(response);
+                // Limpiar las opciones anteriores
+                $('#mascota').empty();
+
+                // Agregar la opción por defecto
+                $('#mascota').append('<option value="Seleccione una mascota" disabled selected>Seleccione una mascota</option>');
+
+                // Iterar sobre las mascotas recibidas y agregarlas como opciones
+                response.mascotas.forEach(function (mascota) {
+                    $('#mascota').append('<option value="' + mascota.idMascota + '">' + mascota.Nombre_mascota + '</option>');
+                });
+            },
+            error: function (error) {
+                console.error("Error en la solicitud AJAX:", error);
+            },
+        });
+    });
+
+
+
+
+    $('#cliente').select2({
+        width: $(this).data('width') ? $(this).data('width') : $(this).hasClass('w-100') ? '150%' : 'style',
+        placeholder: $(this).data('placeholder'),
+        closeOnSelect: false,
+    });
+
+    function HorasDisponibles() {
+        $.ajax({
+            url: "{{ url_for('sistema.horasDisponibles') }}",
+            type: "POST",
+            data: {
+                fecha: $('#fecha').val(),
+            },
+            success: function (response) {
+                $('#horasDisponibles').empty();
+
+                // Agregar la opción por defecto
+                // Obtener la hora del campo de entrada
+                let hora = $('#hora').val();
+
+                // Separar la hora y los minutos (si el formato es HH:mm)
+                let [horas, minutos] = hora.split(':');
+
+                // Convertir la hora a un número para comparar
+                horas = parseInt(horas);
+
+                // Determinar si es AM o PM
+                let periodo = horas < 12 ? 'AM' : 'PM';
+
+                // Ajustar el formato de 24 horas a 12 horas
+                if (horas === 0) {
+                    horas = 12; // Medianoche
+                } else if (horas > 12) {
+                    horas -= 12; // Convertir a formato de 12 horas
+                }
+
+                // Crear el texto con formato HH:MM AM/PM
+                let horaFormateada = `${horas}:${minutos} ${periodo}`;
+
+                // Agregar la opción al selector
+                $('#horasDisponibles').append(`<option value="Seleccione una hora" disabled selected>${horaFormateada}</option>`);
+
+
+                // Iterar sobre las horas disponibles y agregarlas como opciones
+                response.horas_disponibles.forEach(function (hora) {
+                    $('#horasDisponibles').append('<option value="' + hora + '">' + hora + '</option>');
+                });
+            },
+            error: function (error) {
+                console.error("Error en la solicitud AJAX:", error);
+            },
+        });
+
+    }
+
+
+    function guardarConsulta() {
+        if ($('#cliente option:selected').val() == 'seleccione un cliente' || $('#mascota option:selected').val() == 'Seleccione una mascota' ||
+            $('#peso').val() == '' || $('#altura').val() == '' || $('#temperatura').val() == '' || $('#cliente option:selected').val() == 'Seleccione una hora' || $('#cliente option:selected').val() == 'Tipo de atención') {
+            Swal.fire({ icon: 'error', title: 'Error', confirmButtonText: 'Ok', text: 'Debe rellenar todos los campos' }).then((result) => { /* Read more about isConfirmed, isDenied below */
+                if (result.isConfirmed) {
+
+                }
+            })
+        } else {
+            $.ajax({
+                url: "{{ url_for('sistema.actualizarCita') }}",
+                type: "POST",
+                data: {
+                    
+                    mascota: $('#mascota option:selected').val(),
+                    peso: $('#peso').val(),
+                    altura: $('#altura').val(),
+                    observacion: $('#observacion').val(),
+                    fecha: $('#fecha').val(),
+                    temperatura: $('#temperatura').val(),
+                    hora: $('#hora option:selected').val(),
+                    atencion: $('#cliente option:selected').val()
+                },
+                success: function (response) {
+                    Swal.fire({ icon: 'success', title: 'Éxito', confirmButtonText: 'Ok', text: 'Cita Agendada Correctamente' }).then((result) => { /* Read more about isConfirmed, isDenied below */
+                        if (result.isConfirmed) {
+                            cargareventos();
+                            $('#cerrar').click();
+                        }
+                    })
+                },
+                error: function (error) {
+                    console.error("Error en la solicitud AJAX:", error);
+                },
+            });
+        }
+
+    }
+
+
+    $(document).ready(function () {
+        HorasDisponibles();
+    });
+</script>

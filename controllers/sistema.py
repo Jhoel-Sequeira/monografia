@@ -1,13 +1,15 @@
 # controllers/sistema.py
 from datetime import datetime, timedelta
 import os
+import locale
 from fpdf import FPDF
-from flask import Blueprint, jsonify, render_template, request,session,redirect,make_response
+from flask import Blueprint, jsonify, render_template, request,session,redirect,make_response,current_app
 from functools import wraps
 from conexion import conectar
 import pandas as pd
 
 from controllers.excel import GenerarExcel_3
+from controllers.correo import enviar_correo
 
 def capturarHora():
     hi = datetime.now()
@@ -893,9 +895,34 @@ def modalAgendar():
     cursor.execute(query)
     clientes = cursor.fetchall()
 
+    conn = conectar()
+    cursor = conn.cursor()
+    query = "select cod_tipo,tipo from tipo_atencion "
+    cursor.execute(query)
+    atencion = cursor.fetchall()
+
     
 
-    return render_template('sistema/modales/programar_cita.html', fecha = fecha,clientes = clientes)
+    return render_template('sistema/modales/programar_cita.html', fecha = fecha,clientes = clientes,atencion = atencion)
+
+
+@bp.route('/modalDetalleCita', methods=['POST'])
+@login_required
+def modalDetalleCita():
+    num = request.form['num']
+
+    
+
+    conn = conectar()
+    cursor = conn.cursor()
+    query = "SELECT a.cod_atencion,CONVERT(DATE, a.fecha_atencion) AS fecha_atencion, CONVERT(TIME, a.fecha_atencion) AS hora_atencion,c.nombres_cliente + ' ' + c.apellidos_cliente AS Nombre,e.NombreEstado,m.Nombre_mascota,es.nom_especie,t.tipo,a.peso,a.altura,a.temperatura,a.descripcion FROM atencion AS a INNER JOIN cliente AS c ON a.num_cliente = c.num_cliente INNER JOIN estado AS e ON a.id_estado = e.id_estado INNER JOIN mascota AS m ON a.idMascota = m.idMascota INNER JOIN tipo_atencion AS t ON a.tipo_atencion = t.cod_tipo INNER JOIN raza AS r ON m.id_raza = r.id_raza INNER JOIN especie AS es ON r.id_especie = es.id_especie where a.cod_atencion = ?"
+    cursor.execute(query,(num))
+    datos = cursor.fetchall()
+
+    
+
+    return render_template('sistema/modales/modal_detalle_cita.html',datos = datos)
+
 
 
 @bp.route('/horasDisponibles', methods=['POST', 'GET'])
@@ -947,7 +974,154 @@ def horasDisponibles():
 
     return jsonify({"horas_disponibles": intervalos_disponibles})
 
+
+
+@bp.route('/traerMascotas', methods=['POST', 'GET'])
+@login_required
+def traerMascotas():
+    cliente = request.form['cliente']  # Fecha en formato 'YYYY-MM-DD'
+
+    conn = conectar()
+    cursor = conn.cursor()
+    
+    # Obtener las horas ocupadas en el día seleccionado
+    query = """
+        select cod_clienteM,m.idMascota,m.Nombre_mascota from cliente_mascota as cm inner join mascota as m on cm.cod_mascota = m.idMascota 
+        WHERE cm.cod_cliente = ?;
+    """
+    cursor.execute(query, (cliente,))
+    mascotas = cursor.fetchall()
+
+    mascotas_list = [{"cod_clienteM": row[0], "idMascota": row[1], "Nombre_mascota": row[2]} for row in mascotas]
+
+
+    cursor.close()
+    conn.close()
+
+    return jsonify({"mascotas": mascotas_list})
+
+
+
+@bp.route('/agendarCita', methods=['POST'])
+def agendarCita():
+
+    cliente = request.form['cliente']
+    mascota = request.form['mascota']
+    peso = request.form['peso']
+    altura = request.form['altura']
+    observacion = request.form['observacion']
+    hora = request.form['hora']
+    fecha = request.form['fecha']
+    atencion = request.form['atencion']
+    temperatura = request.form['temperatura']
+
+   
+
+    fecha_hora_str = f"{fecha} {hora}"
+    fecha_hora = datetime.strptime(fecha_hora_str, "%Y-%m-%d %I:%M %p")
+
+    # Separar el día y el mes
+    fecha_obj = datetime.strptime(fecha, "%Y-%m-%d")
+    dia = fecha_obj.strftime("%d")  # Día con ceros a la izquierda
+    locale.setlocale(locale.LC_TIME, 'es_MX.UTF-8')  # Español de México
+    mes = fecha_obj.strftime("%B").capitalize()
+
+    print(mes)
+
+    conn = conectar()
+    cursor = conn.cursor()
+            # Realiza la inserción
+    query = 'INSERT INTO atencion (fecha_atencion,num_cliente,id_estado,num_veterinario,idMascota,tipo_atencion,peso,altura,temperatura,descripcion,costo) VALUES (?,?,?,?,?,?,?,?,?,?,?)'
+    cursor.execute(query, (fecha_hora, cliente,10,1,mascota,atencion,peso,altura,temperatura,observacion,0))
+    conn.commit()
+
+
+    conn = conectar()
+    cursor = conn.cursor()
+    query = "select correo_cliente from cliente where num_cliente = ?"
+    cursor.execute(query,(cliente))
+    correo = cursor.fetchone()
+
+    # MANDAR EL CORREO CON LA CITA AGENDADA
+    enviar_correo(current_app,"Usted tiene una nueva cita",correo[0],'agendar',dia,mes,hora)
     
 
+    return 'done'
+
+
+@bp.route('/reAgendar', methods=['POST'])
+def reAgendar():
+
+    num = request.form['id']
+    hora = request.form['hora']
+    fecha = request.form['fecha']
+
+      # Español de España
+    
+
+
+    fecha_hora_str = f"{fecha} {hora}"
+    fecha_hora = datetime.strptime(fecha_hora_str, "%Y-%m-%d %I:%M %p")
+
+    fecha_obj = datetime.strptime(fecha, "%Y-%m-%d")
+    dia = fecha_obj.strftime("%d")  # Día con ceros a la izquierda
+    locale.setlocale(locale.LC_TIME, 'es') 
+    mes = fecha_obj.strftime("%B").capitalize()
+
+    print(dia)
+
+    print(fecha_hora)
+    conn = conectar()
+    cursor = conn.cursor()
+            # Realiza la inserción
+    query = 'UPDATE atencion set fecha_atencion = ? where cod_atencion = ?'
+    cursor.execute(query, (fecha_hora, num))
+    conn.commit()
+
+    conn = conectar()
+    cursor = conn.cursor()
+    query = "select c.correo_cliente from atencion as a inner join cliente as c on a.num_cliente = c.num_cliente where a.cod_atencion = ?"
+    cursor.execute(query,(num))
+    correo = cursor.fetchone()
+
+    enviar_correo(current_app,"Usted tiene una nueva cita",correo[0],'agendar',dia,mes,hora)
+
+    return 'done'
+
+@bp.route('/actualizarCita', methods=['POST'])
+def actualizarCita():
+
+   
+    mascota = request.form['mascota']
+    peso = request.form['peso']
+    altura = request.form['altura']
+    observacion = request.form['observacion']
+    hora = request.form['hora']
+    fecha = request.form['fecha']
+    atencion = request.form['atencion']
+    temperatura = request.form['temperatura']
+
+   
+
+    fecha_hora_str = f"{fecha} {hora}"
+    fecha_hora = datetime.strptime(fecha_hora_str, "%Y-%m-%d %I:%M %p")
+
+    # Separar el día y el mes
+    fecha_obj = datetime.strptime(fecha, "%Y-%m-%d")
+    dia = fecha_obj.strftime("%d")  # Día con ceros a la izquierda
+    locale.setlocale(locale.LC_TIME, 'es_MX.UTF-8')  # Español de México
+    mes = fecha_obj.strftime("%B").capitalize()
+
+    print(mes)
+
+    conn = conectar()
+    cursor = conn.cursor()
+            # Realiza la inserción
+    query = 'UPDATE atencion set fecha_atencion = ?, idMascota = ?, tipo_atencion = ?, peso = ?,altura = ?, temperatura = ?,descripcion = ? where cod_atencion = ?'
+    cursor.execute(query, (fecha_hora, mascota,atencion,peso,altura,temperatura,observacion))
+    conn.commit()
+
+
+    return 'done'
 
 # FIN DEL MODULO DE CONSULTAS

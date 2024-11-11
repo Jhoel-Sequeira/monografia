@@ -11,6 +11,8 @@
                                 data-bs-target="#agregarCliente" data-bs-toggle="modal" data-bs-dismiss="modal"
                                 style="color: red; font-size: 15px;"></i></label>
                         <select class="form-select" id="cliente" data-placeholder="Seleccione un rol">
+                            <option selected="true" value="seleccione un cliente" disabled="disabled">seleccione un
+                                cliente</option>
                             {% for cliente in clientes %}
 
                             <option value="{{ cliente.num_cliente}}">{{ cliente.Nombre }}</option>
@@ -23,11 +25,8 @@
                                 class="ti ti-circle-plus-filled" aria-hidden="true" title="Agregar Nuevo Conductor"
                                 data-bs-target="#agregarMascota" data-bs-toggle="modal" data-bs-dismiss="modal"
                                 style="color: red; font-size: 15px;"></i></label>
-                        <select class="form-select" id="mascota" data-placeholder="Seleccione un rol">
-                            {% for cliente in clientes %}
+                        <select class="form-select" id="mascota" data-placeholder="Seleccione una mascota">
 
-                            <option value="{{ cliente.num_cliente}}">{{ cliente.Nombre }}</option>
-                            {% endfor %}
                         </select>
 
                     </div>
@@ -37,10 +36,13 @@
 
                     <div class="col">
                         <label class="form-label " for="form3Example2"><strong>Tipo Atención</strong></label>
-                        <select class="form-select" id="proveedor" data-placeholder="Seleccione un rol">
-                            {% for proveedor in proveedores %}
+                        <select class="form-select" id="tipoAtencion" data-placeholder="Seleccione un rol">
+                            <option selected="true" value="Tipo de atención" disabled="disabled">seleccione un cliente
+                            </option>
 
-                            <option value="{{ proveedor.cod_proveedor}}">{{ proveedor.nom_proveedor }}</option>
+                            {% for atencion in atencion %}
+
+                            <option value="{{ atencion.cod_atencion}}">{{ atencion.tipo }}</option>
                             {% endfor %}
                         </select>
 
@@ -53,24 +55,14 @@
                         <label class="form-label " for="form3Example2"><strong>
                                 Peso</strong></label>
 
-                        <select class="form-select" id="categoria" data-placeholder="Seleccione un rol">
-                            {% for categoria in categorias %}
-
-                            <option value="{{ categoria.cod_tipo }}">{{ categoria.tipos }}</option>
-                            {% endfor %}
-                        </select>
+                        <input type="number" name="" class="form-control" id="peso">
 
                     </div>
                     <div class="col">
                         <label class="form-label " for="form3Example2"><strong>
                                 Altura</strong></label>
 
-                        <select class="form-select" id="categoria" data-placeholder="Seleccione un rol">
-                            {% for categoria in categorias %}
-
-                            <option value="{{ categoria.cod_tipo }}">{{ categoria.tipos }}</option>
-                            {% endfor %}
-                        </select>
+                        <input type="number" name="" class="form-control" id="altura">
 
                     </div>
 
@@ -78,12 +70,7 @@
                         <label class="form-label " for="form3Example2"><strong>
                                 Temperatura</strong></label>
 
-                        <select class="form-select" id="categoria" data-placeholder="Seleccione un rol">
-                            {% for categoria in categorias %}
-
-                            <option value="{{ categoria.cod_tipo }}">{{ categoria.tipos }}</option>
-                            {% endfor %}
-                        </select>
+                        <input type="number" name="" class="form-control" id="temperatura">
 
                     </div>
 
@@ -117,7 +104,7 @@
 
                     <div class="col">
                         <label class="form-label " for="form3Example2"><strong>Observación</strong></label>
-                        <textarea name="" class="form-control" rows="4" id=""></textarea>
+                        <textarea name="" class="form-control" rows="4" id="observacion"></textarea>
 
 
 
@@ -128,12 +115,10 @@
             </div>
             <div class="row m-3">
                 <div class="modal-footer ">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" id="uploadBtn" style="display:none;" onclick="uploadImage()">Subir
-                        Imagen</button>
-                    <button type="button" id="toggle-btn" onclick="habilitar()" class="btn "
-                        style="background-color: blueviolet; color: white;">Habilitar en Página</button>
-                    <button type="button" onclick="agregarProducto()" class="btn btn-primary">Agendar</button>
+                    <button type="button" class="btn btn-secondary" id="cerrar" data-bs-dismiss="modal">Close</button>
+                   
+                   
+                    <button type="button" onclick="guardarConsulta()" class="btn btn-primary">Agendar</button>
                 </div>
             </div>
         </div>
@@ -257,6 +242,36 @@
 </style>
 <!-- FIN DE MODALES -->
 <script>
+
+    $("#cliente").change(function () {
+        $.ajax({
+            url: "{{ url_for('sistema.traerMascotas') }}",
+            type: "POST",
+            data: {
+                cliente: $('#cliente option:selected').val(),
+            },
+            success: function (response) {
+                console.log(response);
+                // Limpiar las opciones anteriores
+                $('#mascota').empty();
+
+                // Agregar la opción por defecto
+                $('#mascota').append('<option value="Seleccione una mascota" disabled selected>Seleccione una mascota</option>');
+
+                // Iterar sobre las mascotas recibidas y agregarlas como opciones
+                response.mascotas.forEach(function (mascota) {
+                    $('#mascota').append('<option value="' + mascota.idMascota + '">' + mascota.Nombre_mascota + '</option>');
+                });
+            },
+            error: function (error) {
+                console.error("Error en la solicitud AJAX:", error);
+            },
+        });
+    });
+
+
+
+
     $('#cliente').select2({
         width: $(this).data('width') ? $(this).data('width') : $(this).hasClass('w-100') ? '150%' : 'style',
         placeholder: $(this).data('placeholder'),
@@ -274,7 +289,7 @@
                 $('#hora').empty();
 
                 // Agregar la opción por defecto
-                $('#hora').append('<option value="" disabled selected>Seleccione una hora</option>');
+                $('#hora').append('<option value="Seleccione una hora" disabled selected>Seleccione una hora</option>');
 
                 // Iterar sobre las horas disponibles y agregarlas como opciones
                 response.horas_disponibles.forEach(function (hora) {
@@ -288,6 +303,45 @@
 
     }
 
+
+    function guardarConsulta() {
+        if ($('#cliente option:selected').val() == 'seleccione un cliente' || $('#mascota option:selected').val() == 'Seleccione una mascota' ||
+            $('#peso').val() == '' || $('#altura').val() == '' || $('#temperatura').val() == '' || $('#cliente option:selected').val() == 'Seleccione una hora' || $('#cliente option:selected').val() == 'Tipo de atención') {
+            Swal.fire({ icon: 'error', title: 'Error', confirmButtonText: 'Ok', text: 'Debe rellenar todos los campos' }).then((result) => { /* Read more about isConfirmed, isDenied below */
+                if (result.isConfirmed) {
+
+                }
+            })
+        } else {
+            $.ajax({
+                url: "{{ url_for('sistema.agendarCita') }}",
+                type: "POST",
+                data: {
+                    cliente: $('#cliente option:selected').val(),
+                    mascota: $('#mascota option:selected').val(),
+                    peso: $('#peso').val(),
+                    altura: $('#altura').val(),
+                    observacion: $('#observacion').val(),
+                    fecha: $('#fecha').val(),
+                    temperatura: $('#temperatura').val(),
+                    hora: $('#hora option:selected').val(),
+                    atencion: $('#cliente option:selected').val()
+                },
+                success: function (response) {
+                    Swal.fire({ icon: 'success', title: 'Éxito', confirmButtonText: 'Ok', text: 'Cita Agendada Correctamente' }).then((result) => { /* Read more about isConfirmed, isDenied below */
+                        if (result.isConfirmed) {
+                            cargareventos();
+                            $('#cerrar').click();
+                        }
+                    })
+                },
+                error: function (error) {
+                    console.error("Error en la solicitud AJAX:", error);
+                },
+            });
+        }
+
+    }
 
 
     $(document).ready(function () {

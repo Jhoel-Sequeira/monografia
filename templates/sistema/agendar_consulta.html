@@ -38,18 +38,7 @@
 
                 <div class="order ">
                     <div class="row mb-3">
-                        <div class="col" id="leyenda">
-                            <div id="amarillo" class="circulo"></div>
-                            <span>En proceso</span>
 
-                            <div id="verde" class="circulo"></div>
-                            <span>Completado</span>
-
-                            <div id="rojo" class="circulo"></div>
-                            <span>Pendiente</span>
-                            <div id="programado" class="circulo"></div>
-                            <span>Programado</span>
-                        </div>
                         <div class="col filter-container">
                             <i class='bx bxs-calendar' style="color: #0D6EFD; font-size: 25px;" id="Fecha"></i>
                             <input type="hidden" placeholder="Pick date rage" id="start" value="" />
@@ -71,6 +60,9 @@
 
 <div id="agendar-modal"></div>
 <input id="agregar" type="hidden" data-bs-toggle="modal" data-bs-target="#agendarConsulta">
+
+<div id="detalle-modal"></div>
+<input id="detalle" type="hidden" data-bs-toggle="modal" data-bs-target="#detalleCita">
 
 
 
@@ -186,10 +178,10 @@
         return color_aleatorio
     }
     function Agendar(fechaSeleccionada, eventosDelDia) {
-        var horasOcupadas = eventosDelDia.map(function(evento) {
+        var horasOcupadas = eventosDelDia.map(function (evento) {
             return evento.start.toISOString().split('T')[1].substring(0, 5); // Extrae HH:MM
         });
-        
+
         $.ajax({
             url: "{{ url_for('sistema.modalAgendar') }}",
             type: "POST",
@@ -206,9 +198,203 @@
             },
         });
     }
+    function Detalles(id) {
+        
+
+        $.ajax({
+            url: "{{ url_for('sistema.modalDetalleCita') }}",
+            type: "POST",
+            data: {
+                num: id,
+            },
+            success: function (response) {
+                $('#detalle-modal').html(response);
+                $('#detalle-modal').append(response.htmlresponse);
+                $('#detalle').click();
+            },
+            error: function (error) {
+                console.error("Error en la solicitud AJAX:", error);
+            },
+        });
+    }
     var calFuera;
-    
+
+    function HorasDisponiblesReagendar(fecha) {
+        $.ajax({
+            url: "{{ url_for('sistema.horasDisponibles') }}",
+            type: "POST",
+            data: {
+                fecha: fecha,
+            },
+            success: function (response) {
+                $('#hora').empty();
+
+                // Agregar la opción por defecto
+                $('#hora').append('<option value="Seleccione una hora" disabled selected>Seleccione una hora</option>');
+
+                // Iterar sobre las horas disponibles y agregarlas como opciones
+                response.horas_disponibles.forEach(function (hora) {
+                    $('#hora').append('<option value="' + hora + '">' + hora + '</option>');
+                });
+            },
+            error: function (error) {
+                console.error("Error en la solicitud AJAX:", error);
+            },
+        });
+
+    }
+
     function cale() {
+        /* inicializa el calendario */
+        // Date for the calendar events (dummy data)
+        var date1 = new Date();
+        var d1 = date1.getDate(),
+            m1 = date1.getMonth(),
+            y1 = date1.getFullYear();
+
+        var Calendar1 = FullCalendar.Calendar;
+        var calendarEl1 = document.getElementById('calendario-cliente');
+
+        // Inicializa el calendario
+        var calendar1 = new Calendar1(calendarEl1, {
+
+            buttonText: {
+                prevYear: 'prev year',
+                nextYear: 'next year',
+                year: 'year',
+                today: 'Hoy',
+                month: 'Mes',
+                day: 'Día',
+                list: 'Lista',
+            },
+            locale: 'es',
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridDay'
+            },
+            hiddenDays: [0], // Esconde los domingos
+            events: consultas, // Eventos predeterminados
+
+            editable: true, // Permite arrastrar y redimensionar eventos
+            droppable: true, // Habilita eventos "draggable" desde fuentes externas
+            eventTimeFormat: {
+                hour: '2-digit',
+                minute: '2-digit',
+                meridiem: false
+            },
+
+            views: {
+                dayGridMonth: {
+                    displayEventTime: true // Muestra la hora en la vista mensual
+                },
+                timeGridDay: {
+                    displayEventTime: true // Muestra la hora en la vista diaria
+                }
+            },
+
+            dateClick: function (info) {
+                // Filtrar eventos en la fecha seleccionada
+                var eventsOnSelectedDate = calendar1.getEvents().filter(function (evento) {
+                    var eventoDate = evento.start.toISOString().split('T')[0];
+                    return eventoDate === info.dateStr;
+                });
+
+                // Verificar si el número de citas es menor a 5
+                if (eventsOnSelectedDate.length < 5) {
+                    // Abre la interfaz para seleccionar la hora
+                    Agendar(info.dateStr, eventsOnSelectedDate);
+                } else {
+                    console.log("No se pueden agendar más citas en esta fecha.");
+                }
+            },
+
+            // Evento cuando se hace clic en un evento
+            eventClick: function (info) {
+                // Aquí puedes acceder a los detalles del evento
+                console.log('Evento clickeado:', info);
+                 // Accede a los detalles del evento (puedes agregar campos adicionales al evento)
+                alert('aajsdhd')
+                // Mostrar los detalles en un modal (utilizando SweetAlert2 como ejemplo)
+                Swal.fire({
+                    title: `Detalles de la cita`,
+                    html: `
+                    <p><strong>Título:</strong> ${info.event.title}</p>
+                    <p><strong>Fecha:</strong> ${info.event.start.toLocaleDateString()}</p>
+                    <p><strong>Hora:</strong> ${info.event.start.toLocaleTimeString()}</p>
+                    <p><strong>Descripción:</strong> ${eventDetails.descripcion || 'No disponible'}</p>
+                    <p><strong>Ubicación:</strong> ${eventDetails.ubicacion || 'No disponible'}</p>
+                `,
+                    icon: 'info',
+                    showCloseButton: true,
+                });
+            },
+
+            eventDrop: function (info) {
+                // Obtener la nueva fecha del evento después de moverlo
+                let nuevaFecha = info.event.start;
+                let eventId = info.event.id;
+
+                // Formatear la fecha en el formato 'YYYY-MM-DD'
+                let anio = nuevaFecha.getFullYear();
+                let mes = (nuevaFecha.getMonth() + 1).toString().padStart(2, '0');
+                let dia = nuevaFecha.getDate().toString().padStart(2, '0');
+
+                // Crear el valor en el formato adecuado
+                let formatoFecha = `${anio}-${mes}-${dia}`;
+                HorasDisponiblesReagendar(formatoFecha);
+
+                Swal.fire({
+                    title: "Reagendar!",
+                    text: "Elija la Hora",
+                    html: '<select name="" class="form-control" id="hora"></select>',
+                    preConfirm: (value) => {
+                        if (($('#hora option:selected').val() == "Seleccione una hora")) {
+                            Swal.showValidationMessage('Debe ingresar datos válidos.')
+                        }
+                    },
+                    showCancelButton: true,
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        let hora = $("#hora option:selected").val();
+                        $.ajax({
+                            url: "{{ url_for('sistema.reAgendar') }}",
+                            type: "POST",
+                            data: {
+                                id: eventId,
+                                hora: hora,
+                                fecha: formatoFecha,
+                            },
+                            success: function (response) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Éxito',
+                                    confirmButtonText: 'Ok',
+                                    text: 'Su cita se reagendó!'
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        cargareventos();
+                                    }
+                                });
+                            },
+                            error: function (error) {
+                                console.log(error);
+                            },
+                        });
+                    } else {
+                        // Si se cancela, revertimos el movimiento
+                        info.revert();
+                    }
+                });
+            },
+
+            eventResize: function (info) {
+                console.log("Evento redimensionado:", info.event.start, "hasta", info.event.end);
+                // Aquí puedes actualizar la base de datos con la nueva duración del evento
+            }
+
+        });
+
 
         /* initialize the calendar
          -----------------------------------------------------------------*/
@@ -242,6 +428,8 @@
             hiddenDays: [0], // Esconde los domingos
             events: consultas, // Eventos predeterminados
 
+            editable: true, // Permite arrastrar y redimensionar eventos
+            droppable: true, // Habilita eventos "draggable" desde fuentes externas
             eventTimeFormat: {
                 hour: '2-digit',
                 minute: '2-digit',
@@ -272,28 +460,95 @@
                     console.log("No se pueden agendar más citas en esta fecha.");
                 }
             },
+            eventClick: function (info) {
+                // Aquí puedes acceder a los detalles del evento
+                console.log('Evento clickeado:', info);
+                let eventId = info.event.id;
+
+                Detalles(eventId);
+
+            },
+
+            // Evento cuando se cambia la posición de un evento (drag & drop)
+            eventDrop: function (info) {
+                // Obtener la nueva fecha del evento después de moverlo
+                let nuevaFecha = info.event.start;
+                let eventId = info.event.id;
+
+                // Formatear la fecha en el formato 'YYYY-MM-DD'
+                let anio = nuevaFecha.getFullYear();
+                let mes = (nuevaFecha.getMonth() + 1).toString().padStart(2, '0');
+                let dia = nuevaFecha.getDate().toString().padStart(2, '0');
+
+                // Crear el valor en el formato adecuado
+                let formatoFecha = `${anio}-${mes}-${dia}`;
+                HorasDisponiblesReagendar(formatoFecha);
+
+                Swal.fire({
+                    title: "Reagendar!",
+                    text: "Elija la Hora",
+                    html: '<select name="" class="form-control" id="hora"></select>',
+                    preConfirm: (value) => {
+                        if (($('#horas option:selected').val() == "Seleccione una hora")) {
+                            Swal.showValidationMessage('Debe ingresar datos válidos.')
+                        }
+                    },
+                    showCancelButton: true,
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        let hora = $("#hora option:selected").val();
+                        $.ajax({
+                            url: "{{ url_for('sistema.reAgendar') }}",
+                            type: "POST",
+                            data: {
+                                id: eventId,
+                                hora: hora,
+                                fecha: formatoFecha,
+                            },
+                            success: function (response) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Éxito',
+                                    confirmButtonText: 'Ok',
+                                    text: 'Su cita se reagendó!'
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        cargareventos();
+                                    }
+                                });
+                            },
+                            error: function (error) {
+                                console.log(error);
+                            },
+                        });
+                    } else {
+                        // Si se cancela, revertimos el movimiento
+                        info.revert();
+                    }
+                });
+            },
+
+
+            // Evento cuando se cambia el tamaño de un evento (resize)
+            eventResize: function (info) {
+                console.log("Evento redimensionado:", info.event.start, "hasta", info.event.end);
+                // Aquí puedes actualizar la base de datos con la nueva duración del evento
+            }
 
         });
 
         // Renderiza el calendario
-
         calFuera = calendar1;
-
         calendar1.render();
+
         // Agregar eventos a los botones de filtro
         document.getElementById('applyFilter').addEventListener('click', function () {
             applyFilter(calendar1);
         });
-        // // Agregar evento al cambio del campo de filtro de fecha
-        // document.getElementById('start').addEventListener('input', function () {
-        //     applyFilter(calendar1);
-        // });
-
-        // $('#calendario-cliente').fullCalendar()
-
     }
+
     $(document).ready(function () {
-        
+
         cargareventos();
 
     });
@@ -330,8 +585,9 @@
                     // fechaFinActual.setDate(fechaFinActual.getDate() + 1);
 
                     // Actualizar la propiedad fechafin con la nueva fecha
-                    
+
                     consultas.push({
+                        id: evento.numero,
                         title: evento.cliente,
                         start: evento.fecha,
                         end: evento.fechafin,
