@@ -3,19 +3,22 @@
     aria-labelledby="staticBackdropLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-fullscreen-md-down">
         <div class="modal-content">
+            <input type="text" id="id" value="{{dato.cod_atencion}}">
             <div class="row p-3">
                 <div class="row mt-2">
                     <div class="col">
                         <label class="form-label " for="form3Example2"><strong>Cliente</strong></label>
                         <input type="text" class="form-control" value="{{dato.Nombre}}" disabled>
-
+                        <input type="hidden" id="cliente" class="form-control" value="{{dato.num_cliente}}" disabled>
+                        
                     </div>
                     <div class="col">
                         <label class="form-label " for="form3Example2"><strong>Mascota</strong><i
                                 class="ti ti-circle-plus-filled" aria-hidden="true" title="Agregar Nuevo Conductor"
-                                data-bs-target="#agregarMascota" data-bs-toggle="modal" data-bs-dismiss="modal"
+                                data-bs-target="#agregarMascotaDetalle" data-bs-toggle="modal" data-bs-dismiss="modal"
                                 style="color: red; font-size: 15px;"></i></label>
-                        <input type="text" class="form-control desbloquear" value="{{dato.Nombre_mascota}}" disabled>
+                        <input type="text" id="nombremascota" class="form-control " value="{{dato.Nombre_mascota}}" disabled>
+                        <input type="hidden" id="idMascota" class="form-control " value="{{dato.idMascota}}"  disabled>
 
                     </div>
 
@@ -24,8 +27,16 @@
 
                     <div class="col">
                         <label class="form-label " for="form3Example2"><strong>Tipo Atención</strong></label>
-                        <input type="text" class="form-control desbloquear" value="{{dato.tipo}}" disabled>
-
+                        <select class="form-select desbloquear" id="tipo" data-placeholder="Seleccione un rol" disabled>
+                            {% for tipo in tipos %}
+                            {% if dato.tipo in tipo %}
+                            <option value="{{ tipo.cod_tipo }}" selected>{{ tipo.tipo }}
+                            </option>
+                            {% else %}
+                            <option value="{{ tipo.cod_tipo }}">{{ tipo.tipo }}</option>
+                            {% endif %}
+                            {% endfor %}
+                        </select>
 
 
 
@@ -113,7 +124,84 @@
 </div>
 {%endfor%}
 
+<div class="modal fade" id="agregarMascotaDetalle" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalToggleLabel2">Agregar Mascota</h5>
+                <!-- <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> -->
+            </div>
+            <div class="modal-body">
+                <div class="row mt-3">
+                    <div class="col-lg">
+                        <div class="form-group" id="camionModal">
+                            <label for="txtPlacaV" class=" form-label">Nombre</label>
 
+                            <input type="text" id="nombreMascota" class="form-control">
+                        </div>
+                    </div>
+                    
+                </div>
+                <div class="row mt-3">
+                    <div class="col-lg">
+                        <div class="form-group" id="camionModal">
+                            <label for="txtPlacaV" class=" form-label">Especie</label>
+
+                            <select name="" class="form-select" id="especie">
+                                <option value="Seleccione una mascota" disabled selected>Seleccione una especie</option>
+                            {%for especie in especies%}
+                                <option value="{{especie.id_especie}}">{{especie.nom_especie}}</option>
+                            {%endfor%}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-lg">
+                        <div class="form-group" id="camionModal">
+                            <label for="txtPlacaV" class=" form-label">Raza</label>
+                            <select name="" class="form-select" id="raza">
+                            
+                            </select>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-lg">
+                        <div class="form-group" id="camionModal">
+                            <label for="txtPlacaV" class=" form-label">Sexo</label>
+
+                           <select name="" id="sexo" class="form-select">
+                                <option value="M">Macho</option>
+                                <option value="H">Hembra</option>
+                           </select>
+                        </div>
+                    </div>
+                    <div class="col-lg">
+                        <div class="form-group" id="camionModal">
+                            <label for="txtPlacaV" class=" form-label">Color</label>
+
+                            <input type="text" id="color" class="form-control">
+                        </div>
+                    </div>
+                    <div class="col-lg">
+                        <div class="form-group" id="camionModal">
+                            <label for="txtPlacaV" class=" form-label">Edad</label>
+
+                            <input type="number" id="edad" class="form-control">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-target="#detalleCita" id="regresar1"
+                    data-bs-toggle="modal" data-bs-dismiss="modal">Regresar</button>
+                <button class="btn btn-primary" onclick="NuevaMascota()">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 <!-- FIN DEL MODAL -->
@@ -155,24 +243,24 @@
 
     }
 
-    $("#cliente").change(function () {
+    $("#especie").change(function () {
         $.ajax({
-            url: "{{ url_for('sistema.traerMascotas') }}",
+            url: "{{ url_for('sistema.traerRazas') }}",
             type: "POST",
             data: {
-                cliente: $('#cliente option:selected').val(),
+                especie: $('#especie option:selected').val(),
             },
             success: function (response) {
                 console.log(response);
                 // Limpiar las opciones anteriores
-                $('#mascota').empty();
+                $('#raza').empty();
 
                 // Agregar la opción por defecto
-                $('#mascota').append('<option value="Seleccione una mascota" disabled selected>Seleccione una mascota</option>');
+                $('#raza').append('<option value="Seleccione una mascota" disabled selected>Seleccione una mascota</option>');
 
                 // Iterar sobre las mascotas recibidas y agregarlas como opciones
-                response.mascotas.forEach(function (mascota) {
-                    $('#mascota').append('<option value="' + mascota.idMascota + '">' + mascota.Nombre_mascota + '</option>');
+                response.razas.forEach(function (razas) {
+                    $('#raza').append('<option value="' + razas.num + '">' + razas.especie + '</option>');
                 });
             },
             error: function (error) {
@@ -184,7 +272,7 @@
 
 
 
-    $('#cliente').select2({
+    $('#especie').select2({
         width: $(this).data('width') ? $(this).data('width') : $(this).hasClass('w-100') ? '150%' : 'style',
         placeholder: $(this).data('placeholder'),
         closeOnSelect: false,
@@ -249,19 +337,20 @@
                 }
             })
         } else {
+            alert($('#idMascota').val())
             $.ajax({
                 url: "{{ url_for('sistema.actualizarCita') }}",
                 type: "POST",
                 data: {
-                    
-                    mascota: $('#mascota option:selected').val(),
+                    num:$('#id').val(),
+                    mascota: $('#idMascota').val(),
                     peso: $('#peso').val(),
                     altura: $('#altura').val(),
                     observacion: $('#observacion').val(),
                     fecha: $('#fecha').val(),
                     temperatura: $('#temperatura').val(),
-                    hora: $('#hora option:selected').val(),
-                    atencion: $('#cliente option:selected').val()
+                    hora: $('#hora').val(),
+                    atencion: $('#tipo option:selected').val()
                 },
                 success: function (response) {
                     Swal.fire({ icon: 'success', title: 'Éxito', confirmButtonText: 'Ok', text: 'Cita Agendada Correctamente' }).then((result) => { /* Read more about isConfirmed, isDenied below */
@@ -279,6 +368,29 @@
 
     }
 
+
+    function NuevaMascota(){
+        $.ajax({
+            url: "{{ url_for('sistema.agregarMascota') }}",
+            type: "POST",
+            data: {
+                cliente: $('#cliente').val(),
+                nombre: $('#nombreMascota').val(),
+                raza: $('#raza option:selected').val(),
+                sexo: $('#sexo option:selected').val(),
+                color: $('#color').val(),
+                edad: $('#edad').val()
+            },
+            success: function (response) {
+                $('#nombremascota').val($('#nombreMascota').val());
+                $('#idMascota').val(response);
+                $('#regresar1').click();
+
+            },
+            error: function (error) { // console.log(error);
+            }
+        });
+    }
 
     $(document).ready(function () {
         HorasDisponibles();

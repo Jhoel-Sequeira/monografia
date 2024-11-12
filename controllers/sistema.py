@@ -915,13 +915,31 @@ def modalDetalleCita():
 
     conn = conectar()
     cursor = conn.cursor()
-    query = "SELECT a.cod_atencion,CONVERT(DATE, a.fecha_atencion) AS fecha_atencion, CONVERT(TIME, a.fecha_atencion) AS hora_atencion,c.nombres_cliente + ' ' + c.apellidos_cliente AS Nombre,e.NombreEstado,m.Nombre_mascota,es.nom_especie,t.tipo,a.peso,a.altura,a.temperatura,a.descripcion FROM atencion AS a INNER JOIN cliente AS c ON a.num_cliente = c.num_cliente INNER JOIN estado AS e ON a.id_estado = e.id_estado INNER JOIN mascota AS m ON a.idMascota = m.idMascota INNER JOIN tipo_atencion AS t ON a.tipo_atencion = t.cod_tipo INNER JOIN raza AS r ON m.id_raza = r.id_raza INNER JOIN especie AS es ON r.id_especie = es.id_especie where a.cod_atencion = ?"
+    query = "SELECT a.cod_atencion,m.idMascota,CONVERT(DATE, a.fecha_atencion) AS fecha_atencion, CONVERT(TIME, a.fecha_atencion) AS hora_atencion,c.num_cliente,c.nombres_cliente + ' ' + c.apellidos_cliente AS Nombre,e.NombreEstado,m.Nombre_mascota,es.nom_especie,t.tipo,a.peso,a.altura,a.temperatura,a.descripcion FROM atencion AS a INNER JOIN cliente AS c ON a.num_cliente = c.num_cliente INNER JOIN estado AS e ON a.id_estado = e.id_estado INNER JOIN mascota AS m ON a.idMascota = m.idMascota INNER JOIN tipo_atencion AS t ON a.tipo_atencion = t.cod_tipo INNER JOIN raza AS r ON m.id_raza = r.id_raza INNER JOIN especie AS es ON r.id_especie = es.id_especie where a.cod_atencion = ?"
     cursor.execute(query,(num))
     datos = cursor.fetchall()
 
+    conn = conectar()
+    cursor = conn.cursor()
+    query = "select id_raza,nombre_raza from raza"
+    cursor.execute(query)
+    raza = cursor.fetchall()
+
+    conn = conectar()
+    cursor = conn.cursor()
+    query = "select cod_tipo,tipo from tipo_atencion"
+    cursor.execute(query)
+    tipo = cursor.fetchall()
+
+    conn = conectar()
+    cursor = conn.cursor()
+    query = "select id_especie,nom_especie from especie"
+    cursor.execute(query)
+    especies = cursor.fetchall()
+
     
 
-    return render_template('sistema/modales/modal_detalle_cita.html',datos = datos)
+    return render_template('sistema/modales/modal_detalle_cita.html',datos = datos,razas = raza,especies = especies,tipos = tipo)
 
 
 
@@ -999,6 +1017,29 @@ def traerMascotas():
     conn.close()
 
     return jsonify({"mascotas": mascotas_list})
+
+@bp.route('/traerRazas', methods=['POST', 'GET'])
+@login_required
+def traerRazas():
+    especie = request.form['especie']  # Fecha en formato 'YYYY-MM-DD'
+
+    conn = conectar()
+    cursor = conn.cursor()
+    
+    # Obtener las horas ocupadas en el día seleccionado
+    query = """
+        select * from raza where id_especie = ? 
+    """
+    cursor.execute(query, (especie))
+    mascotas = cursor.fetchall()
+
+    mascotas_list = [{"num": row[0], "especie": row[1]} for row in mascotas]
+
+
+    cursor.close()
+    conn.close()
+
+    return jsonify({"razas": mascotas_list})
 
 
 
@@ -1091,7 +1132,7 @@ def reAgendar():
 @bp.route('/actualizarCita', methods=['POST'])
 def actualizarCita():
 
-   
+    num = request.form['num']
     mascota = request.form['mascota']
     peso = request.form['peso']
     altura = request.form['altura']
@@ -1104,23 +1145,59 @@ def actualizarCita():
    
 
     fecha_hora_str = f"{fecha} {hora}"
-    fecha_hora = datetime.strptime(fecha_hora_str, "%Y-%m-%d %I:%M %p")
+
+    # Convertir fecha y hora con el formato correcto de 24 horas
+    fecha_hora = datetime.strptime(fecha_hora_str, "%Y-%m-%d %H:%M:%S")
 
     # Separar el día y el mes
     fecha_obj = datetime.strptime(fecha, "%Y-%m-%d")
     dia = fecha_obj.strftime("%d")  # Día con ceros a la izquierda
-    locale.setlocale(locale.LC_TIME, 'es_MX.UTF-8')  # Español de México
-    mes = fecha_obj.strftime("%B").capitalize()
 
-    print(mes)
+    # Configurar el idioma para obtener el nombre del mes en español
+    locale.setlocale(locale.LC_TIME, 'es_MX.UTF-8')
+    mes = fecha_obj.strftime("%B").capitalize()
 
     conn = conectar()
     cursor = conn.cursor()
             # Realiza la inserción
     query = 'UPDATE atencion set fecha_atencion = ?, idMascota = ?, tipo_atencion = ?, peso = ?,altura = ?, temperatura = ?,descripcion = ? where cod_atencion = ?'
-    cursor.execute(query, (fecha_hora, mascota,atencion,peso,altura,temperatura,observacion))
+    cursor.execute(query, (fecha_hora, mascota,atencion,peso,altura,temperatura,observacion, num))
     conn.commit()
 
+
+    return 'done'
+
+
+@bp.route('/agregarMascota', methods=['POST'])
+def agregarMascota():
+
+   
+    nombre = request.form['nombre']
+    cliente = request.form['cliente']
+    raza = request.form['raza']
+    sexo = request.form['sexo']
+    color = request.form['color']
+    edad = request.form['edad']
+    fechaHoraIngreso = capturarHora()
+   
+    conn = conectar()
+    cursor = conn.cursor()
+            # Realiza la inserción
+    query = 'INSERT INTO mascota (Nombre_mascota,id_raza,num_cliente,sexo,color,fecha_ingreso,fecha_nac_mascota,edad,id_estado) VALUES (?,?,?,?,?,?,?,?,1)'
+    cursor.execute(query, (nombre, raza,cliente,sexo,color,fechaHoraIngreso,fechaHoraIngreso,edad))
+    conn.commit()
+
+    conn = conectar()
+    cursor = conn.cursor()
+    cursor.execute('SELECT TOP 1 idMascota FROM mascota ORDER BY idMascota DESC;')
+    mascota = cursor.fetchone()
+    cursor.close()
+    conn.close()
+
+   
+    
+    return str(mascota[0])
+    
 
     return 'done'
 
