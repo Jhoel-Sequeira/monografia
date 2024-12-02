@@ -112,7 +112,7 @@
                     <button type="button" onclick="desbloquear()" id="bloquear" class="btn btn-primary"><i
                             class="ti ti-lock-open-2"></i> Desbloquear</button>
 
-                    <button type="button" class="btn btn-danger" id="cerrar" data-bs-dismiss="modal"><i
+                    <button type="button" class="btn btn-danger"  onclick="cancelar()"><i
                             class="ti ti-cancel"></i> Cancelar</button>
 
                     <button type="button" onclick="guardarConsulta()" class="btn btn-success"><i
@@ -241,6 +241,35 @@
         // Invertir el valor de isDisabled
         isDisabled = !isDisabled;
 
+    }
+
+    function cancelar(){
+
+        Swal.fire({ icon: 'question', title: 'Seguro', confirmButtonText: 'Ok', text: '¿Desea cancelar la cita?' }).then((result) => { /* Read more about isConfirmed, isDenied below */
+            if (result.isConfirmed) {
+
+                $.ajax({
+                    url: "{{ url_for('sistema.cancelarCita') }}",
+                    type: "POST",
+                    data: {
+                        num: $('#id').val(),
+                    },
+                    success: function (response) {
+                        Swal.fire({ icon: 'success', title: 'Éxito', confirmButtonText: 'Ok', text: 'Cita Cancelada Correctamente' }).then((result) => { /* Read more about isConfirmed, isDenied below */
+                                if (result.isConfirmed) {
+                                    cargareventos();
+                                    $('#cerrar').click();
+                                }
+                        })
+                    },
+                    error: function (error) {
+                        console.error("Error en la solicitud AJAX:", error);
+                    },
+                });
+            }else{
+
+            }
+        });
     }
 
     $("#especie").change(function () {

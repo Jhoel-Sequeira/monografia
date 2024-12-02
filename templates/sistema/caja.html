@@ -541,17 +541,11 @@
   
   function Facturar(){
 
-    validarProductos(function (existe) {
-      if (existe === 'existe') {
+ 
         printTicket($('#facturaId').val());
         traerId();
-      } else {
-        Swal.fire({ icon: 'warning', title: 'Error', confirmButtonText: 'Ok', text: 'Debe ingresar Productos para generar la factura' }).then((result) => { /* Read more about isConfirmed, isDenied below */
-                if (result.isConfirmed) {
-                }
-            })
-      }
-    });
+      
+ 
 
 
 

@@ -20278,3 +20278,9 @@ ul {
     display: inline-block !important;
     margin-right: 5px;
 }
+
+.icono{
+    font-size: 20px !important;
+    font-weight: bold;
+    color: var(--bs-primary);
+}

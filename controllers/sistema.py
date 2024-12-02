@@ -6,6 +6,7 @@ from fpdf import FPDF
 from flask import Blueprint, jsonify, render_template, request,session,redirect,make_response,current_app
 from functools import wraps
 from conexion import conectar
+from werkzeug.security import check_password_hash, generate_password_hash
 import pandas as pd
 
 from controllers.excel import GenerarExcel_3
@@ -1089,6 +1090,24 @@ def agendarCita():
 
     return 'done'
 
+@bp.route('/cancelarCita', methods=['POST', 'GET'])
+@login_required
+def cancelarCita():
+    num = request.form['num']  
+
+    conn = conectar()
+    cursor = conn.cursor()
+            # Realiza la inserción
+    query = 'UPDATE atencion set id_estado = 9 where cod_atencion = ?'
+    cursor.execute(query, ( num))
+    conn.commit()
+
+   
+
+    cursor.close()
+    conn.close()
+
+    return 'HECHO'
 
 @bp.route('/reAgendar', methods=['POST'])
 def reAgendar():
@@ -1201,4 +1220,170 @@ def agregarMascota():
 
     return 'done'
 
+
+@bp.route('/historialConsultas')
+@login_required
+def historialConsultas():
+    return render_template('sistema/consultas.html')
+
+# TABLA DE CONSULTAS
+@bp.route('/tablaConsultas', methods=['POST'])
+def tablaConsultas():
+
+    if request.method == "POST":
+
+        conn = conectar()
+        cursor = conn.cursor()
+        query = "select a.cod_atencion,a.fecha_atencion,c.nombres_cliente + ' ' + c.apellidos_cliente as Nombre,e.NombreEstado,m.Nombre_mascota,es.nom_especie,ta.tipo,a.peso,a.altura,a.temperatura from atencion as a inner join cliente as c on a.num_cliente = c.num_cliente inner join estado as e on a.id_estado = e.id_estado inner join mascota as m on a.idMascota = m.idMascota inner join tipo_atencion as ta on a.tipo_atencion = ta.cod_tipo inner join raza as r on m.id_raza = r.id_raza inner join especie as es on r.id_especie = es.id_especie order by a.cod_atencion DESC"
+        cursor.execute(query)
+        consultas = cursor.fetchall()
+
+        print(consultas)
+
+        return render_template('sistema/tablas/tabla_consultas.html', consultas=consultas)
+        
+    else:
+        return "No"
+    
+
+@bp.route('/detalleConsulta', methods=['POST'])
+def detalleConsulta():
+
+    if request.method == "POST":
+
+        num = request.form['num']
+
+        conn = conectar()
+        cursor = conn.cursor()
+        query = "select a.cod_atencion,a.fecha_atencion,c.nombres_cliente + ' ' + c.apellidos_cliente as Nombre,e.NombreEstado,m.Nombre_mascota,es.nom_especie,ta.tipo,a.peso,a.altura,a.temperatura,a.descripcion from atencion as a inner join cliente as c on a.num_cliente = c.num_cliente inner join estado as e on a.id_estado = e.id_estado inner join mascota as m on a.idMascota = m.idMascota inner join tipo_atencion as ta on a.tipo_atencion = ta.cod_tipo inner join raza as r on m.id_raza = r.id_raza inner join especie as es on r.id_especie = es.id_especie where a.cod_atencion = ? order by a.cod_atencion DESC"
+        cursor.execute(query,(num))
+        detalle = cursor.fetchall()
+
+        print(detalle)
+        return render_template('sistema/modales/modal_detalle_consulta.html', detalle=detalle,)
+    else:
+        return "No"
+
 # FIN DEL MODULO DE CONSULTAS
+
+
+# MODULO DE ADMINISTRACIÓN
+@bp.route('/usuarios')
+@login_required
+def usuarios():
+    return render_template('sistema/usuarios.html')
+
+@bp.route('/tablaUsuarios', methods=['POST'])
+def tablaUsuarios():
+
+    if request.method == "POST":
+
+        conn = conectar()
+        cursor = conn.cursor()
+        query = "select c.num_cliente,c.nombres_cliente + '  ' + c.apellidos_cliente as Nombre,cred.usuario,r.nombre_rol,e.NombreEstado from cliente as c inner join credenciales as cred on cred.id_credencial = c.id_credencial inner join estado as e on c.id_estado = e.id_estado inner join roles as r on cred.rol = r.cod_rol"
+        cursor.execute(query)
+        productos = cursor.fetchall()
+        return render_template('sistema/tablas/tabla_usuarios.html', productos=productos)
+        
+    else:
+        return "No"
+    
+
+@bp.route('/detalleUsuarios', methods=['POST'])
+def detalleUsuarios():
+
+    if request.method == "POST":
+
+        num = request.form['num']
+
+        conn = conectar()
+        cursor = conn.cursor()
+        query = "select c.num_cliente,c.nombres_cliente as nombre, c.apellidos_cliente as apellido,cred.usuario,r.nombre_rol,e.NombreEstado,c.correo_cliente,c.direccion_cliente,c.telefono,car.cargo from cliente as c inner join credenciales as cred on cred.id_credencial = c.id_credencial inner join estado as e on c.id_estado = e.id_estado inner join roles as r on cred.rol = r.cod_rol inner join cargo as car on cred.cargo = car.cod_cargo where c.num_cliente = ?"
+        cursor.execute(query,(num))
+        usuario = cursor.fetchall()
+
+
+        conn = conectar()
+        cursor = conn.cursor()
+        query = "select * from roles"
+        cursor.execute(query)
+        roles = cursor.fetchall()
+
+        conn = conectar()
+        cursor = conn.cursor()
+        query = "select * from cargo"
+        cursor.execute(query)
+        cargos = cursor.fetchall()
+
+
+
+        conn = conectar()
+        cursor = conn.cursor()
+        query = "select * from estado where NombreEstado = 'Activo' or NombreEstado = 'INACTIVO'"
+        cursor.execute(query)
+        estados = cursor.fetchall()
+
+
+        return render_template('sistema/modales/modal_detalle_usuario.html',cargos = cargos, usuario=usuario,roles = roles,estados = estados)
+        
+@bp.route('/editUsuario',methods = ['GET','POST'])
+def editUsuario():
+    nombre = request.form['nombre']
+    usuario = request.form['usuario']
+    contra = request.form['password']
+    rol = request.form['rol']
+    estado = request.form['estado']
+    cargo = request.form['cargo']
+    id = request.form['id']
+    direccion = request.form['direccion']
+    correo = request.form['correo']
+    apellidos = request.form['apellido']
+    telefono = request.form['telefono']
+
+
+    conn = conectar()
+    cursor = conn.cursor()
+    query = "select id_credencial from cliente where num_cliente = ?"
+    cursor.execute(query,(id))
+    credencial = cursor.fetchone()
+
+    if contra:
+
+
+        conn = conectar()
+        cursor = conn.cursor()
+
+            # Realiza la inserción
+        query = 'Update cliente set nombres_cliente = ?,apellidos_cliente = ?,direccion_cliente = ?,correo_cliente = ?,telefono = ?,id_estado = ? where id_credencial = ?'
+        cursor.execute(query, (nombre,apellidos,direccion,correo,telefono,estado,id))
+        conn.commit()
+
+        conn = conectar()
+        cursor = conn.cursor()
+
+            # Realiza la inserción
+        query = 'Update credenciales set usuario = ?,contrasena = ?,rol = ?,cargo = ? where id_credencial = ?'
+        cursor.execute(query, (usuario,generate_password_hash(contra),rol,cargo,credencial[0]))
+        conn.commit()
+    else:
+
+        conn = conectar()
+        cursor = conn.cursor()
+
+            # Realiza la inserción
+        query = 'Update cliente set nombres_cliente = ?,apellidos_cliente = ?,direccion_cliente = ?,correo_cliente = ?,telefono = ?,id_estado = ? where id_credencial = ?'
+        cursor.execute(query, (nombre,apellidos,direccion,correo,telefono,estado,id))
+        conn.commit()
+
+        conn = conectar()
+        cursor = conn.cursor()
+
+            # Realiza la inserción
+        query = 'Update credenciales set usuario = ?,rol = ?,cargo = ? where id_credencial = ?'
+        cursor.execute(query, (usuario,rol,cargo,credencial[0]))
+        conn.commit()
+
+    return 'HECHO'
+
+
+# FIN MODULO DE ADMINISTRACIÓN
