@@ -1,0 +1,249 @@
+<head>
+    <script src="../../../static/sistema/js/validacion-usuario.js"></script>
+</head>
+
+<div class="modal fade" id="agregarUsuario" data-bs-focus="false" tabindex="-1" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-fullscreen-lg-down">
+        <div class="modal-content" >
+            <div class="modal-header encabezado_modales">
+
+
+                <div class="col-4">
+                    <h5 class="modal-title fuente-grande-titulo" id="exampleModalLabel">
+                        Agregar Usuario
+                    </h5>
+                </div>
+                <button type="button" class="btn-close" id="cerrarDet" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+            <input type="hidden" id="filtrosInput" value='{  "filtro": [    "1",    "2",    "3"  ]}'>
+            <div class="modal-body fondo-modal">
+
+                <div class="container cuerpo-modal" style="background-color: white;">
+                    <div class="row mt-2">
+                        <div class="col">
+                            <label class="form-label" for="form3Example2"><strong>Nombre</strong></label>
+                            <input type="text" id="nombre" class="form-control">
+
+                        </div>
+                        <div class="col">
+                            <label class="form-label" for="form3Example2"><strong>Apellidos</strong></label>
+                            <input type="text" id="apellido" class="form-control">
+
+                        </div>
+
+                    </div>
+                    <div class="row mt-2">
+
+                        <div class="col">
+                            <label class="form-label" for="form3Example2"><strong>Usuario</strong></label>
+                            <input type="text" id="usuario"  class="form-control">
+
+
+
+
+                        </div>
+                        <div class="col">
+                            <label class="form-label " for="form3Example2"><strong>Contraseña</strong></label>
+
+                            <input type="password" id="contra" class="form-control">
+                          
+
+
+
+                        </div>
+                        <div class="col">
+                            <label class="form-label " for="form3Example2"><strong>Repetir la Contraseña</strong></label>
+
+                            <input type="password" id="contra1" class="form-control">
+                            <label id="mensaje_error" class="control-label col-md-12 text-danger"
+                            style="display: block;">Las
+                            constraseñas no coinciden</label>
+                            <label id="passstrength" class="control-label col-md-12 text-danger"
+                                style="display: block;">Las
+                                constraseñas no coinciden</label>
+
+
+
+                        </div>
+
+
+                    </div>
+                    <div class="row mt-2">
+
+                        <div class="col">
+                            <label class="form-label" for="form3Example2"><strong>Correo</strong></label>
+                            <input type="text" id="correo"  class="form-control">
+
+
+
+
+                        </div>
+                        <div class="col">
+                            <label class="form-label " for="form3Example2"><strong>telefono</strong></label>
+
+                            <input type="text" id="telefono" class="form-control">
+
+
+
+                        </div>
+                        <div class="col">
+                            <label class="form-label " for="form3Example2"><strong>Cargo</strong></label>
+
+                            <select class="form-select" id="cargo" data-placeholder="Seleccione un rol">
+                                {% for rol in cargos %}
+                              
+                                 <option value="{{ rol.cod_cargo }}">{{ rol.cargo }}</option>
+                          
+                                {% endfor %}
+                            </select>
+
+
+                        </div>
+
+
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col">
+                            <label class="form-label " for="form3Example2"
+                                style="margin-top: 20px;"><strong>Rol</strong></label>
+                            <select class="form-select" id="rol" data-placeholder="Seleccione un rol">
+                                {% for rol in roles %}
+                              
+                                    <option value="{{ rol.cod_rol }}">{{ rol.nombre_rol }}</option>
+                            
+                                {% endfor %}
+                            </select>
+
+
+                        </div>
+                        <div class="col">
+                            <label class="form-label " for="form3Example2"
+                                style="margin-top: 20px;"><strong>Estado</strong> </label>
+
+                            <select class="form-select" id="estado" data-placeholder="Seleccione un rol">
+                                {% for estado in estados %}
+                               
+                                    <option value="{{ estado.id_estado }}">{{ estado.NombreEstado }}</option>
+                  
+                                {% endfor %}
+                            </select>
+
+                        </div>
+
+
+
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col">
+                            <label class="form-label " for="form3Example2"
+                                style="margin-top: 20px;"><strong>Dirección</strong> </label>
+                            <textarea name="" class="form-control" id="direccion"></textarea>
+                        </div>
+
+
+
+                    </div>
+                   
+                    
+                    <div class="row d-flex mt-5 ">
+                        
+                        <div class="col d-flex justify-content-end " style="margin-right: 10px;">
+                            <button type="button" class="btn btn-primary" id="finalizar"
+                                onclick="guardarUsuario()"><i class="fa-regular fa-circle-check"></i>
+                                GUARDAR
+                            </button>
+                        </div>
+                    </div>
+
+
+
+                </div>
+                <!-- INICIO DE LA FUNCIONALIDAD DE LOS BOTONES CON JQUERY  DE LA PRIMERA PANTALLA-->
+
+            </div>
+            <div class="p-2">
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .select2 {
+        width: 100% !important;
+    }
+
+    /* Agrega un estilo personalizado para alinear horizontalmente las selecciones */
+    .select2-selection__choice {
+        display: inline-block !important;
+        margin-right: 5px;
+    }
+</style>
+
+<script>
+    $(document).ready(function () {
+        $('.select2').select2({
+            theme: "bootstrap-5",
+            width: $(this).data('width') ? $(this).data('width') : $(this).hasClass('w-100') ? '150%' : 'style',
+            placeholder: $(this).data('placeholder'),
+            closeOnSelect: false,
+        });
+        $('#material').select2({
+            theme: "bootstrap-5",
+            width: $(this).data('width') ? $(this).data('width') : $(this).hasClass('w-100') ? '150%' : 'style',
+            placeholder: $(this).data('placeholder'),
+            closeOnSelect: false,
+        });
+    });
+
+    function guardarUsuario() {
+
+        if ($('#nombre').val() == '' || $('#contra').val() == '' || $('#usuario').val() == '' || $('#correo').val() == '' || $("#rol option:selected").val() == '' || $("#cargo option:selected").val() == '' || $("#estado option:selected").val() == '') {
+            Swal.fire({ icon: 'error', title: 'Error', confirmButtonText: 'Ok', text: 'Debe rellenar todos los campos' }).then((result) => { /* Read more about isConfirmed, isDenied below */
+                if (result.isConfirmed) {
+
+                }
+            })
+        } else {
+            
+                var formData = new FormData();
+                formData.append('nombre', $('#nombre').val());
+                formData.append('usuario', $('#usuario').val());
+                formData.append('password', $('#contra').val());
+                formData.append('estado', $("#estado option:selected").val());
+                formData.append('rol', $("#rol option:selected").val());
+                formData.append('cargo', $("#cargo option:selected").val());
+                formData.append('direccion', $("#direccion ").val());
+                formData.append('telefono', $("#telefono ").val());
+                formData.append('apellido', $("#apellido").val());
+                formData.append('correo', $("#correo").val());
+                for (var pair of formData.entries()) {
+                    console.log(pair[0] + ': ' + pair[1]);
+                }
+                $.ajax({
+                    url: "/nuevoUsuario",
+                    type: "POST",
+                    data: formData,
+                    contentType: false,  // Importante: no configurar el tipo de contenido
+                    processData: false,
+                   
+                    success: function (response) {
+                        Swal.fire({ icon: 'success', title: 'Exito', confirmButtonText: 'Ok', text: 'Usuario Actualizado' }).then((result) => { /* Read more about isConfirmed, isDenied below */
+                            if (result.isConfirmed) {
+                                cargarUsuarios();
+                                $('#cerrarDet').click();
+                            }
+                        })
+                    },
+                    error: function (error) { // console.log(error);
+                    }
+                });
+            
+
+        }
+
+    }
+
+</script>

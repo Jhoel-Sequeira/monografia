@@ -1386,4 +1386,126 @@ def editUsuario():
     return 'HECHO'
 
 
+
+# PARTE DE LOS PERMISOS
+
+# @bp.route('/detallePermisos', methods=['POST'])
+# def detallePermisos():
+
+#     if request.method == "POST":
+
+#         num = request.form['num']
+
+#         conn = conectar()
+#         cursor = conn.cursor()
+#         query = "select c.num_cliente,c.nombres_cliente as nombre, c.apellidos_cliente as apellido,cred.usuario,r.nombre_rol,e.NombreEstado,c.correo_cliente,c.direccion_cliente,c.telefono,car.cargo from cliente as c inner join credenciales as cred on cred.id_credencial = c.id_credencial inner join estado as e on c.id_estado = e.id_estado inner join roles as r on cred.rol = r.cod_rol inner join cargo as car on cred.cargo = car.cod_cargo where c.num_cliente = ?"
+#         cursor.execute(query,(num))
+#         usuario = cursor.fetchall()
+
+
+#         conn = conectar()
+#         cursor = conn.cursor()
+#         query = "select * from roles"
+#         cursor.execute(query)
+#         roles = cursor.fetchall()
+
+#         conn = conectar()
+#         cursor = conn.cursor()
+#         query = "select * from cargo"
+#         cursor.execute(query)
+#         cargos = cursor.fetchall()
+
+
+
+#         conn = conectar()
+#         cursor = conn.cursor()
+#         query = "select * from estado where NombreEstado = 'Activo' or NombreEstado = 'INACTIVO'"
+#         cursor.execute(query)
+#         estados = cursor.fetchall()
+
+
+#         return render_template('sistema/modales/modal_permiso.html',cargos = cargos, usuario=usuario,roles = roles,estados = estados)
+        
+
+@bp.route('/modalAgregarUsuario', methods=['POST'])
+def modalAgregarUsuario():
+
+    if request.method == "POST":
+
+        conn = conectar()
+        cursor = conn.cursor()
+        query = "select * from roles"
+        cursor.execute(query)
+        roles = cursor.fetchall()
+
+        conn = conectar()
+        cursor = conn.cursor()
+        query = "select * from cargo"
+        cursor.execute(query)
+        cargos = cursor.fetchall()
+
+        conn = conectar()
+        cursor = conn.cursor()
+        query = "select * from estado where NombreEstado = 'Activo' or NombreEstado = 'INACTIVO'"
+        cursor.execute(query)
+        estados = cursor.fetchall()
+
+        
+        return render_template('sistema/modales/modal_agregar_usuario.html', cargos = cargos,roles = roles,estados = estados)
+        
+    else:
+        return "No"
+
+
+
+@bp.route('/nuevoUsuario',methods = ['GET','POST'])
+def nuevoUsuario():
+    nombre = request.form['nombre']
+    usuario = request.form['usuario']
+    contra = request.form['password']
+    rol = request.form['rol']
+    estado = request.form['estado']
+    cargo = request.form['cargo']
+    direccion = request.form['direccion']
+    correo = request.form['correo']
+    apellidos = request.form['apellido']
+    telefono = request.form['telefono']
+
+
+
+    conn = conectar()
+    cursor = conn.cursor()
+    query = 'INSERT INTO credenciales (usuario,contrasena,Rol,cargo) VALUES (?,?,?,?)'
+    cursor.execute(query, (usuario,generate_password_hash(contra),rol,cargo))
+    conn.commit()
+    cursor.close()
+    conn.close()
+    conn = conectar()
+    cursor = conn.cursor()
+
+
+    conn = conectar()
+    cursor = conn.cursor()
+    query = "select top 1 id_credencial from credenciales order by id_credencial desc"
+    cursor.execute(query,(id))
+    idcredencial = cursor.fetchone()
+
+
+    conn = conectar()
+    cursor = conn.cursor()
+    query = 'INSERT INTO cliente (nom_cliente,apellido_cliente,direccion_cliente,correo_cliente,id_credencial,telefono) VALUES (?,?,?,?,?,?)'
+    cursor.execute(query, (nombre,apellidos,direccion,correo,idcredencial[0],telefono))
+    conn.commit()
+    cursor.close()
+    conn.close()
+    conn = conectar()
+    cursor = conn.cursor()
+
+    enviar_correo(current_app,"Usuario creado!!!",correo,'registro','','','')
+    
+    
+
+    return 'HECHO'
+
+
 # FIN MODULO DE ADMINISTRACIÓN

@@ -10,8 +10,8 @@
     </div>
 </div>
 <!-- MODALES -->
-<input id="launchModal" type="hidden" data-bs-toggle="modal" data-bs-target="#modalAgregarVenta">
-<div id="modal-producto"></div>
+<input id="launchModal" type="hidden" data-bs-toggle="modal" data-bs-target="#agregarUsuario">
+<div id="modal-usuario"></div>
 
 <!-- MODAL DE DETALLE DE PRODUCTOS -->
 <input id="launchDetalle" type="hidden" data-bs-toggle="modal" data-bs-target="#modalDetalleProducto">
@@ -47,15 +47,15 @@
             },
         });
     }
-    function agregarVenta() {
+    function agregarUsuario() {
         $.ajax({
-            url: "{{ url_for('sistema.modalAgregarVenta') }}",
+            url: "{{ url_for('sistema.modalAgregarUsuario') }}",
             type: "POST",
             data: {
             },
             success: function (response) {
-                $("#modal-producto").html(response);
-                $("#modal-producto").append(response.htmlresponse);
+                $("#modal-usuario").html(response);
+                $("#modal-usuario").append(response.htmlresponse);
                 $('#launchModal').click();
 
             },
