@@ -21,7 +21,7 @@
 <script>
     $(document).ready(function () {
 
-        cargarUsuarios();
+        cargarHospitalizacion();
 
     });
     function buscarUsuarios() {
@@ -30,9 +30,9 @@
         $('#tabla_usuarios').DataTable().search(searchTerm).draw();
     };
     $('#Buscador').on('keyup', buscarUsuarios)
-    function cargarUsuarios() {
+    function cargarHospitalizacion() {
         $.ajax({
-            url: "{{ url_for('sistema.tablaUsuarios') }}",
+            url: "{{ url_for('sistema.tablaHospitalizacion') }}",
             type: "POST",
             data: {
             },

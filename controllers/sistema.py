@@ -10,7 +10,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 import pandas as pd
 
 from controllers.excel import GenerarExcel_3
-from controllers.correo import enviar_correo
+from controllers.correo import enviar_correo, enviar_correo_registro
 
 def capturarHora():
     hi = datetime.now()
@@ -1487,21 +1487,21 @@ def nuevoUsuario():
     conn = conectar()
     cursor = conn.cursor()
     query = "select top 1 id_credencial from credenciales order by id_credencial desc"
-    cursor.execute(query,(id))
+    cursor.execute(query)
     idcredencial = cursor.fetchone()
 
 
     conn = conectar()
     cursor = conn.cursor()
-    query = 'INSERT INTO cliente (nom_cliente,apellido_cliente,direccion_cliente,correo_cliente,id_credencial,telefono) VALUES (?,?,?,?,?,?)'
-    cursor.execute(query, (nombre,apellidos,direccion,correo,idcredencial[0],telefono))
+    query = 'INSERT INTO cliente (nombres_cliente,apellidos_cliente,id_estado,direccion_cliente,correo_cliente,id_credencial,telefono) VALUES (?,?,?,?,?,?,?)'
+    cursor.execute(query, (nombre,apellidos,estado,direccion,correo,idcredencial[0],telefono))
     conn.commit()
     cursor.close()
     conn.close()
     conn = conectar()
     cursor = conn.cursor()
 
-    enviar_correo(current_app,"Usuario creado!!!",correo,'registro','','','')
+    enviar_correo_registro(current_app,"Usuario creado!!!",correo,'registro',usuario,contra)
     
     
 
@@ -1509,3 +1509,28 @@ def nuevoUsuario():
 
 
 # FIN MODULO DE ADMINISTRACIÓN
+
+#INICIO DEL MODULO HOSPITALIZACION
+@bp.route('/hospitalizacion')
+def hospitalizacion():
+    return render_template('sistema/hospitalizacion.html')
+
+
+@bp.route('/tablaHospitalizacion', methods=['POST'])
+def tablaHospitalizacion():
+
+    if request.method == "POST":
+
+        conn = conectar()
+        cursor = conn.cursor()
+        query = "select h.id_hosp,m.Nombre_mascota,e.nom_especie,ha.habitacion,h.descripcion,h.fecha_hosp,es.NombreEstado from hospitalizacion as h inner join habitaciones as ha on h.id_cuarto = ha.id_habitacion inner join mascota as m on h.idMascota = m.idMascota inner join raza as r on m.id_raza = r.id_raza inner join especie as e on e.id_especie = r.id_especie inner join estado as es on h.id_estado = es.id_estado"
+        cursor.execute(query)
+        hospitalizacion = cursor.fetchall()
+        return render_template('sistema/tablas/tabla_hospitalizacion.html', hospitalizacion=hospitalizacion)
+        
+    else:
+        return "No"
+    
+
+
+#FIN DEL MODULO DE HOSPITALIZACION
