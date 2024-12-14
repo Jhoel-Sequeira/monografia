@@ -1532,5 +1532,78 @@ def tablaHospitalizacion():
         return "No"
     
 
+@bp.route('/detalleHospitalizacion', methods=['POST'])
+def detalleHospitalizacion():
+
+    if request.method == "POST":
+
+        num = request.form['num']
+
+        conn = conectar()
+        cursor = conn.cursor()
+        query = "select c.num_cliente,c.nombres_cliente as nombre, c.apellidos_cliente as apellido,cred.usuario,r.nombre_rol,e.NombreEstado,c.correo_cliente,c.direccion_cliente,c.telefono,car.cargo from cliente as c inner join credenciales as cred on cred.id_credencial = c.id_credencial inner join estado as e on c.id_estado = e.id_estado inner join roles as r on cred.rol = r.cod_rol inner join cargo as car on cred.cargo = car.cod_cargo where c.num_cliente = ?"
+        cursor.execute(query,(num))
+        usuario = cursor.fetchall()
+
+
+        conn = conectar()
+        cursor = conn.cursor()
+        query = "select * from roles"
+        cursor.execute(query)
+        roles = cursor.fetchall()
+
+        conn = conectar()
+        cursor = conn.cursor()
+        query = "select * from cargo"
+        cursor.execute(query)
+        cargos = cursor.fetchall()
+
+
+
+        conn = conectar()
+        cursor = conn.cursor()
+        query = "select * from estado where NombreEstado = 'Activo' or NombreEstado = 'INACTIVO'"
+        cursor.execute(query)
+        estados = cursor.fetchall()
+
+
+        return render_template('sistema/modales/modal_detalle_usuario.html',cargos = cargos, usuario=usuario,roles = roles,estados = estados)
+
+
+@bp.route('/modalAgregarHospitalizacion', methods=['POST'])
+def modalAgregarHospitalizacion():
+
+    if request.method == "POST":
+
+        conn = conectar()
+        cursor = conn.cursor()
+        query = "select * from habitaciones"
+        cursor.execute(query)
+        habitaciones = cursor.fetchall()
+
+        conn = conectar()
+        cursor = conn.cursor()
+        query = "select idMascota from mascota"
+        cursor.execute(query)
+        mascotas = cursor.fetchall()
+
+        conn = conectar()
+        cursor = conn.cursor()
+        query = "select num_cliente, nombres_cliente + ' ' + apellidos_cliente as Nombre  from cliente"
+        cursor.execute(query)
+        cliente = cursor.fetchall()
+
+        conn = conectar()
+        cursor = conn.cursor()
+        query = "select * from estado where NombreEstado = 'Activo' or NombreEstado = 'INACTIVO'"
+        cursor.execute(query)
+        estados = cursor.fetchall()
+
+        
+        return render_template('sistema/modales/modal_agregar_hospitalizacion.html', habitaciones = habitaciones,mascotas = mascotas,estados = estados,clientes = cliente)
+        
+    else:
+        return "No"
+     
 
 #FIN DEL MODULO DE HOSPITALIZACION
