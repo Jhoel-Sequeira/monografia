@@ -2,7 +2,9 @@
     <script src="../../../static/sistema/js/validacion-usuario.js"></script>
 </head>
 
-<div class="modal fade" id="agregarHospitalizacion" data-bs-focus="false" tabindex="-1" aria-labelledby="exampleModalLabel"
+
+{% for hospitalizacion in datos%}
+<div class="modal fade" id="detalleHospitalizacion" data-bs-focus="false" tabindex="-1" aria-labelledby="exampleModalLabel"
     aria-hidden="true">
     <div class="modal-dialog modal-xl modal-fullscreen-lg-down">
         <div class="modal-content" >
@@ -23,57 +25,55 @@
                 <div class="container cuerpo-modal" style="background-color: white;">
                     <div class="row mt-2">
                         <div class="col">
-                            <label class="form-label " for="form3Example2"><strong>Cliente</strong><i
-                                    class="ti ti-circle-plus-filled" aria-hidden="true" title="Agregar Nuevo Conductor"
-                                    data-bs-target="#agregarCliente" data-bs-toggle="modal" data-bs-dismiss="modal"
-                                    style="color: red; font-size: 15px;"></i></label>
-                            <select class="form-select" id="cliente" data-placeholder="Seleccione un rol">
-                                <option selected="true" value="seleccione un cliente" disabled="disabled">seleccione un
-                                    cliente</option>
-                                {% for cliente in clientes %}
-    
-                                <option value="{{ cliente.num_cliente}}">{{ cliente.Nombre }}</option>
-                                {% endfor %}
-                            </select>
+                            <label class="form-label " for="form3Example2"><strong>Cliente</strong></label>
+                           <input type="text" class="form-control" value="{{hospitalizacion.nombre}}" disabled>
     
                         </div>
                         <div class="col">
-                            <label class="form-label " for="form3Example2"><strong>Mascota</strong><i
-                                    class="ti ti-circle-plus-filled" aria-hidden="true" title="Agregar Nuevo Conductor"
-                                    data-bs-target="#agregarMascota" data-bs-toggle="modal" data-bs-dismiss="modal"
-                                    style="color: red; font-size: 15px;"></i></label>
-                            <select class="form-select" id="mascota" data-placeholder="Seleccione una mascota">
-    
-                            </select>
+                            <label class="form-label " for="form3Example2"><strong>Mascota</strong></label>
+                                    <input type="text" class="form-control" value="{{hospitalizacion.Nombre_mascota}}" disabled>
     
                         </div>
 
                         <div class="col">
-                            <label class="form-label" for="form3Example2"><strong>Cuarto</strong></label>
-                            {%if habitaciones %}
-                            <select class="form-select" id="cuarto" data-placeholder="Seleccione un rol">
-                               
-                                {% for habitaciones in habitaciones %}
-                               
-                                    <option value="{{ habitaciones.id_habitacion }}">{{ habitaciones.habitacion }}</option>
-                  
-                                {% endfor %}
-                            </select>
-                            {%else%}
-                            <label for="" class="control-label col-md-12 text-danger">No hay habitaciones disponibles !!!</label>
-                            {%endif%}
+                            <label class="form-label" for="form3Example2"><strong>Especie</strong></label>
+                            <input type="text" class="form-control" value="{{hospitalizacion.nom_especie}}" disabled>
+    
 
 
 
+                        </div>
+
+                        
+
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col">
+                            <label class="form-label " for="form3Example2"><strong>Fecha Hospedaje</strong></label>
+                           <input type="text" class="form-control" value="{{hospitalizacion.fecha_hosp}}" disabled>
+    
+                        </div>
+                        <div class="col">
+                            <label class="form-label " for="form3Example2"><strong>Fecha Salida</strong></label>
+                                    <input type="text" class="form-control" value="{{hospitalizacion.fecha_salida}}" disabled>
+    
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        
+                        <div class="col">
+                            <label class="form-label" for="form3Example2"><strong>Habitación</strong></label>
+                            <input type="text" class="form-control" value="{{hospitalizacion.habitacion}}" disabled>
+    
                         </div>
 
                         <div class="col">
-                            <label class="form-label" for="form3Example2"><strong>Fecha Salida</strong></label>
-                            <input type="date" class="form-control" id="fechaSalida">
-
-
-
+                            <label class="form-label" for="form3Example2"><strong>Total</strong></label>
+                            <input type="text" class="form-control" value="C$ {{hospitalizacion.total}}" disabled>
+    
                         </div>
+
+                        
 
                     </div>
                     
@@ -83,7 +83,7 @@
                         <div class="col">
                             <label class="form-label " for="form3Example2"
                                 style="margin-top: 20px;"><strong>Observación</strong> </label>
-                            <textarea name="" rows="6" class="form-control" id="observacion"></textarea>
+                            <textarea name="" rows="6" class="form-control" id="observacion">{{hospitalizacion.descripcion}}</textarea>
                         </div>
 
 
@@ -91,15 +91,7 @@
                     </div>
                    
                     
-                    <div class="row d-flex mt-5 ">
-                        
-                        <div class="col d-flex justify-content-end " style="margin-right: 10px;">
-                            <button type="button" class="btn btn-primary" id="finalizar"
-                                onclick="hospitalizar()"><i class="fa-regular fa-circle-check"></i>
-                                GUARDAR
-                            </button>
-                        </div>
-                    </div>
+                    
 
 
 
@@ -110,9 +102,16 @@
             <div class="p-2">
 
             </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+               
+                <button type="button" onclick="marcarSalidaHospitalizacion()" class="btn btn-success"><i class="ti ti-checklist"></i> Marcar Salida</button>
+            </div>
         </div>
+        
     </div>
 </div>
+{%endfor%}
 
 
 <!-- MODALES -->
@@ -343,8 +342,7 @@
 
 
 
-    function hospitalizar() {
-        alert($("#cuarto option:selected").val() )
+    function marcarSalidaHospitalizacion() {
         if ($("#fechaSalida").val() == ''  || $("#cliente option:selected").val() == '' || $("#mascota option:selected").val() == '' || $("#cuarto option:selected").val() == '') {
             Swal.fire({ icon: 'error', title: 'Error', confirmButtonText: 'Ok', text: 'Debe rellenar todos los campos' }).then((result) => { /* Read more about isConfirmed, isDenied below */
                 if (result.isConfirmed) {

@@ -1541,33 +1541,13 @@ def detalleHospitalizacion():
 
         conn = conectar()
         cursor = conn.cursor()
-        query = "select c.num_cliente,c.nombres_cliente as nombre, c.apellidos_cliente as apellido,cred.usuario,r.nombre_rol,e.NombreEstado,c.correo_cliente,c.direccion_cliente,c.telefono,car.cargo from cliente as c inner join credenciales as cred on cred.id_credencial = c.id_credencial inner join estado as e on c.id_estado = e.id_estado inner join roles as r on cred.rol = r.cod_rol inner join cargo as car on cred.cargo = car.cod_cargo where c.num_cliente = ?"
+        query = "select h.id_hosp,m.Nombre_mascota,e.nom_especie,ha.habitacion,h.descripcion,CONVERT(DATE, h.fecha_hosp) AS fecha_hosp,CONVERT(DATE, h.fecha_salida) AS fecha_salida,h.total,es.NombreEstado,c.nombres_cliente + ' '+ apellidos_cliente as nombre from hospitalizacion as h inner join habitaciones as ha on h.id_cuarto = ha.id_habitacion inner join mascota as m on h.idMascota = m.idMascota inner join raza as r on m.id_raza = r.id_raza inner join especie as e on e.id_especie = r.id_especie inner join estado as es on h.id_estado = es.id_estado inner join cliente as c on c.num_cliente = m.num_cliente where h.id_hosp = ?"
         cursor.execute(query,(num))
-        usuario = cursor.fetchall()
+        hospitalizacion = cursor.fetchall()
 
+        
 
-        conn = conectar()
-        cursor = conn.cursor()
-        query = "select * from roles"
-        cursor.execute(query)
-        roles = cursor.fetchall()
-
-        conn = conectar()
-        cursor = conn.cursor()
-        query = "select * from cargo"
-        cursor.execute(query)
-        cargos = cursor.fetchall()
-
-
-
-        conn = conectar()
-        cursor = conn.cursor()
-        query = "select * from estado where NombreEstado = 'Activo' or NombreEstado = 'INACTIVO'"
-        cursor.execute(query)
-        estados = cursor.fetchall()
-
-
-        return render_template('sistema/modales/modal_detalle_usuario.html',cargos = cargos, usuario=usuario,roles = roles,estados = estados)
+        return render_template('sistema/modales/modal_detalle_hospitalizacion.html',datos = hospitalizacion)
 
 
 @bp.route('/modalAgregarHospitalizacion', methods=['POST'])
@@ -1599,11 +1579,72 @@ def modalAgregarHospitalizacion():
         cursor.execute(query)
         estados = cursor.fetchall()
 
+        conn = conectar()
+        cursor = conn.cursor()
+        query = "select habitaciones.id_habitacion,habitaciones.habitacion from habitaciones inner join estado as e on habitaciones.id_estado = e.id_estado where e.NombreEstado = 'DISPONIBLE' "
+        cursor.execute(query)
+        cuarto = cursor.fetchall()
+
         
-        return render_template('sistema/modales/modal_agregar_hospitalizacion.html', habitaciones = habitaciones,mascotas = mascotas,estados = estados,clientes = cliente)
+        return render_template('sistema/modales/modal_agregar_hospitalizacion.html', habitaciones = cuarto,mascotas = mascotas,estados = estados,clientes = cliente)
         
     else:
         return "No"
-     
+    
+
+@bp.route('/hospitalizar',methods = ['GET','POST'])
+def hospitalizar():
+    cliente = request.form['cliente']
+    mascota = request.form['mascota']
+    cuarto = request.form['cuarto']
+    observacion = request.form['observacion']
+    fechaSalida = request.form['fechaSalida']
+
+    fechaActual = capturarHora()
+
+
+
+    conn = conectar()
+    cursor = conn.cursor()
+    query = "select costo from habitaciones where id_habitacion = ?"
+    cursor.execute(query,(cuarto))
+    cuartoPrice = cursor.fetchone()
+
+    #total = valor por noche de la habitacion * cantidad de dias
+    fecha_objetivo = datetime.strptime(fechaSalida, '%Y-%m-%d')
+    
+    # Obtener la fecha y hora actual
+    fecha_actual = datetime.now()
+    
+    # Calcular la diferencia
+    diferencia = fecha_objetivo - fecha_actual
+    dias_totales = diferencia.days
+    total = dias_totales * cuartoPrice[0]
+
+    print(total)
+    print(fechaSalida)
+
+    conn = conectar()
+    cursor = conn.cursor()
+    query = 'INSERT INTO hospitalizacion (fecha_hosp,id_estado,idMascota,fecha_salida,descripcion,total,valor_consulta,id_cuarto) VALUES (?,1,?,?,?,?,?,?)'
+    cursor.execute(query, (fechaActual,mascota,fechaSalida,observacion,total,0,cuarto))
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+
+    conn = conectar()
+    cursor = conn.cursor()
+
+            # Realiza la inserción
+    query = 'Update habitaciones set id_estado = 13 where id_habitacion = ?'
+    cursor.execute(query, (cuarto))
+    conn.commit()
+    
+
+    return 'HECHO'
+
+
+
 
 #FIN DEL MODULO DE HOSPITALIZACION
