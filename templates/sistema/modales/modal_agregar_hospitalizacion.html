@@ -344,7 +344,6 @@
 
 
     function hospitalizar() {
-        alert($("#cuarto option:selected").val() )
         if ($("#fechaSalida").val() == ''  || $("#cliente option:selected").val() == '' || $("#mascota option:selected").val() == '' || $("#cuarto option:selected").val() == '') {
             Swal.fire({ icon: 'error', title: 'Error', confirmButtonText: 'Ok', text: 'Debe rellenar todos los campos' }).then((result) => { /* Read more about isConfirmed, isDenied below */
                 if (result.isConfirmed) {
@@ -363,7 +362,7 @@
                     console.log(pair[0] + ': ' + pair[1]);
                 }
                 $.ajax({
-                    url: "/hospitalizar",
+                    url: "{{ url_for('sistema.hospitalizar') }}",
                     type: "POST",
                     data: formData,
                     contentType: false,  // Importante: no configurar el tipo de contenido

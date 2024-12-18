@@ -24,9 +24,9 @@
                             <th class="border-bottom-0">
                                 <h6 class="fw-semibold mb-0">Habitación</h6>
                             </th>
-                            <th class="border-bottom-0">
+                            <!-- <th class="border-bottom-0">
                                 <h6 class="fw-semibold mb-0">Observación</h6>
-                            </th>
+                            </th> -->
                             <th class="border-bottom-0">
                                 <h6 class="fw-semibold mb-0">Fecha</h6>
                             </th>
@@ -56,17 +56,41 @@
                             <td class="border-bottom-0">
                                 <span class="fw-normal">{{hospitalizacion.habitacion}}</span>
                             </td>
-                            <td class="border-bottom-0">
+                            <!-- <td class="border-bottom-0">
                                 <span class="fw-normal">{{hospitalizacion.descripcion}}</span>
-                            </td>
+                            </td> -->
                             <td class="border-bottom-0">
 
                                 <span class="fw-normal">{{hospitalizacion.fecha_hosp}}</span>
                             </td>
-                            <td class="border-bottom-0">
 
-                                <span class="fw-normal">{{hospitalizacion.NombreEstado}}</span>
+                            {%if hospitalizacion.NombreEstado == 'FINALIZADO'%}
+                            <!-- GREEN -->
+                            <td class="border-bottom-0">
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="badge bg-success rounded-3 fw-semibold">Finalizado</span>
+                                </div>
                             </td>
+                            {%elif hospitalizacion.NombreEstado == 'ACTIVO'%}
+                            <!-- BLUE -->
+                            <td class="border-bottom-0">
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="badge bg-warning rounded-3 fw-semibold">En uso</span>
+                                </div>
+                            </td>
+                            {%elif hospitalizacion.NombreEstado == 'CANCELADO'%}
+                            <!-- RED -->
+                            <td class="border-bottom-0">
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="badge bg-danger rounded-3 fw-semibold">Cancelado</span>
+                                </div>
+                            </td>
+                            {%endif%}
+
+
+                            
+
+
                             <td class="border-bottom-0" style="   display: flex;justify-content: end;">
                                 <button class="btn btn-primary "  name="detalleHosp" id="{{hospitalizacion.id_hosp}}"><i class="ti ti-eye icono text-white"></i></button>
                             </td>

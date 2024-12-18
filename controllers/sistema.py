@@ -1645,6 +1645,190 @@ def hospitalizar():
     return 'HECHO'
 
 
+@bp.route('/salidaHospitalizacion',methods = ['GET','POST'])
+def salidaHospitalizacion():
+    id = request.form['id']
+    observacion = request.form['observacion']
+
+    fechaActual = capturarHora()
+
+    conn = conectar()
+    cursor = conn.cursor()
+    query = "select id_cuarto from hospitalizacion where id_hosp = ?"
+    cursor.execute(query,(id))
+    cuarto = cursor.fetchone()
+
+    conn = conectar()
+    cursor = conn.cursor()
+
+            # Realiza la inserción
+    query = 'Update hospitalizacion set id_estado = 14,fecha_salida = ? where id_hosp = ?'
+    cursor.execute(query, (fechaActual,id))
+    conn.commit()
+
+
+    conn = conectar()
+    cursor = conn.cursor()
+
+            # Realiza la inserción
+    query = 'Update habitaciones set id_estado = 12 where id_habitacion = ?'
+    cursor.execute(query, (cuarto[0]))
+    conn.commit()
+    
+
+    return 'HECHO'
+
+@bp.route('/hospFact')
+def hospFact():
+    num = request.args.get('id')
+
+    # Simula la consulta a la base de datos
+    conn = conectar()
+    cursor = conn.cursor()
+    query = """
+    select h.id_hosp,m.Nombre_mascota,e.nom_especie,ha.habitacion,h.descripcion,CONVERT(DATETIME, h.fecha_hosp) AS fecha_hosp,CONVERT(DATETIME, h.fecha_salida) AS fecha_salida,h.total,es.NombreEstado,c.nombres_cliente + ' '+ apellidos_cliente as nombre,DATEDIFF(DAY, h.fecha_hosp, h.fecha_salida) AS dias_hospedaje,ha.costo  from hospitalizacion as h 
+    inner join habitaciones as ha on h.id_cuarto = ha.id_habitacion inner join mascota as m on h.idMascota = m.idMascota inner join raza as r on m.id_raza = r.id_raza 
+    inner join especie as e on e.id_especie = r.id_especie inner join estado as es on h.id_estado = es.id_estado 
+    inner join cliente as c on c.num_cliente = m.num_cliente 
+    where h.id_hosp = ?
+    """
+    
+    cursor.execute(query, num)
+    ticket = cursor.fetchone()
+
+    if not ticket:
+        return "Ticket no encontrado", 404
+
+    fecha_factura_ingreso = ticket[5].strftime("%Y-%m-%d") if isinstance(ticket[5], datetime) else str(ticket[5])
+    hora_factura_ingreso = ticket[5].strftime("%I:%M %p") if isinstance(ticket[5], datetime) else str(ticket[5])
+    
+    fecha_factura_salida = ticket[6].strftime("%Y-%m-%d") if isinstance(ticket[6], datetime) else str(ticket[6])
+    hora_factura_salida = ticket[6].strftime("%I:%M %p") if isinstance(ticket[6], datetime) else str(ticket[6])
+
+    pdf = FPDF('P', 'mm',  (101.6, 175))
+    pdf.set_margins(5.5, 5.5, 5.5)
+    pdf.set_display_mode(zoom=100, layout='continuous')
+    pdf.add_page()
+    
+    x = 35
+    y = 0
+    width = 30
+    height = 0 
+    imagePath = 'static/sistema/images/logos/logo.png'
+
+    pdf.image(imagePath, x, y, width, height)
+    pdf.ln(20)
+    pdf.set_font('Arial', 'B', 30)
+    pdf.set_text_color(0, 0, 0)
+    pdf.set_font('Arial', 'B', 14)
+    pdf.multi_cell(0, 5, 'Veterinaria El Buen Productor', 0, "C")
+    pdf.ln(1)
+    pdf.set_font('Arial', 'B', 10)
+    pdf.multi_cell(0, 5, 'FACTURA DE HOSPITALIZACIÓN', 0, "C")
+    pdf.ln(1)
+    
+    pdf.set_font('Arial', 'B', 7.5)
+    pdf.cell(25, 10, 'Factura No: ')
+    pdf.set_font('Arial', '', 7.5)
+    pdf.cell(30, 10, str(ticket[0]))
+    pdf.ln(6)
+    
+    pdf.set_font('Arial', 'B', 7.5)
+    pdf.cell(25, 10, 'Fecha Ingreso: ')
+    pdf.set_font('Arial', '', 7.5)  # Cambia a fuente normal si lo prefieres
+    pdf.cell(30, 10, fecha_factura_ingreso)  # Espacio suficiente para la fecha
+    pdf.ln(6)
+
+    pdf.set_font('Arial', 'B', 7.5)
+    pdf.cell(25, 10, 'Hora Ingreso: ')
+    pdf.set_font('Arial', '', 7.5)
+    pdf.cell(30, 10, hora_factura_ingreso)  # Espacio suficiente para la hora
+
+    pdf.ln(5)  
+    
+    pdf.set_font('Arial', 'B', 7.5)
+    pdf.cell(25, 10, 'Fecha Salida: ')
+    pdf.set_font('Arial', '', 7.5)  # Cambia a fuente normal si lo prefieres
+    pdf.cell(30, 10, fecha_factura_salida)  # Espacio suficiente para la fecha
+    pdf.ln(6)
+
+    pdf.set_font('Arial', 'B', 7.5)
+    pdf.cell(25, 10, 'Hora Salida: ')
+    pdf.set_font('Arial', '', 7.5)
+    pdf.cell(30, 10, hora_factura_salida)  # Espacio suficiente para la hora
+
+    pdf.ln(5)  
+    
+
+    pdf.set_font('Arial', 'B', 7.5)
+    pdf.cell(25, 10, 'Cliente: ')
+    pdf.set_font('Arial', 'B', 7.5)
+    pdf.cell(20, 10, ticket[9].upper())
+    pdf.ln(6)
+
+
+    pdf.set_font('Arial', 'B', 7.5)
+    pdf.cell(25, 10, 'Mascota: ')
+    pdf.set_font('Arial', 'B', 7.5)
+    pdf.cell(20, 10, ticket[1].upper())
+    pdf.ln(6)
+    pdf.ln(10)
+    
+        
+    
+    # pdf.set_font('Arial', 'B', 7.5)
+    # pdf.cell(25, 10, 'Habitación: ')
+    # pdf.set_font('Arial', '', 7.5)
+    # pdf.cell(25, 10, ticket[4])
+    # pdf.ln(9)
+
+    pdf.set_line_width(0.2) 
+    pdf.set_font('Arial', 'B', 7.5)
+    
+        # Encabezados de la tabla
+    pdf.cell(30, 10, 'Habitación', 1)
+    pdf.cell(15, 10, 'Dias', 1)
+    pdf.cell(15, 10, '', 1)
+    pdf.cell(30, 10, 'Subtotal', 1)
+    pdf.ln(10)  # Salto de línea
+
+    # Iterar sobre los resultados y calcular el descuento
+    
+    nom_producto = str(ticket[3]).upper()  # Nombre del producto en mayúsculas
+    cantidad = float(ticket[10])  # Cantidad comprada
+    precio = float(ticket[11])  # Precio unitario
+   
+
+        # Imprimir los datos en el PDF
+    pdf.set_line_width(0.0)  # Establecer un borde más fino
+
+    pdf.set_font('Arial', '', 7.5)
+    
+        # Fila de datos
+    pdf.cell(30, 10, nom_producto, 1, 0)  # Borde para la celda de producto
+    pdf.cell(15, 10, str(cantidad), 1, 0, 'C')  # Cantidad centrada con borde fino
+    pdf.cell(15, 10, '', 1)
+    pdf.cell(30, 10, str(precio), 1)
+    pdf.ln(10)  # Aumenta el espacio entre filas a 6 unidades
+
+    pdf.set_font('Arial', 'B', 7.5)  # Título "Total"
+    pdf.cell(25, 30, 'Total: ')
+    pdf.set_font('Arial', '', 30)  # Aumentar el tamaño de la fuente para el valor
+    pdf.cell(65, 30, 'C$ '+str(ticket[7]), 0, 1, 'R')  # Alinear a la derecha
+    pdf.ln(9)  # Salto de línea
+
+        
+    pdf_output = pdf.output(dest='S').encode('latin1') 
+
+    response = make_response(pdf_output)
+    response.headers['Content-Type'] = 'application/pdf'
+    response.headers['Content-Disposition'] = 'inline; filename=ticket.pdf'
+
+    return response
+
+
+
+
 
 
 #FIN DEL MODULO DE HOSPITALIZACION

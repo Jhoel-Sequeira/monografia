@@ -4,10 +4,10 @@
 
 
 {% for hospitalizacion in datos%}
-<div class="modal fade" id="detalleHospitalizacion" data-bs-focus="false" tabindex="-1" aria-labelledby="exampleModalLabel"
-    aria-hidden="true">
+<div class="modal fade" id="detalleHospitalizacion" data-bs-focus="false" tabindex="-1"
+    aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-fullscreen-lg-down">
-        <div class="modal-content" >
+        <div class="modal-content">
             <div class="modal-header encabezado_modales">
 
 
@@ -19,79 +19,80 @@
                 <button type="button" class="btn-close" id="cerrarDet" data-bs-dismiss="modal"
                     aria-label="Close"></button>
             </div>
-            <input type="hidden" id="filtrosInput" value='{  "filtro": [    "1",    "2",    "3"  ]}'>
+            <input type="hidden" id="id" value='{{hospitalizacion.id_hosp}}'>
             <div class="modal-body fondo-modal">
 
                 <div class="container cuerpo-modal" style="background-color: white;">
                     <div class="row mt-2">
                         <div class="col">
                             <label class="form-label " for="form3Example2"><strong>Cliente</strong></label>
-                           <input type="text" class="form-control" value="{{hospitalizacion.nombre}}" disabled>
-    
+                            <input type="text" class="form-control" value="{{hospitalizacion.nombre}}" disabled>
+
                         </div>
                         <div class="col">
                             <label class="form-label " for="form3Example2"><strong>Mascota</strong></label>
-                                    <input type="text" class="form-control" value="{{hospitalizacion.Nombre_mascota}}" disabled>
-    
+                            <input type="text" class="form-control" value="{{hospitalizacion.Nombre_mascota}}" disabled>
+
                         </div>
 
                         <div class="col">
                             <label class="form-label" for="form3Example2"><strong>Especie</strong></label>
                             <input type="text" class="form-control" value="{{hospitalizacion.nom_especie}}" disabled>
-    
+
 
 
 
                         </div>
 
-                        
+
 
                     </div>
                     <div class="row mt-2">
                         <div class="col">
                             <label class="form-label " for="form3Example2"><strong>Fecha Hospedaje</strong></label>
-                           <input type="text" class="form-control" value="{{hospitalizacion.fecha_hosp}}" disabled>
-    
+                            <input type="text" class="form-control" value="{{hospitalizacion.fecha_hosp}}" disabled>
+
                         </div>
                         <div class="col">
                             <label class="form-label " for="form3Example2"><strong>Fecha Salida</strong></label>
-                                    <input type="text" class="form-control" value="{{hospitalizacion.fecha_salida}}" disabled>
-    
+                            <input type="text" class="form-control" value="{{hospitalizacion.fecha_salida}}" disabled>
+
                         </div>
                     </div>
                     <div class="row mt-2">
-                        
+
                         <div class="col">
                             <label class="form-label" for="form3Example2"><strong>Habitación</strong></label>
                             <input type="text" class="form-control" value="{{hospitalizacion.habitacion}}" disabled>
-    
+
                         </div>
 
                         <div class="col">
                             <label class="form-label" for="form3Example2"><strong>Total</strong></label>
                             <input type="text" class="form-control" value="C$ {{hospitalizacion.total}}" disabled>
-    
+
                         </div>
 
-                        
+
 
                     </div>
-                    
-                    
-                    
+
+
+
                     <div class="row mt-2">
                         <div class="col">
                             <label class="form-label " for="form3Example2"
                                 style="margin-top: 20px;"><strong>Observación</strong> </label>
-                            <textarea name="" rows="6" class="form-control" id="observacion">{{hospitalizacion.descripcion}}</textarea>
+                            <textarea name="" rows="6" class="form-control"
+                                id="observacion">{{hospitalizacion.descripcion}}</textarea>
                         </div>
 
 
 
                     </div>
-                   
-                    
-                    
+
+
+
 
 
 
@@ -104,11 +105,12 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-               
-                <button type="button" onclick="marcarSalidaHospitalizacion()" class="btn btn-success"><i class="ti ti-checklist"></i> Marcar Salida</button>
+
+                <button type="button" onclick="marcarSalidaHospitalizacion()" class="btn btn-success"><i
+                        class="ti ti-checklist"></i> Marcar Salida</button>
             </div>
         </div>
-        
+
     </div>
 </div>
 {%endfor%}
@@ -193,7 +195,7 @@
                             <input type="text" id="nombreMascota" class="form-control">
                         </div>
                     </div>
-                    
+
                 </div>
                 <div class="row mt-3">
                     <div class="col-lg">
@@ -202,9 +204,9 @@
 
                             <select name="" class="form-select" id="especie">
                                 <option value="Seleccione una mascota" disabled selected>Seleccione una especie</option>
-                            {%for especie in especies%}
+                                {%for especie in especies%}
                                 <option value="{{especie.id_especie}}">{{especie.nom_especie}}</option>
-                            {%endfor%}
+                                {%endfor%}
                             </select>
                         </div>
                     </div>
@@ -212,7 +214,7 @@
                         <div class="form-group" id="camionModal">
                             <label for="txtPlacaV" class=" form-label">Raza</label>
                             <select name="" class="form-select" id="raza">
-                            
+
                             </select>
 
                         </div>
@@ -223,10 +225,10 @@
                         <div class="form-group" id="camionModal">
                             <label for="txtPlacaV" class=" form-label">Sexo</label>
 
-                           <select name="" id="sexo" class="form-select">
+                            <select name="" id="sexo" class="form-select">
                                 <option value="M">Macho</option>
                                 <option value="H">Hembra</option>
-                           </select>
+                            </select>
                         </div>
                     </div>
                     <div class="col-lg">
@@ -247,8 +249,8 @@
             </div>
 
             <div class="modal-footer">
-                <button class="btn btn-secondary" data-bs-target="#agregarUsuario" id="regresar1"
-                    data-bs-toggle="modal" data-bs-dismiss="modal">Regresar</button>
+                <button class="btn btn-secondary" data-bs-target="#agregarUsuario" id="regresar1" data-bs-toggle="modal"
+                    data-bs-dismiss="modal">Regresar</button>
                 <button class="btn btn-primary" onclick="NuevaMascota()">Guardar</button>
             </div>
         </div>
@@ -286,7 +288,7 @@
             closeOnSelect: false,
         });
     });
-    function NuevaMascota(){
+    function NuevaMascota() {
         $.ajax({
             url: "{{ url_for('sistema.agregarMascota') }}",
             type: "POST",
@@ -343,45 +345,51 @@
 
 
     function marcarSalidaHospitalizacion() {
-        if ($("#fechaSalida").val() == ''  || $("#cliente option:selected").val() == '' || $("#mascota option:selected").val() == '' || $("#cuarto option:selected").val() == '') {
-            Swal.fire({ icon: 'error', title: 'Error', confirmButtonText: 'Ok', text: 'Debe rellenar todos los campos' }).then((result) => { /* Read more about isConfirmed, isDenied below */
-                if (result.isConfirmed) {
 
-                }
-            })
-        } else {
-            
-                var formData = new FormData();
-                formData.append('cliente', $("#cliente option:selected").val());
-                formData.append('mascota', $("#mascota option:selected").val());
-                formData.append('cuarto', $("#cuarto option:selected").val());
-                formData.append('observacion', $("#observacion ").val());
-                formData.append('fechaSalida', $("#fechaSalida ").val());
-                for (var pair of formData.entries()) {
-                    console.log(pair[0] + ': ' + pair[1]);
-                }
-                $.ajax({
-                    url: "/hospitalizar",
-                    type: "POST",
-                    data: formData,
-                    contentType: false,  // Importante: no configurar el tipo de contenido
-                    processData: false,
-                   
-                    success: function (response) {
-                        Swal.fire({ icon: 'success', title: 'Exito', confirmButtonText: 'Ok', text: 'Usuario Actualizado' }).then((result) => { /* Read more about isConfirmed, isDenied below */
-                            if (result.isConfirmed) {
-                                cargarHospitalizacion();
-                                $('#agregarHospitalizacion').click();
-                            }
-                        })
-                    },
-                    error: function (error) { // console.log(error);
-                    }
-                });
-            
 
+        var formData = new FormData();
+        formData.append('id', $("#id").val());
+        formData.append('observacion', $("#observacion ").val());
+        for (var pair of formData.entries()) {
+            console.log(pair[0] + ': ' + pair[1]);
         }
+        $.ajax({
+            url: "{{ url_for('sistema.salidaHospitalizacion') }}",
+            type: "POST",
+            data: formData,
+            contentType: false,  // Importante: no configurar el tipo de contenido
+            processData: false,
 
+            success: function (response) {
+                Swal.fire({ icon: 'success', title: 'Exito', confirmButtonText: 'Ok', text: 'Usuario Actualizado' }).then((result) => { /* Read more about isConfirmed, isDenied below */
+                    if (result.isConfirmed) {
+                        cargarHospitalizacion();
+                        $('#agregarHospitalizacion').click();
+                        openTicket($("#id").val());
+                    }
+                })
+            },
+            error: function (error) { // console.log(error);
+            }
+        });
+
+
+
+
+    }
+
+    function openTicket(id) {
+        // Construye la URL con el ID
+        var url = "{{ url_for('sistema.hospFact') }}?id=" + id;
+        // Abre una nueva ventana sin barras de herramientas
+        var newWindow = window.open(url, '_blank', "toolbar=no,scrollbars=yes,resizable=yes,location=no");
+        if (newWindow) {
+            // Si se pudo abrir la nueva ventana, enfócala
+            newWindow.focus();
+        } else {
+            // Si no se pudo abrir la nueva ventana (debido a un bloqueador de ventanas emergentes), muestra un mensaje
+            alert("No se pudo abrir la nueva ventana. Asegúrate de desactivar el bloqueador de ventanas emergentes.");
+        }
     }
 
 </script>

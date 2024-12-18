@@ -20284,3 +20284,16 @@ ul {
     font-weight: bold;
     color: var(--bs-primary);
 }
+
+.profile-circle {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: white;
+	font-size: 20px;
+	font-weight: bold;
+	background-color: red;
+	width: 36px;
+	height: 36px;
+	border-radius: 50%;
+}
