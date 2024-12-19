@@ -4,10 +4,13 @@ from flask import Blueprint
 from datetime import datetime, date, timedelta
 import json
 from conexion import conectar
-
-from flask import Flask, jsonify, redirect, render_template, request, send_file, session, url_for
+import spacy
+from spacy.lang.es.stop_words import STOP_WORDS
+from dateutil.relativedelta import relativedelta
+from flask import Flask, jsonify, redirect, render_template, request, send_file, session, url_for,current_app
 
 from werkzeug.security import check_password_hash, generate_password_hash
+import controllers.chatbot
 
 import jinja2
 from jinja2 import Environment
@@ -27,6 +30,19 @@ from openpyxl.drawing.image import Image
 from openpyxl.styles import Alignment,Font,Border,Side
 
 bp = Blueprint('web', __name__)
+
+
+nlp = spacy.load('es_core_news_sm')
+
+# Palabras a excluir del conjunto stop_words
+palabras_excluidas = ["tener","tienen"]
+
+        # Remover palabras del conjunto stop_words
+stop_words_personalizado = set(STOP_WORDS) - set(palabras_excluidas)
+
+        # Asignar el nuevo conjunto stop_words personalizado al modelo de SpaCy
+nlp.Defaults.stop_words = stop_words_personalizado
+
 
 @bp.route('/')
 def home():
@@ -721,6 +737,32 @@ def cargarTabla():
 
 
 # FIN DE LA TIENDA
+
+# MODULO DE CHATBOT
+@bp.route('/recibirMensaje',methods=["GET", "POST"])
+def recibirMensaje():
+    if request.method == 'POST':
+
+        solicitud = request.form['mensaje']
+        doc = nlp(solicitud.lower())
+        # LINEA CON LAS STOP_WORDS PRESENTA PROBLEMAS CON ALGUNOS VERBOS
+        #lemmatized_tokens = [token.lemma_ for token in doc if token.is_alpha and not token.is_stop]
+        #LINEA SIN LOS STOP WORDS
+        lemmatized_tokens = [token.lemma_ for token in doc if token.is_alpha ]
+
+        filtered_tokens = [token for token in lemmatized_tokens if token.isalnum()]
+        print("PRIMER FILTRO: ", filtered_tokens)
+        if session["id"]:
+            
+            resultado = controllers.chatbot.procesar_entrada(filtered_tokens, session["id"],current_app)
+            return resultado
+        else:
+            return "Su usuario no fue encontrado, usted podrá hacer consultas sencillas como horarios, precios, servicios etc."       
+
+
+
+
+# FIN CHATBOT
 
 @bp.route('/servicios')
 def servicios():

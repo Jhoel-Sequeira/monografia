@@ -274,32 +274,7 @@
     $(document).ready(function () {
         // cargarChatbot();    
     });
-    function log(){
-        $.ajax({
-            url: "{{ url_for('web.carritoTotal') }}",
-            type: "POST",
-            data: {
-                usuario: ,
-                pass: 
-            },
-            success: function (response) {
-
-                // Cargar el nuevo contenido en el modal
-                $("#modalCarrito").html(response);
-                $("#modalCarrito").append(response.htmlresponse);
-
-                $('#llamarCarrito').click();
-
-
-
-
-
-            },
-            error: function (error) {
-                // console.log(error);
-            },
-        });
-    }
+    
     function cargarChatbot() {
         $.ajax({
             url: "/cargarChatBot",
@@ -319,6 +294,7 @@
     }
 
     function MandarMensaje() {
+
         var chatDisplay = document.getElementById("chats");
         var userMessageInput = document.getElementById("mensaje");
         var userMessage = userMessageInput.value;
