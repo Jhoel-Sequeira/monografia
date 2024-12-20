@@ -752,12 +752,11 @@ def recibirMensaje():
 
         filtered_tokens = [token for token in lemmatized_tokens if token.isalnum()]
         print("PRIMER FILTRO: ", filtered_tokens)
-        if session["id"]:
-            
-            resultado = controllers.chatbot.procesar_entrada(filtered_tokens, session["id"],current_app)
+        if session.get("id"):
+            resultado = controllers.chatbot.procesar_entrada(filtered_tokens, session["id"], current_app)
             return resultado
         else:
-            return "Su usuario no fue encontrado, usted podrá hacer consultas sencillas como horarios, precios, servicios etc."       
+            return "Su usuario no fue encontrado, usted podrá hacer consultas sencillas como horarios, precios, servicios, etc."
 
 
 

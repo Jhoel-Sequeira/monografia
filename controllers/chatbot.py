@@ -27,12 +27,12 @@ def consultar_citas_pendientes(usuario):
 
     if len(citas) == 0:
         return "No tienes citas pendientes."
+    else:
+        fecha_hora = citas[0]
+        fecha, hora = fecha_hora.split(' ')
 
-    fecha_hora = citas[0]
-    fecha, hora = fecha_hora.split(' ')
-
-    retorno = f"Tiene una cita pendiente para la fecha: {fecha} a las {hora}."
-    return retorno
+        retorno = f"Tiene una cita pendiente para la fecha: {fecha} a las {hora}."
+        return retorno
 
 # Función para realizar una consulta de acuerdo a una solicitud específica y el nombre de usuario
 # EN LA PARTE DE CITAS
@@ -43,11 +43,20 @@ def procesar_consulta(solicitud, usuario):
         return resultado
     elif 'cita' in solicitud and ('pasado' in solicitud or 'anterior' in solicitud or 'ultimo' in solicitud):
         # Agrega tu lógica para consultar los usuarios en la base de datos
-        citas = db1.execute("select Fecha from Consulta as c inner join Usuarios as u ON c.IdUsuario = u.Id_Usuario inner join Mascota as m on c.IdMascota = m.Id_Mascota WHERE m.IdUsuario = :correo and c.IdEstado = 4 order by c.Fecha desc", correo = usuario)
+        conn = conectar()
+        cursor = conn.cursor()
+        query = 'select fecha_atencion from atencion where id_estado = 14 and num_cliente = ? order by fecha_atencion desc'
+        cursor.execute(query, usuario)
+        citas = cursor.fetchone()
+        cursor.close()
+        conn.close()
         if len(citas) == 0:
             return "No tiene registro de citas."
 
-        retorno = "Su ultima cita fue: "+ citas[0]['Fecha']
+        fecha_hora = citas[0]
+        fecha, hora = fecha_hora.split(' ')
+
+        retorno = f"Su ultima cita fue: {fecha} a las {hora}."
         return retorno
     else:
         return "No entiendo tu solicitud."

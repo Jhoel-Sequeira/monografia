@@ -42,26 +42,32 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/css/tabler-vendors.min.css">
 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css" />
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-fileinput/5.2.3/js/fileinput.min.js" integrity="sha512-FlNq0keo0vUQFX5RIhfwKTSilmVeFIqZtZOENjIm2tb0sUUtEvw0+gHrxDTqRyseK55KeUQVwqjIH/eImdAXLA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-fileinput/5.2.3/js/fileinput.min.js"
+    integrity="sha512-FlNq0keo0vUQFX5RIhfwKTSilmVeFIqZtZOENjIm2tb0sUUtEvw0+gHrxDTqRyseK55KeUQVwqjIH/eImdAXLA=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-fileinput/5.1.5/css/fileinput.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="path/to/your/custom-styles.css"> <!-- Asegúrate de cargar tu CSS aquí -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-fileinput/5.1.5/css/fileinput.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="path/to/your/custom-styles.css"> <!-- Asegúrate de cargar tu CSS aquí -->
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
-    <!-- ======= SELECT2 ========= -->
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+  <!-- ======= SELECT2 ========= -->
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
-    <!-- ======= FULL CALENDAR ========= -->
+  <!-- ======= FULL CALENDAR ========= -->
 
-    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.css' rel='stylesheet' />
-    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+  <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.css' rel='stylesheet' />
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
 
-    <!-- RELOJ -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/clockpicker/0.0.7/jquery-clockpicker.min.js" integrity="sha512-x0qixPCOQbS3xAQw8BL9qjhAh185N7JSw39hzE/ff71BXg7P1fkynTqcLYMlNmwRDtgdoYgURIvos+NJ6g0rNg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/clockpicker/0.0.7/bootstrap-clockpicker.css" integrity="sha512-BB0bszal4NXOgRP9MYCyVA0NNK2k1Rhr+8klY17rj4OhwTmqdPUQibKUDeHesYtXl7Ma2+tqC6c7FzYuHhw94g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <!-- RELOJ -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/clockpicker/0.0.7/jquery-clockpicker.min.js"
+    integrity="sha512-x0qixPCOQbS3xAQw8BL9qjhAh185N7JSw39hzE/ff71BXg7P1fkynTqcLYMlNmwRDtgdoYgURIvos+NJ6g0rNg=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/clockpicker/0.0.7/bootstrap-clockpicker.css"
+    integrity="sha512-BB0bszal4NXOgRP9MYCyVA0NNK2k1Rhr+8klY17rj4OhwTmqdPUQibKUDeHesYtXl7Ma2+tqC6c7FzYuHhw94g=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
 
 
 
@@ -88,6 +94,7 @@
 
         </div>
         <!-- Sidebar navigation-->
+
         <nav class="sidebar-nav scroll-sidebar" data-simplebar="">
           <ul id="sidebarnav">
             <li class="nav-small-cap">
@@ -106,6 +113,7 @@
               <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
               <span class="hide-menu">MODULOS</span>
             </li>
+            {%if session.rol == 'ADMINISTRADOR' or session.rol == 'USUARIO'%}
             <li class="sidebar-item">
               <a class="sidebar-link" href="#" id="toggle-submenu-inventario" aria-expanded="false">
                 <span>
@@ -126,7 +134,24 @@
                 </li>
               </ul>
             </li>
+            <script>
+              function toggleSubmenu(submenuId) {
+                const submenu = document.getElementById(submenuId);
+                if (submenu.style.display === 'none' || submenu.style.display === '') {
+                  submenu.style.display = 'block';
+                } else {
+                  submenu.style.display = 'none';
+                }
+              }
+              // Asignar la función a cada enlace de toggle para abrir/cerrar submenús
+              document.getElementById('toggle-submenu-inventario').addEventListener('click', function (e) {
+                e.preventDefault();
+                toggleSubmenu('submenu-inventario');
+              });
+            </script>
+            {%endif%}
 
+            {%if session.rol == 'ADMINISTRADOR' or session.rol == 'USUARIO'%}
             <li class="sidebar-item">
               <a class="sidebar-link" href="#" id="toggle-submenu-ventas" aria-expanded="false">
                 <span>
@@ -147,7 +172,23 @@
                 </li>
               </ul>
             </li>
-
+            <script>
+              function toggleSubmenu(submenuId) {
+                const submenu = document.getElementById(submenuId);
+                if (submenu.style.display === 'none' || submenu.style.display === '') {
+                  submenu.style.display = 'block';
+                } else {
+                  submenu.style.display = 'none';
+                }
+              }
+              // Otros menús con submenú similar al de inventario
+              document.getElementById('toggle-submenu-ventas').addEventListener('click', function (e) {
+                e.preventDefault();
+                toggleSubmenu('submenu-ventas');
+              });
+            </script>
+            {%endif%}
+            {%if session.rol == 'VETERINARIO' or session.rol == 'ADMINISTRADOR'%}
             <li class="sidebar-item">
               <a class="sidebar-link" href="#" id="toggle-submenu-consultas" aria-expanded="false">
                 <span>
@@ -162,13 +203,35 @@
                   </a>
                 </li>
                 <li class="sidebar-item">
+                  <a href="/atencionDiaria" class="sidebar-link">
+                    <span class="hide-menu">Atención Diaria</span>
+                  </a>
+                </li>
+                <li class="sidebar-item">
                   <a href="/historialConsultas" class="sidebar-link">
                     <span class="hide-menu">Historial Consultas</span>
                   </a>
                 </li>
+                
               </ul>
             </li>
+            <script>
+              function toggleSubmenu(submenuId) {
+                const submenu = document.getElementById(submenuId);
+                if (submenu.style.display === 'none' || submenu.style.display === '') {
+                  submenu.style.display = 'block';
+                } else {
+                  submenu.style.display = 'none';
+                }
+              }
+              document.getElementById('toggle-submenu-consultas').addEventListener('click', function (e) {
+                e.preventDefault();
+                toggleSubmenu('submenu-consultas');
+              });
+            </script>
+            {%endif%}
 
+            {%if session.rol == 'ADMINISTRADOR' %}
             <li class="sidebar-item">
               <a class="sidebar-link" href="#" id="toggle-submenu-administracion" aria-expanded="false">
                 <span>
@@ -190,7 +253,23 @@
                 </li>
               </ul>
             </li>
+            <script>
+              function toggleSubmenu(submenuId) {
+                const submenu = document.getElementById(submenuId);
+                if (submenu.style.display === 'none' || submenu.style.display === '') {
+                  submenu.style.display = 'block';
+                } else {
+                  submenu.style.display = 'none';
+                }
+              }
+              document.getElementById('toggle-submenu-administracion').addEventListener('click', function (e) {
+                e.preventDefault();
+                toggleSubmenu('submenu-administracion');
+              });
+            </script>
+            {%endif%}
 
+            {%if session.rol == 'VETERINARIO' or session.rol == 'ADMINISTRADOR' or session.rol == 'USUARIO'%}
             <li class="sidebar-item">
               <a class="sidebar-link" href="#" id="toggle-submenu-hospitalizacion" aria-expanded="false">
                 <span>
@@ -212,6 +291,22 @@
                 </li> -->
               </ul>
             </li>
+            <script>
+              function toggleSubmenu(submenuId) {
+                const submenu = document.getElementById(submenuId);
+                if (submenu.style.display === 'none' || submenu.style.display === '') {
+                  submenu.style.display = 'block';
+                } else {
+                  submenu.style.display = 'none';
+                }
+              }
+              document.getElementById('toggle-submenu-hospitalizacion').addEventListener('click', function (e) {
+                e.preventDefault();
+                toggleSubmenu('submenu-hospitalizacion');
+              });
+
+            </script>
+            {%endif%}
 
             <li class="nav-small-cap">
               <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
@@ -264,13 +359,13 @@
               <!-- <a href="https://adminmart.com/product/modernize-free-bootstrap-admin-dashboard/" target="_blank"
                 class="btn btn-primary">Download Free</a> -->
               <li class="nav-item dropdown">
-               
-                
-                    <a href="/deslog" class="profile ">
 
-                      <div class="profile-circle">{{session.nombre[0] | upper}}</div>
-                  </a>
-              
+
+                <a href="/deslog" class="profile ">
+
+                  <div class="profile-circle">{{session.nombre[0] | upper}}</div>
+                </a>
+
                 <!-- <div class="dropdown-menu dropdown-menu-end dropdown-menu-animate-up" aria-labelledby="drop2">
                   <div class="message-body">
                     <a href="javascript:void(0)" class="d-flex align-items-center gap-2 dropdown-item">
@@ -342,61 +437,44 @@
   document.addEventListener('DOMContentLoaded', function () {
     // Función para deseleccionar todos los menús y submenús
     function deselectAll() {
-        const allItems = document.querySelectorAll('.sidebar-item .sidebar-link');
-        allItems.forEach(item => {
-            item.classList.remove('selected'); // Remueve la clase 'selected' de todos los elementos
-        });
+      const allItems = document.querySelectorAll('.sidebar-item .sidebar-link');
+      allItems.forEach(item => {
+        item.classList.remove('selected'); // Remueve la clase 'selected' de todos los elementos
+      });
     }
 
     // Función para manejar la selección del menú o submenú
     function handleSelection(event) {
-        deselectAll(); // Deseleccionar todos los elementos
-        event.target.classList.add('selected'); // Agregar la clase 'selected' solo al elemento seleccionado
+      deselectAll(); // Deseleccionar todos los elementos
+      event.target.classList.add('selected'); // Agregar la clase 'selected' solo al elemento seleccionado
     }
 
     // Añadir el evento click para cada enlace del menú
     const allLinks = document.querySelectorAll('.sidebar-item .sidebar-link');
     allLinks.forEach(link => {
-        link.addEventListener('click', handleSelection);
+      link.addEventListener('click', handleSelection);
     });
 
     // Función para alternar submenús
     function toggleSubmenu(submenuId) {
-        const submenu = document.getElementById(submenuId);
-        if (submenu.style.display === 'none' || submenu.style.display === '') {
-            submenu.style.display = 'block';
-        } else {
-            submenu.style.display = 'none';
-        }
+      const submenu = document.getElementById(submenuId);
+      if (submenu.style.display === 'none' || submenu.style.display === '') {
+        submenu.style.display = 'block';
+      } else {
+        submenu.style.display = 'none';
+      }
     }
 
-    // Asignar la función a cada enlace de toggle para abrir/cerrar submenús
-    document.getElementById('toggle-submenu-inventario').addEventListener('click', function (e) {
-        e.preventDefault();
-        toggleSubmenu('submenu-inventario');
-    });
 
-    // Otros menús con submenú similar al de inventario
-    document.getElementById('toggle-submenu-ventas').addEventListener('click', function (e) {
-        e.preventDefault();
-        toggleSubmenu('submenu-ventas');
-    });
 
-    document.getElementById('toggle-submenu-consultas').addEventListener('click', function (e) {
-        e.preventDefault();
-        toggleSubmenu('submenu-consultas');
-    });
 
-    document.getElementById('toggle-submenu-administracion').addEventListener('click', function (e) {
-        e.preventDefault();
-        toggleSubmenu('submenu-administracion');
-    });
 
-    document.getElementById('toggle-submenu-hospitalizacion').addEventListener('click', function (e) {
-        e.preventDefault();
-        toggleSubmenu('submenu-hospitalizacion');
-    });
-});
+
+
+
+
+
+  });
 
 
 

@@ -1263,6 +1263,29 @@ def detalleConsulta():
         return render_template('sistema/modales/modal_detalle_consulta.html', detalle=detalle,)
     else:
         return "No"
+    
+
+@bp.route('/atencionDiaria')
+def atencionDiaria():
+    return render_template('sistema/consultas.html')
+
+@bp.route('/tablaConsultasDiarias', methods=['POST'])
+def tablaConsultasDiarias():
+
+    if request.method == "POST":
+
+        conn = conectar()
+        cursor = conn.cursor()
+        query = "select a.cod_atencion,a.fecha_atencion,c.nombres_cliente + ' ' + c.apellidos_cliente as Nombre,e.NombreEstado,m.Nombre_mascota,es.nom_especie,ta.tipo,a.peso,a.altura,a.temperatura from atencion as a inner join cliente as c on a.num_cliente = c.num_cliente inner join estado as e on a.id_estado = e.id_estado inner join mascota as m on a.idMascota = m.idMascota inner join tipo_atencion as ta on a.tipo_atencion = ta.cod_tipo inner join raza as r on m.id_raza = r.id_raza inner join especie as es on r.id_especie = es.id_especie order by a.cod_atencion DESC"
+        cursor.execute(query)
+        consultas = cursor.fetchall()
+
+        print(consultas)
+
+        return render_template('sistema/tablas/tabla_consultas.html', consultas=consultas)
+        
+    else:
+        return "No"
 
 # FIN DEL MODULO DE CONSULTAS
 
