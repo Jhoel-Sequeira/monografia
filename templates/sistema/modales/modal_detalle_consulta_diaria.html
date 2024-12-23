@@ -1,0 +1,317 @@
+{%for general in detalle%}
+<style>
+    .style-two {
+        width: 90vw;
+        border: 0;
+        height: 1px;
+        background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0));
+    }
+</style>
+<div class="modal fade" id="modalDetalleConsultaDiaria" data-bs-backdrop="static" tabindex="-1"
+    aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">Detalle Consulta</h5>
+                <button type="button" class="btn-close" id="cerrarDet" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" name="" value="{{general.cod_venta}}" id="id">
+                <div class=" cuerpo-modal m-4" style="background-color: white;">
+                    <div class="row justify-content-center encabezado" onclick="ocultarInformacion()">
+                        ⓘ Información
+                        <hr class="mt-2 style-two ">
+
+                    </div>
+                    <div id="generales" style="display: none;">
+                        <div class="row mt-2">
+                            <div class="col" style="margin-top: 20px;">
+                                <label class="form-label " for="form3Example2"><strong>Cliente</strong></label>
+                                <input type="text" id="nombre" value="{{general.Nombre}}" class="form-control">
+
+                            </div>
+                            <div class="col" id="bas">
+                                <div class="row">
+                                    <div class="col ">
+                                        <label class="form-label " for="form3Example2"
+                                            style="margin-top: 20px;"><strong>Mascota</strong> </label>
+
+                                        <input type="text" id="stock_critico" value="{{general.Nombre_mascota}}"
+                                            class="form-control">
+
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div class="row mt-2">
+                            <div class="col">
+                                <label class="form-label " for="form3Example2"
+                                    style="margin-top: 20px;"><strong>Especie</strong></label>
+                                <input type="text" id="precio" value="{{general.nom_especie}}" class="form-control">
+
+                            </div>
+                            <div class="col">
+                                <label class="form-label " for="form3Example2" style="margin-top: 20px;"><strong>Tipo
+                                </label>
+
+
+                                <input type="text" id="stock" value="{{general.tipo}}" class="form-control">
+
+                            </div>
+                            <div class="col">
+                                <label class="form-label " for="form3Example2" style="margin-top: 20px;"><strong>Estado
+                                </label>
+
+
+                                <input type="text" id="stock" value="{{general.NombreEstado}}" class="form-control">
+
+                            </div>
+
+
+
+                        </div>
+                        <div class="row mt-2 ">
+                            <div class="col">
+                                <label class="form-label " for="form3Example2"
+                                    style="margin-top: 20px;"><strong>Peso</strong></label>
+                                <input type="text" id="precio" value="{{general.peso}}" class="form-control">
+
+                            </div>
+                            <div class="col">
+                                <label class="form-label " for="form3Example2"
+                                    style="margin-top: 20px;"><strong>Altura</strong>
+                                </label>
+
+
+                                <input type="text" id="altura" value="{{general.altura}}" class="form-control">
+
+                            </div>
+                            <div class="col">
+                                <label class="form-label " for="form3Example2"
+                                    style="margin-top: 20px;"><strong>Temperatura</strong>
+                                </label>
+
+
+                                <input type="text" id="temperatura" value="{{general.temperatura}}"
+                                    class="form-control">
+
+                            </div>
+
+
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col">
+                                <label class="form-label " for="form3Example2"
+                                    style="margin-top: 20px;"><strong>Observación
+                                </label>
+
+
+                                <textarea name="" disabled class="form-control" id="">{{general.descripcion}}</textarea>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div id="solucion" class="mt-5">
+                        <div class="row justify-content-center encabezado">
+                            Diagnóstico
+                            <hr class="mt-2 style-two ">
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-9" style="margin-top: 20px;">
+                                <label class="form-label " for="form3Example2"><strong>Producto</strong></label>
+                              
+                                <input type="text" class="form-control" onkeyup="this.value=this.value.toUpperCase()"
+                                placeholder="Producto" id="producto">
+                                <input type="hidden" class="form-control" onkeyup="this.value=this.value.toUpperCase()"
+                                placeholder="Nombre conductor" value="" id="productoId">
+
+                            </div>
+                           <div class="col"  style="margin-top: 20px;">
+                                <label class="form-label " for="form3Example2"><strong>Cantidad</strong></label>
+                                <input type="number" id="cantidad" value="" class="form-control">
+                                
+                           </div>
+                           <div class="col"  style="margin-top: 50px;">
+                            <button class="btn btn-success">+ Agregar</button>
+                           </div>
+                            <div style="background-color:#fff;position: relative; height: 20%; width: 100%; margin-left: 0px;"
+                                    id="productos">
+                                    <div class="info" id="listaproductos">
+                                    </div>
+                                </div>
+
+                        </div>
+
+
+                        <div class="row mt-3">
+                            <div class="col">
+                                <label class="form-label " for="form3Example2"
+                                    style="margin-top: 20px;"><strong>Indicaciones
+                                </label>
+
+
+                                <textarea name="" class="form-control" id=""></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <input type="hidden" id="tienda" value="0">
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" id="uploadBtn" class="btn"
+                    style="background-color: rgb(178, 13, 13); color: white;" onclick="cancelar()"><i
+                        class="ti ti-x"></i> Cancelar</button>
+                <button type="button" id="desbloquear" class="btn "
+                    style="background-color: rgb(47, 133, 155); color: white;" onclick="printTicket($('#id').val())"><i
+                        class="ti ti-printer"></i> Imprimir</button>
+
+            </div>
+        </div>
+    </div>
+</div>
+{%endfor%}
+
+<script>
+
+var buscarProducto = function () {
+        if ($("#producto").val() != "") {
+
+            $.ajax({
+                url: "{{ url_for('sistema.buscarProductoReceta') }}",
+                type: "POST",
+                data: {
+                    producto: $("#producto").val(),
+                },
+                success: function (response) {
+                    alert(response)
+                    $("#listaproductos").html(response);
+                    $("#listaproductos").append(response.htmlresponse);
+                    $("#listaproductos").show();
+                    $("#busqueda button[name=det]").click(function () {
+                        $("#conductor").val($(this).text());
+                        $("#conductoresId").val($(this).attr("value"));
+                        $("#listaproductos").hide();
+                        
+                    });
+                },
+                error: function (error) {
+                    // console.log(error);
+                },
+            });
+        } else {
+            $("#listaconductor").hide();
+        }
+
+
+
+
+    }
+    $("#producto").on('keyup', buscarProducto);
+
+
+    function ocultarInformacion() {
+        const miDiv = document.getElementById('generales');
+        if (miDiv.style.display === 'none') {
+            miDiv.style.display = 'block'; // Mostrar el div
+        } else {
+            miDiv.style.display = 'none'; // Ocultar el div
+        }
+    }
+
+    function printTicket(id) {
+        // Construye la URL con el ID
+        var url = '/facturar?id=' + id;
+        // Abre una nueva ventana sin barras de herramientas
+        var newWindow = window.open(url, '_blank', "toolbar=no,scrollbars=yes,resizable=yes,location=no");
+        if (newWindow) {
+            // Si se pudo abrir la nueva ventana, enfócala
+            newWindow.focus();
+        } else {
+            // Si no se pudo abrir la nueva ventana (debido a un bloqueador de ventanas emergentes), muestra un mensaje
+            alert("No se pudo abrir la nueva ventana. Asegúrate de desactivar el bloqueador de ventanas emergentes.");
+        }
+    }
+
+    function cancelar() {
+
+
+
+        Swal.fire({
+            title: "Anular Factura",
+            text: "Desea anular la factura.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Si"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: "{{ url_for('sistema.cancelarFactura') }}",
+                    type: "POST",
+                    data: {
+                        id: $('#id').val(),
+                    },
+
+
+                    success: function (response) {
+                        Swal.fire({
+                            title: "Anulada!",
+                            text: "Se ha anulado la factura.",
+                            icon: "success"
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                $('#cerrarDet').click();
+                                cargarCompras();  // Recargar el inventario
+
+                            }
+                        });
+                    },
+                    error: function (error) {
+                        console.log(error);
+                    }
+                });
+
+
+
+
+
+
+            }
+        });
+
+
+
+
+
+
+
+
+    }
+
+
+
+
+
+    document.querySelectorAll('.cuerpo-modal #generales input, .cuerpo-modal select, .cuerpo-modal file').forEach(element => {
+        element.disabled = true;
+    });
+    var isDisabled = false; // Iniciamos con los elementos desactivados
+
+    // Verifica si la variable ya está definida
+    if (typeof isDisabled === 'undefined') {
+        var isDisabled = false; // Iniciamos con los elementos desactivados
+    }
+
+    document.querySelectorAll('.cuerpo-modal #generales input, .cuerpo-modal select, .cuerpo-modal file').forEach(element => {
+        element.disabled = true;
+    });
+
+
+</script>

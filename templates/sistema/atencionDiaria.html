@@ -21,7 +21,7 @@
 <script>
     $(document).ready(function () {
 
-        cargarCompras();
+        cargarComprasDiarias();
 
     });
     function buscarRegistros() {
@@ -31,7 +31,7 @@
         $('#tabla_inventario').DataTable().search(searchTerm).draw();
     };
     $('#Buscador').on('keyup', buscarRegistros)
-    function cargarCompras() {
+    function cargarComprasDiarias() {
         $.ajax({
             url: "{{ url_for('sistema.tablaConsultasDiarias') }}",
             type: "POST",

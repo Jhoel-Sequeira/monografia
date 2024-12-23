@@ -558,12 +558,7 @@ select:disabled {
     display: none !important
 }
 
-[type=button],
-[type=reset],
-[type=submit],
-button {
-    -webkit-appearance: button
-}
+
 
 [type=button]:not(:disabled),
 [type=reset]:not(:disabled),
@@ -20132,6 +20127,7 @@ div .dataTables_wrapper div.dataTables_filter label {
     #main-wrapper[data-layout=vertical][data-sidebartype=full] .body-wrapper {
         margin-left: 250px
     }
+
 }
 
 @media (max-width:1199px) {
@@ -20279,21 +20275,46 @@ ul {
     margin-right: 5px;
 }
 
-.icono{
+.icono {
     font-size: 20px !important;
     font-weight: bold;
     color: var(--bs-primary);
 }
 
 .profile-circle {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	color: white;
-	font-size: 20px;
-	font-weight: bold;
-	background-color: red;
-	width: 36px;
-	height: 36px;
-	border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 20px;
+    font-weight: bold;
+    background-color: red;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+}
+
+.modal-fullscreen {
+    width: 100vw !important;
+    max-width: none !important;
+    height: 100% !important;
+    margin: 0 !important;
+}
+
+.separador {
+    background-color: red !important;
+}
+
+.encabezado {
+    font-size: 20px;
+    font-weight: bold;
+    color: #1c1e7b;
+    cursor: pointer;
+}
+
+[type=button],
+[type=reset],
+[type=submit],
+button {
+    -webkit-appearance: button
 }

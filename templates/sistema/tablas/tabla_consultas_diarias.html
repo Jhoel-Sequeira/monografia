@@ -1,0 +1,134 @@
+<div class="col-lg d-flex align-items-stretch">
+    <div class="card w-100">
+        <div class="card-body p-4">
+            <div class="d-sm-flex d-block align-items-center justify-content-between mb-9">
+                <h5 class="card-title fw-semibold mb-4">Consultas</h5>
+
+
+            </div>
+
+            <div class="table-responsive">
+                <table class="table text-nowrap mb-0 align-middle table-hover " id="tabla_consultas_diarias">
+                    <thead class="text-dark fs-4">
+                        <tr>
+                            <th class="border-bottom-0">
+                                <h6 class="fw-semibold mb-0">cod</h6>
+                            </th>
+                            <th class="border-bottom-0">
+                                <h6 class="fw-semibold mb-0">Fecha</h6>
+                            </th>
+                            <th class="border-bottom-0">
+                                <h6 class="fw-semibold mb-0">Cliente</h6>
+                            </th>
+                            <th class="border-bottom-0">
+                                <h6 class="fw-semibold mb-0">Mascota</h6>
+                            </th>
+                            <th class="border-bottom-0">
+                                <h6 class="fw-semibold mb-0">Tipo Mascota</h6>
+                            </th>
+                            <th class="border-bottom-0">
+                                <h6 class="fw-semibold mb-0">Tipo Atención</h6>
+                            </th>
+                            <th class="border-bottom-0">
+                                <h6 class="fw-semibold mb-0">Estado</h6>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {%for venta in consultas%}
+                        <tr id="{{venta.cod_atencion}}" style="cursor: pointer;">
+                            <td class="border-bottom-0">
+                                <span class="fw-normal">{{venta.cod_atencion}}</span>
+                            </td>
+                            <td class="border-bottom-0">
+                                <span class="fw-normal">{{venta.fecha_atencion}}</span>
+                            </td>
+                          
+                            <td class="border-bottom-0">
+                                <span class="fw-normal">{{venta.Nombre}}</span>
+                            </td>
+                            <td class="border-bottom-0">
+                                <span class="fw-normal">{{venta.Nombre_mascota}}</span>
+                            </td>
+                            <td class="border-bottom-0">
+                                <span class="fw-normal">{{venta.nom_especie}}</span>
+                            </td>
+                            <td class="border-bottom-0">
+
+                                <span class="fw-normal">{{venta.tipo}}</span>
+                            </td>
+
+                            {%if venta.NombreEstado == 'AGENDADO'%}
+                            <!-- GREEN -->
+                            <td class="border-bottom-0">
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="badge bg-primary rounded-3 fw-semibold">Agendado</span>
+                                </div>
+                            </td>
+                            {%elif venta.NombreEstado == 'PENDIENTE'%}
+                            <!-- BLUE -->
+                            <td class="border-bottom-0">
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="badge bg-primary rounded-3 fw-semibold">Pendiente</span>
+                                </div>
+                            </td>
+                            {%elif venta.NombreEstado == 'CANCELADO'%}
+                            <!-- RED -->
+                            <td class="border-bottom-0">
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="badge bg-danger rounded-3 fw-semibold">Cancelado</span>
+                                </div>
+                            </td>
+                            {%endif%}
+                        </tr>
+                        {%endfor%}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="modal-detalle-consulta-diaria"></div>
+<input id="detalleConsultaDiaria" type="hidden" data-bs-toggle="modal" data-bs-target="#modalDetalleConsultaDiaria">
+<script>
+    var table = $('#tabla_inventario').DataTable({
+        "language": {
+            "url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Spanish.json",
+            "emptyTable": "Sin Datos",
+            "zeroRecords": "No se encontraron registros coincidentes",
+        },
+        "lengthChange": false,
+        "searching": true,
+        "info": false,
+        "ordering": false
+    });
+    $("#tabla_consultas_diarias tr").click(function () {
+        // MANDAMOS A TRAER LOS DATOS
+        var id = $(this).attr("id");
+        
+
+        $.ajax({
+            url: "{{ url_for('sistema.detalleConsultaDiaria') }}",
+            type: "POST",
+            data: {
+                num: id
+
+            },
+            success: function (response) {
+                $('#modal-detalle-consulta-diaria').html(response);
+                $('#modal-detalle-consulta-diaria').append(response.htmlresponse);
+                $('#detalleConsultaDiaria').click();
+            },
+            error: function (error) { // console.log(error);
+            }
+        });
+
+    });
+    function buscarRegistros() {
+        var searchTerm = $('#Buscador').val();
+
+        // Aplica el término de búsqueda a DataTables
+        $('#tabla_consultas_diarias').DataTable().search(searchTerm).draw();
+    };
+    $('#Buscador').on('keyup', buscarRegistros)
+</script>

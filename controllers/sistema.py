@@ -32,6 +32,11 @@ def sistema_route():
     
     return render_template('sistema/home.html')
 
+@bp.route('/deslog')
+def deslog():
+    session.clear()
+    return render_template('sistema/home.html')
+
 # MODULO: INVENTARIO
 
 
@@ -1074,7 +1079,7 @@ def agendarCita():
     cursor = conn.cursor()
             # Realiza la inserción
     query = 'INSERT INTO atencion (fecha_atencion,num_cliente,id_estado,num_veterinario,idMascota,tipo_atencion,peso,altura,temperatura,descripcion,costo) VALUES (?,?,?,?,?,?,?,?,?,?,?)'
-    cursor.execute(query, (fecha_hora, cliente,10,1,mascota,atencion,peso,altura,temperatura,observacion,0))
+    cursor.execute(query, (fecha_hora, cliente,10,6,mascota,atencion,peso,altura,temperatura,observacion,0))
     conn.commit()
 
 
@@ -1234,7 +1239,7 @@ def tablaConsultas():
 
         conn = conectar()
         cursor = conn.cursor()
-        query = "select a.cod_atencion,a.fecha_atencion,c.nombres_cliente + ' ' + c.apellidos_cliente as Nombre,e.NombreEstado,m.Nombre_mascota,es.nom_especie,ta.tipo,a.peso,a.altura,a.temperatura from atencion as a inner join cliente as c on a.num_cliente = c.num_cliente inner join estado as e on a.id_estado = e.id_estado inner join mascota as m on a.idMascota = m.idMascota inner join tipo_atencion as ta on a.tipo_atencion = ta.cod_tipo inner join raza as r on m.id_raza = r.id_raza inner join especie as es on r.id_especie = es.id_especie order by a.cod_atencion DESC"
+        query = "select a.cod_atencion,a.fecha_atencion,c.nombres_cliente + ' ' + c.apellidos_cliente as Nombre,e.NombreEstado,m.Nombre_mascota,es.nom_especie,ta.tipo,a.peso,a.altura,a.temperatura from atencion as a inner join cliente as c on a.num_cliente = c.num_cliente inner join estado as e on a.id_estado = e.id_estado inner join mascota as m on a.idMascota = m.idMascota inner join tipo_atencion as ta on a.tipo_atencion = ta.cod_tipo inner join raza as r on m.id_raza = r.id_raza inner join especie as es on r.id_especie = es.id_especie order by a.cod_atencion ASC"
         cursor.execute(query)
         consultas = cursor.fetchall()
 
@@ -1267,22 +1272,61 @@ def detalleConsulta():
 
 @bp.route('/atencionDiaria')
 def atencionDiaria():
-    return render_template('sistema/consultas.html')
+    return render_template('sistema/atencionDiaria.html')
 
 @bp.route('/tablaConsultasDiarias', methods=['POST'])
 def tablaConsultasDiarias():
 
     if request.method == "POST":
 
+        fechaActual = capturarHora()
+        print(fechaActual.date())
+        print(session['id'])
         conn = conectar()
         cursor = conn.cursor()
-        query = "select a.cod_atencion,a.fecha_atencion,c.nombres_cliente + ' ' + c.apellidos_cliente as Nombre,e.NombreEstado,m.Nombre_mascota,es.nom_especie,ta.tipo,a.peso,a.altura,a.temperatura from atencion as a inner join cliente as c on a.num_cliente = c.num_cliente inner join estado as e on a.id_estado = e.id_estado inner join mascota as m on a.idMascota = m.idMascota inner join tipo_atencion as ta on a.tipo_atencion = ta.cod_tipo inner join raza as r on m.id_raza = r.id_raza inner join especie as es on r.id_especie = es.id_especie order by a.cod_atencion DESC"
-        cursor.execute(query)
+        query = "select a.cod_atencion,a.fecha_atencion,c.nombres_cliente + ' ' + c.apellidos_cliente as Nombre,e.NombreEstado,m.Nombre_mascota,es.nom_especie,ta.tipo,a.peso,a.altura,a.temperatura  from atencion as a inner join cliente as c on a.num_cliente = c.num_cliente inner join estado as e on a.id_estado = e.id_estado inner join mascota as m on a.idMascota = m.idMascota inner join tipo_atencion as ta on a.tipo_atencion = ta.cod_tipo inner join raza as r on m.id_raza = r.id_raza inner join especie as es on r.id_especie = es.id_especie inner join cliente as vet on a.num_veterinario = vet.num_cliente inner join credenciales as cred on cred.id_credencial = vet.id_credencial where a.id_estado = 10 AND CONVERT(DATE, a.fecha_atencion) = ? and vet.num_cliente  = ? order by a.cod_atencion DESC"
+        cursor.execute(query,(fechaActual.date(),session['id']))
         consultas = cursor.fetchall()
 
         print(consultas)
+        print('diarias')
 
-        return render_template('sistema/tablas/tabla_consultas.html', consultas=consultas)
+        return render_template('sistema/tablas/tabla_consultas_diarias.html', consultas=consultas)
+        
+    else:
+        return "No"
+    
+@bp.route('/detalleConsultaDiaria', methods=['POST'])
+def detalleConsultaDiaria():
+
+    if request.method == "POST":
+
+        num = request.form['num']
+
+        conn = conectar()
+        cursor = conn.cursor()
+        query = "select a.cod_atencion,a.fecha_atencion,c.nombres_cliente + ' ' + c.apellidos_cliente as Nombre,e.NombreEstado,m.Nombre_mascota,es.nom_especie,ta.tipo,a.peso,a.altura,a.temperatura,a.descripcion from atencion as a inner join cliente as c on a.num_cliente = c.num_cliente inner join estado as e on a.id_estado = e.id_estado inner join mascota as m on a.idMascota = m.idMascota inner join tipo_atencion as ta on a.tipo_atencion = ta.cod_tipo inner join raza as r on m.id_raza = r.id_raza inner join especie as es on r.id_especie = es.id_especie where a.cod_atencion = ? order by a.cod_atencion DESC"
+        cursor.execute(query,(num))
+        detalle = cursor.fetchall()
+
+        print(detalle)
+        return render_template('sistema/modales/modal_detalle_consulta_diaria.html', detalle=detalle,)
+    else:
+        return "No"
+    
+@bp.route('/buscarProductoReceta', methods=['POST'])
+def buscarProductoReceta  ():
+
+    if request.method == "POST":
+        producto = request.form['producto']
+
+        conn = conectar()
+        cursor = conn.cursor()
+        query = "select cod_producto,precio,Imagen,stock,nom_producto from producto where nom_producto like ? and Tienda = 'Si'"
+        cursor.execute(query,(producto + '%'))
+        productos = cursor.fetchall()
+        print(productos)
+        return render_template('sistema/otros/buscador_productos.html', productos=productos)
         
     else:
         return "No"
