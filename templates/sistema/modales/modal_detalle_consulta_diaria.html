@@ -6,8 +6,10 @@
         height: 1px;
         background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0));
     }
+
+
 </style>
-<div class="modal fade" id="modalDetalleConsultaDiaria" data-bs-backdrop="static" tabindex="-1"
+<div class="modal fade" id="modalDetalleConsultaDiaria" data-bs-focus="false" tabindex="-1"
     aria-labelledby="staticBackdropLabel" aria-hidden="true">
     <div class="modal-dialog modal-fullscreen">
         <div class="modal-content">
@@ -24,6 +26,7 @@
                         <hr class="mt-2 style-two ">
 
                     </div>
+                    <input type="hidden" value="{{general.cod_atencion}}" id="atencion">
                     <div id="generales" style="display: none;">
                         <div class="row mt-2">
                             <div class="col" style="margin-top: 20px;">
@@ -117,7 +120,7 @@
 
                     <div id="solucion" class="mt-5">
                         <div class="row justify-content-center encabezado">
-                            Diagnóstico
+                            ⓘ  Diagnóstico
                             <hr class="mt-2 style-two ">
                         </div>
                         <div class="row mt-2">
@@ -136,7 +139,7 @@
                                 
                            </div>
                            <div class="col"  style="margin-top: 50px;">
-                            <button class="btn btn-success">+ Agregar</button>
+                            <button onclick="agregar()" class="btn btn-success">+ Agregar</button>
                            </div>
                             <div style="background-color:#fff;position: relative; height: 20%; width: 100%; margin-left: 0px;"
                                     id="productos">
@@ -148,13 +151,8 @@
 
 
                         <div class="row mt-3">
-                            <div class="col">
-                                <label class="form-label " for="form3Example2"
-                                    style="margin-top: 20px;"><strong>Indicaciones
-                                </label>
-
-
-                                <textarea name="" class="form-control" id=""></textarea>
+                            <div class="col" id="receta">
+                               
                             </div>
                         </div>
                     </div>
@@ -167,9 +165,12 @@
                 <button type="button" id="uploadBtn" class="btn"
                     style="background-color: rgb(178, 13, 13); color: white;" onclick="cancelar()"><i
                         class="ti ti-x"></i> Cancelar</button>
-                <button type="button" id="desbloquear" class="btn "
+                <!-- <button type="button" id="desbloquear" class="btn "
                     style="background-color: rgb(47, 133, 155); color: white;" onclick="printTicket($('#id').val())"><i
-                        class="ti ti-printer"></i> Imprimir</button>
+                        class="ti ti-printer"></i> Imprimir</button> -->
+                        <button type="button" id="desbloquear" class="btn "
+                    style="background-color: rgb(47, 133, 155); color: white;" onclick=""><i
+                        class="ti ti-printer"></i> Confirmar</button>
 
             </div>
         </div>
@@ -178,6 +179,57 @@
 {%endfor%}
 
 <script>
+    cargarReceta();
+    function cargarReceta(){
+        $.ajax({
+            url: "{{ url_for('sistema.tablaConsultasProductos') }}",
+            type: "POST",
+            data: {
+                atencion: $('#atencion').val()
+            },
+            success: function (response) {
+                $("#receta").html(response);
+                $("#receta").append(response.htmlresponse);
+
+            },
+            error: function (error) {
+                // console.log(error);
+            },
+        });
+    }
+
+function agregar(){
+    if($('#cantidad').val()<= 0 || $('#cantidad').val() == '' || $('#producto').val() == '' ){
+        Swal.fire({
+            title: "Error",
+            text: "Datos no válidos",
+            icon: "warning",
+            showCancelButton: false,
+            confirmButtonColor: "#3085d6",
+            confirmButtonText: "Continuar"
+        }).then((result) => {})
+    }else{
+        $.ajax({
+                url: "{{ url_for('sistema.agregarProductosAtencion') }}",
+                type: "POST",
+                data: {
+                    producto: $("#productoId").val(),
+                    atencion: $('#atencion').val(),
+                    cantidad: $('#cantidad').val()
+                },
+                success: function (response) {
+                    $("#producto").val('');
+                    $("#productoId").val('');
+                    $("#cantidad").val('');
+                    cargarReceta();
+                },
+                error: function (error) {
+                    // console.log(error);
+                },
+            });
+    }
+   
+}
 
 var buscarProducto = function () {
         if ($("#producto").val() != "") {
@@ -189,13 +241,12 @@ var buscarProducto = function () {
                     producto: $("#producto").val(),
                 },
                 success: function (response) {
-                    alert(response)
                     $("#listaproductos").html(response);
                     $("#listaproductos").append(response.htmlresponse);
                     $("#listaproductos").show();
                     $("#busqueda button[name=det]").click(function () {
-                        $("#conductor").val($(this).text());
-                        $("#conductoresId").val($(this).attr("value"));
+                        $("#producto").val($(this).text());
+                        $("#productoId").val($(this).attr("value"));
                         $("#listaproductos").hide();
                         
                     });

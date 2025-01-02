@@ -1,0 +1,129 @@
+<style>
+    .modal-backdrop {
+    display: none;
+  }
+</style>
+<table
+  class="table text-nowrap mb-0 align-middle table-hover"
+  id="tabla_consultas_diarias"
+>
+  <thead class="text-dark fs-4">
+    <tr>
+      <th class="border-bottom-0">
+        <h6 class="fw-semibold mb-0">Producto</h6>
+      </th>
+      <th class="border-bottom-0">
+        <h6 class="fw-semibold mb-0">Cantidad</h6>
+      </th>
+      <th class="border-bottom-0">
+        <h6 class="fw-semibold mb-0">Orientación</h6>
+      </th>
+
+      <th class="border-bottom-0">
+        <h6 class="fw-semibold mb-0"></h6>
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    {%for venta in consultas%}
+    <tr id="" style="cursor: pointer">
+      <td class="border-bottom-0">
+        <span class="fw-normal">{{venta.nom_producto}}</span>
+      </td>
+      <td class="border-bottom-0">
+        <span class="fw-normal">{{venta.cantidad}}</span>
+      </td>
+
+      <td class="border-bottom-0">
+        <span class="fw-normal">{{venta.orientacion}}</span>
+      </td>
+
+      <td class="border-bottom-0" style="text-align: end">
+        <span class="fw-normal"
+          ><button
+            value="{{venta.cod_atencion}}"
+            name="comment"
+            class="btn btn-light"
+          >
+            <i class="ti ti-message"></i></button
+          ><button
+            value="{{venta.cod_atencion}}"
+            name="delete"
+            class="btn btn-light"
+          >
+            <i class="ti ti-eraser"></i></button
+        ></span>
+      </td>
+    </tr>
+    {%endfor%}
+  </tbody>
+</table>
+<div id="modal-detalle-consulta-diaria"></div>
+<input
+  id="detalleConsultaDiaria"
+  type="hidden"
+  data-bs-toggle="modal"
+  data-bs-target="#modalDetalleConsultaDiaria"
+/>
+<script>
+  $("#tabla_consultas_diarias button[name=comment]").click(function () {
+    idDet = $(this).val();
+    Swal.fire({
+      title: "Agregar Orientaciones!",
+      text: "Ingrese los datos de la tara",
+      html: '<textarea class="form-control" id="orientacion"></textarea>',
+      
+      preConfirm: (value) => {
+        if ($("#orientacion").val() == "") {
+          Swal.showValidationMessage("Debe ingresar datos válidos.");
+        }
+      },
+
+      showCancelButton: true,
+    }).then((result) => {
+      valor = $("#orientacion").val();
+      // alert('entro al tara')
+
+      $.ajax({
+        url: "{{ url_for('sistema.orientaciones') }}",
+        type: "POST",
+        data: {
+          id: idDet,
+          tipo: tipo,
+        },
+        success: function (response) {
+          cargarReceta();
+        },
+        error: function (error) {
+          // console.log(error);
+        },
+      });
+    });
+  });
+
+  $("#tabla_consultas_diarias button[name=delete]").click(function () {
+    idDet = $(this).val();
+    Swal.fire({
+      title: "¿Desea eliminar el medicamento?",
+      text: "Esta seguro que desea continuar.",
+
+      showCancelButton: true,
+    }).then((result) => {
+      // alert('entro al tara')
+
+      $.ajax({
+        url: "{{ url_for('sistema.eliminarMedicamentoReceta') }}",
+        type: "POST",
+        data: {
+          id: idDet,
+        },
+        success: function (response) {
+          cargarReceta();
+        },
+        error: function (error) {
+          // console.log(error);
+        },
+      });
+    });
+  });
+</script>

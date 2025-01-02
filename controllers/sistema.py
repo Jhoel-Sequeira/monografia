@@ -1330,6 +1330,91 @@ def buscarProductoReceta  ():
         
     else:
         return "No"
+    
+
+    
+
+@bp.route('/tablaConsultasProductos', methods=['POST'])
+def tablaConsultasProductos():
+
+    if request.method == "POST":
+        atencion = request.form['atencion']
+        
+        conn = conectar()
+        cursor = conn.cursor()
+        query = "select cod_detalle,p.nom_producto,p.precio,a.cantidad from atencion_producto as a inner join producto as p on a.cod_producto = p.cod_producto where a.cod_atencion = ?"
+        cursor.execute(query,(atencion))
+        consultas = cursor.fetchall()
+
+        
+
+        return render_template('sistema/tablas/tabla_receta.html', consultas=consultas)
+        
+    else:
+        return "No"
+    
+@bp.route('/agregarProductosAtencion', methods=['POST'])
+def agregarProductosAtencion():
+
+    if request.method == "POST":
+        producto = request.form['producto']
+        cantidad = request.form['cantidad']
+        atencion = request.form['atencion']
+
+
+
+        conn = conectar()
+        cursor = conn.cursor()
+        query = 'INSERT INTO atencion_producto (cod_atencion,cod_producto,cantidad,precio) VALUES (?,?,?,0)'
+        cursor.execute(query, (atencion,producto,cantidad))
+        conn.commit()
+        cursor.close()
+        conn.close()
+        return 'HECHO'
+        
+    else:
+        return "No"
+    
+@bp.route('/orientaciones', methods=['POST'])
+def orientaciones():
+
+    if request.method == "POST":
+        detalle = request.form['detalle']
+        orientacion = request.form['orientacion']
+
+
+
+        conn = conectar()
+        cursor = conn.cursor()
+        query = 'UPDATE atencion_producto set orientacion = ? where cod_detalle = ?'
+        cursor.execute(query, (orientacion,detalle))
+        conn.commit()
+        cursor.close()
+        conn.close()
+        return 'HECHO'
+        
+    else:
+        return "No"
+    
+@bp.route('/eliminarMedicamentoReceta', methods=['POST'])
+def eliminarMedicamentoReceta():
+
+    if request.method == "POST":
+        detalle = request.form['detalle']
+
+
+
+        conn = conectar()
+        cursor = conn.cursor()
+        query = 'DELETE atencion_producto where cod_detalle = ?'
+        cursor.execute(query, (detalle))
+        conn.commit()
+        cursor.close()
+        conn.close()
+        return 'HECHO'
+        
+    else:
+        return "No"
 
 # FIN DEL MODULO DE CONSULTAS
 
