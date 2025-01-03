@@ -1264,6 +1264,14 @@ def detalleConsulta():
         cursor.execute(query,(num))
         detalle = cursor.fetchall()
 
+
+        conn = conectar()
+        cursor = conn.cursor()
+        query = "select a.cod_detalle,p.nom_producto,p.precio,a.cantidad,a.orientacion from atencion_producto as a inner join producto as p on a.cod_producto = p.cod_producto where a.cod_atencion = ?"
+        cursor.execute(query,(num))
+        consultas = cursor.fetchall()
+
+
         print(detalle)
         return render_template('sistema/modales/modal_detalle_consulta.html', detalle=detalle,)
     else:
