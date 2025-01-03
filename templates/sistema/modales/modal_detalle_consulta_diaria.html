@@ -169,7 +169,7 @@
                     style="background-color: rgb(47, 133, 155); color: white;" onclick="printTicket($('#id').val())"><i
                         class="ti ti-printer"></i> Imprimir</button> -->
                         <button type="button" id="desbloquear" class="btn "
-                    style="background-color: rgb(47, 133, 155); color: white;" onclick=""><i
+                    style="background-color: rgb(47, 133, 155); color: white;" onclick="recetar()"><i
                         class="ti ti-printer"></i> Confirmar</button>
 
             </div>
@@ -179,6 +179,68 @@
 {%endfor%}
 
 <script>
+    function recetar(){
+
+        Swal.fire({
+      title: "Ingrese su Diagnóstico!",
+      text: "",
+      html: '<textarea class="form-control" id="diagnostico" rows="4"></textarea>',
+      
+      preConfirm: (value) => {
+        if ($("#diagnostico").val() == "") {
+          Swal.showValidationMessage("Debe ingresar datos válidos.");
+        }
+      },
+
+      showCancelButton: true,
+    }).then((result) => {
+        $.ajax({
+            url: "{{ url_for('sistema.recetar') }}",
+            type: "POST",
+            data: {
+                atencion: $('#atencion').val(),
+                diagnostico: $('#diagnostico').val()
+            },
+            beforeSend: function () {
+                Swal.fire({
+                    html: '<div class="col-lg-12" style="z-index:99999;  display:absolute; width"><img  style="height: 80px;" src="../../static/sistema/images/logos/dots.gif" alt="loading" /><br/>Enviando detalles...</div>',
+                    showCancelButton: false,
+                    showConfirmButton: false,
+                    backdrop: 'static'
+
+                }).then((result) => {
+                    /* Read more about isConfirmed, isDenied below */
+                    if (result.isConfirmed) {
+                    }
+                });
+
+            },
+            success: function (response) {
+                Swal.close();
+                Swal.fire({
+                            title: "Consulta completada!",
+                            text: "Se enviaron los detalles al correo.",
+                            icon: "success"
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                $('#cerrarDet').click();
+                                cargarComprasDiarias()  // Recargar el inventario
+
+                            }
+                        });
+
+            },
+            error: function (error) {
+                // console.log(error);
+            },
+        });
+    })
+
+        
+    }
+
+
+
     cargarReceta();
     function cargarReceta(){
         $.ajax({

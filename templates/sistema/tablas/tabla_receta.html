@@ -35,19 +35,20 @@
       </td>
 
       <td class="border-bottom-0">
-        <span class="fw-normal">{{venta.orientacion}}</span>
+        <span class="fw-normal">
+          {%if venta.orientacion%}{{venta.orientacion}}{%else%}-{%endif%}</span>
       </td>
 
       <td class="border-bottom-0" style="text-align: end">
         <span class="fw-normal"
           ><button
-            value="{{venta.cod_atencion}}"
+            value="{{venta.cod_detalle}}"
             name="comment"
             class="btn btn-light"
           >
             <i class="ti ti-message"></i></button
           ><button
-            value="{{venta.cod_atencion}}"
+            value="{{venta.cod_detalle}}"
             name="delete"
             class="btn btn-light"
           >
@@ -71,7 +72,7 @@
     Swal.fire({
       title: "Agregar Orientaciones!",
       text: "Ingrese los datos de la tara",
-      html: '<textarea class="form-control" id="orientacion"></textarea>',
+      html: '<textarea class="form-control" id="orientacion" rows="4"></textarea>',
       
       preConfirm: (value) => {
         if ($("#orientacion").val() == "") {
@@ -82,14 +83,14 @@
       showCancelButton: true,
     }).then((result) => {
       valor = $("#orientacion").val();
-      // alert('entro al tara')
+      
 
       $.ajax({
         url: "{{ url_for('sistema.orientaciones') }}",
         type: "POST",
         data: {
-          id: idDet,
-          tipo: tipo,
+          detalle: idDet,
+          orientacion: valor,
         },
         success: function (response) {
           cargarReceta();
@@ -115,7 +116,7 @@
         url: "{{ url_for('sistema.eliminarMedicamentoReceta') }}",
         type: "POST",
         data: {
-          id: idDet,
+          detalle: idDet,
         },
         success: function (response) {
           cargarReceta();

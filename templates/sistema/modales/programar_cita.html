@@ -1,352 +1,473 @@
 {% block contenido %}
-<div class="modal fade" id="agendarConsulta" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-    aria-labelledby="staticBackdropLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-fullscreen-md-down">
-        <div class="modal-content">
-            <div class="row p-3">
-                <div class="row mt-2">
-                    <div class="col">
-                        <label class="form-label " for="form3Example2"><strong>Cliente</strong><i
-                                class="ti ti-circle-plus-filled" aria-hidden="true" title="Agregar Nuevo Conductor"
-                                data-bs-target="#agregarCliente" data-bs-toggle="modal" data-bs-dismiss="modal"
-                                style="color: red; font-size: 15px;"></i></label>
-                        <select class="form-select" id="cliente" data-placeholder="Seleccione un rol">
-                            <option selected="true" value="seleccione un cliente" disabled="disabled">seleccione un
-                                cliente</option>
-                            {% for cliente in clientes %}
+<div
+  class="modal fade"
+  id="agendarConsulta"
+  data-bs-backdrop="static"
+  data-bs-keyboard="false"
+  tabindex="-1"
+  aria-labelledby="staticBackdropLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-lg modal-fullscreen-md-down">
+    <div class="modal-content">
+      <div class="row p-3">
+        <div class="row mt-2">
+          <div class="col">
+            <label class="form-label" for="form3Example2"
+              ><strong>Cliente</strong
+              ><i
+                class="ti ti-circle-plus-filled"
+                aria-hidden="true"
+                title="Agregar Nuevo Conductor"
+                data-bs-target="#agregarCliente"
+                data-bs-toggle="modal"
+                data-bs-dismiss="modal"
+                style="color: red; font-size: 15px"
+              ></i
+            ></label>
+            <select
+              class="form-select"
+              id="cliente"
+              data-placeholder="Seleccione un rol"
+            >
+              <option
+                selected="true"
+                value="seleccione un cliente"
+                disabled="disabled"
+              >
+                seleccione un cliente
+              </option>
+              {% for cliente in clientes %}
 
-                            <option value="{{ cliente.num_cliente}}">{{ cliente.Nombre }}</option>
-                            {% endfor %}
-                        </select>
-
-                    </div>
-                    <div class="col">
-                        <label class="form-label " for="form3Example2"><strong>Mascota</strong><i
-                                class="ti ti-circle-plus-filled" aria-hidden="true" title="Agregar Nuevo Conductor"
-                                data-bs-target="#agregarMascota" data-bs-toggle="modal" data-bs-dismiss="modal"
-                                style="color: red; font-size: 15px;"></i></label>
-                        <select class="form-select" id="mascota" data-placeholder="Seleccione una mascota">
-
-                        </select>
-
-                    </div>
-
-                </div>
-                <div class="row mt-2">
-
-                    <div class="col">
-                        <label class="form-label " for="form3Example2"><strong>Tipo Atención</strong></label>
-                        <select class="form-select" id="tipoAtencion" data-placeholder="Seleccione un rol">
-                            <option selected="true" value="Tipo de atención" disabled="disabled">seleccione un cliente
-                            </option>
-
-                            {% for atencion in atencion %}
-
-                            <option value="{{ atencion.cod_atencion}}">{{ atencion.tipo }}</option>
-                            {% endfor %}
-                        </select>
-
-
-
-
-                    </div>
-
-                    <div class="col">
-                        <label class="form-label " for="form3Example2"><strong>
-                                Peso</strong></label>
-
-                        <input type="number" name="" class="form-control" id="peso">
-
-                    </div>
-                    <div class="col">
-                        <label class="form-label " for="form3Example2"><strong>
-                                Altura</strong></label>
-
-                        <input type="number" name="" class="form-control" id="altura">
-
-                    </div>
-
-                    <div class="col">
-                        <label class="form-label " for="form3Example2"><strong>
-                                Temperatura</strong></label>
-
-                        <input type="number" name="" class="form-control" id="temperatura">
-
-                    </div>
-
-
-
-                </div>
-
-                <div class="row mt-2">
-
-                    <div class="col">
-                        <label class="form-label " for="form3Example2"><strong>Fecha</strong></label>
-                        <input type="date" class="form-control" id="fecha" value="{{fecha}}" disabled>
-
-
-
-
-                    </div>
-                    <div class="col">
-                        <label class="form-label" for="timePicker"><strong>Hora</strong></label>
-                        <select class="form-select" id="hora" data-placeholder="Seleccione una hora">
-
-                        </select>
-                    </div>
-
-
-
-
-
-                </div>
-                <div class="row mt-2">
-
-                    <div class="col">
-                        <label class="form-label " for="form3Example2"><strong>Observación</strong></label>
-                        <textarea name="" class="form-control" rows="4" id="observacion"></textarea>
-
-
-
-                    </div>
-
-                </div>
-
-            </div>
-            <div class="row m-3">
-                <div class="modal-footer ">
-                    <button type="button" class="btn btn-secondary" id="cerrar" data-bs-dismiss="modal">Close</button>
-                   
-                   
-                    <button type="button" onclick="guardarConsulta()" class="btn btn-primary">Agendar</button>
-                </div>
-            </div>
+              <option value="{{ cliente.num_cliente}}">
+                {{ cliente.Nombre }}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col">
+            <label class="form-label" for="form3Example2"
+              ><strong>Mascota</strong
+              ><i
+                class="ti ti-circle-plus-filled"
+                aria-hidden="true"
+                title="Agregar Nuevo Conductor"
+                data-bs-target="#agregarMascota"
+                data-bs-toggle="modal"
+                data-bs-dismiss="modal"
+                style="color: red; font-size: 15px"
+              ></i
+            ></label>
+            <select
+              class="form-select"
+              id="mascota"
+              data-placeholder="Seleccione una mascota"
+            ></select>
+          </div>
         </div>
+        <div class="row mt-2">
+          <div class="col">
+            <label class="form-label" for="form3Example2"
+              ><strong>Tipo Atención</strong></label
+            >
+            <select
+              class="form-select"
+              id="tipoAtencion"
+              data-placeholder="Seleccione un rol"
+            >
+              <option
+                selected="true"
+                value="Tipo de atención"
+                disabled="disabled"
+              >
+                seleccione un cliente
+              </option>
+
+              {% for atencion in atencion %}
+
+              <option value="{{ atencion.cod_atencion}}">
+                {{ atencion.tipo }}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="col">
+            <label class="form-label" for="form3Example2"
+              ><strong> Peso</strong></label
+            >
+
+            <input type="number" name="" class="form-control" id="peso" />
+          </div>
+          <div class="col">
+            <label class="form-label" for="form3Example2"
+              ><strong> Altura</strong></label
+            >
+
+            <input type="number" name="" class="form-control" id="altura" />
+          </div>
+
+          <div class="col">
+            <label class="form-label" for="form3Example2"
+              ><strong> Temperatura</strong></label
+            >
+
+            <input
+              type="number"
+              name=""
+              class="form-control"
+              id="temperatura"
+            />
+          </div>
+        </div>
+
+        <div class="row mt-2">
+          <div class="col">
+            <label class="form-label" for="form3Example2"
+              ><strong>Fecha</strong></label
+            >
+            <input
+              type="date"
+              class="form-control"
+              id="fecha"
+              value="{{fecha}}"
+              disabled
+            />
+          </div>
+          <div class="col">
+            <label class="form-label" for="timePicker"
+              ><strong>Hora</strong></label
+            >
+            <select
+              class="form-select"
+              id="hora"
+              data-placeholder="Seleccione una hora"
+            ></select>
+          </div>
+        </div>
+        <div class="row mt-2">
+          <div class="col">
+            <label class="form-label" for="form3Example2"
+              ><strong>Observación</strong></label
+            >
+            <textarea
+              name=""
+              class="form-control"
+              rows="4"
+              id="observacion"
+            ></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="row m-3">
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            id="cerrar"
+            data-bs-dismiss="modal"
+          >
+            Close
+          </button>
+
+          <button
+            type="button"
+            onclick="guardarConsulta()"
+            class="btn btn-primary"
+          >
+            Agendar
+          </button>
+        </div>
+      </div>
     </div>
+  </div>
 </div>
-
-
-
-
-
-
-
-
 
 <!-- MODALES -->
-<div class="modal fade" id="agregarCliente" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-    aria-labelledby="staticBackdropLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalToggleLabel2">Agregar Cliente</h5>
-                <!-- <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> -->
+<div
+  class="modal fade"
+  id="agregarCliente"
+  data-bs-backdrop="static"
+  data-bs-keyboard="false"
+  tabindex="-1"
+  aria-labelledby="staticBackdropLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalToggleLabel2">
+          Agregar Cliente
+        </h5>
+        <!-- <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> -->
+      </div>
+      <div class="modal-body">
+        <div class="row mt-3">
+          <div class="col">
+            <div class="form-group" id="camionModal">
+              <label for="txtPlacaV" class="form-label">Nombres</label>
+
+              <input type="text" id="nombreCliente" class="form-control" />
             </div>
-            <div class="modal-body">
-                <div class="row mt-3">
-                    <div class="col">
-                        <div class="form-group" id="camionModal">
-                            <label for="txtPlacaV" class=" form-label">Nombres</label>
+          </div>
+          <div class="col">
+            <div class="form-group" id="camionModal">
+              <label for="txtPlacaV" class="form-label">Apellidos</label>
 
-                            <input type="text" id="nombreCliente" class="form-control">
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="form-group" id="camionModal">
-                            <label for="txtPlacaV" class=" form-label">Apellidos</label>
-
-                            <input type="text" id="apellidoCliente" class="form-control">
-                        </div>
-                    </div>
-                </div>
-                <div class="row mt-3">
-                    <div class="col">
-                        <div class="form-group" id="camionModal">
-                            <label for="txtPlacaV" class=" form-label">Correo</label>
-
-                            <input type="text" id="nombreCliente" class="form-control">
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="form-group" id="camionModal">
-                            <label for="txtPlacaV" class=" form-label">Teléfono</label>
-
-                            <input type="text" id="apellidoCliente" class="form-control">
-                        </div>
-                    </div>
-                </div>
-                <div class="row mt-3">
-                    <div class="col">
-                        <div class="form-group" id="camionModal">
-                            <label for="txtPlacaV" class=" form-label">Dirección</label>
-
-                            <textarea name="" class="form-control" id=""></textarea>
-                        </div>
-                    </div>
-                </div>
+              <input type="text" id="apellidoCliente" class="form-control" />
             </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" data-bs-target="#agendarConsulta" id="regresar" data-bs-toggle="modal"
-                    data-bs-dismiss="modal">Regresar</button>
-                <button class="btn btn-primary" onclick="NuevoConductor()">Guardar</button>
-            </div>
+          </div>
         </div>
+        <div class="row mt-3">
+          <div class="col">
+            <div class="form-group" id="camionModal">
+              <label for="txtPlacaV" class="form-label">Correo</label>
+
+              <input type="text" id="nombreCliente" class="form-control" />
+            </div>
+          </div>
+          <div class="col">
+            <div class="form-group" id="camionModal">
+              <label for="txtPlacaV" class="form-label">Teléfono</label>
+
+              <input type="text" id="apellidoCliente" class="form-control" />
+            </div>
+          </div>
+        </div>
+        <div class="row mt-3">
+          <div class="col">
+            <div class="form-group" id="camionModal">
+              <label for="txtPlacaV" class="form-label">Dirección</label>
+
+              <textarea name="" class="form-control" id=""></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button
+          class="btn btn-secondary"
+          data-bs-target="#agendarConsulta"
+          id="regresar"
+          data-bs-toggle="modal"
+          data-bs-dismiss="modal"
+        >
+          Regresar
+        </button>
+        <button class="btn btn-primary" onclick="NuevoConductor()">
+          Guardar
+        </button>
+      </div>
     </div>
+  </div>
 </div>
 
+<div
+  class="modal fade"
+  id="agregarMascota"
+  data-bs-backdrop="static"
+  data-bs-keyboard="false"
+  tabindex="-1"
+  aria-labelledby="staticBackdropLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalToggleLabel2">
+          Agregar Mascota
+        </h5>
+        <!-- <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> -->
+      </div>
+      <div class="modal-body">
+        <div class="row mt-3">
+          <div class="col-lg-12">
+            <div class="form-group" id="camionModal">
+              <label for="txtPlacaV" class="form-label">Placa</label>
 
-<div class="modal fade" id="agregarMascota" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-    aria-labelledby="staticBackdropLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalToggleLabel2">Agregar Mascota</h5>
-                <!-- <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> -->
+              <input type="text" id="PlacaNueva" class="form-control" />
             </div>
-            <div class="modal-body">
-                <div class="row mt-3">
-                    <div class="col-lg-12">
-                        <div class="form-group" id="camionModal">
-                            <label for="txtPlacaV" class=" form-label">Placa</label>
-
-                            <input type="text" id="PlacaNueva" class="form-control">
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="modal-footer">
-                <button class="btn btn-secondary" data-bs-target="#agendarConsulta" id="regresar1"
-                    data-bs-toggle="modal" data-bs-dismiss="modal">Regresar</button>
-                <button class="btn btn-primary" onclick="NuevaPlaca()">Guardar</button>
-            </div>
+          </div>
         </div>
+      </div>
+
+      <div class="modal-footer">
+        <button
+          class="btn btn-secondary"
+          data-bs-target="#agendarConsulta"
+          id="regresar1"
+          data-bs-toggle="modal"
+          data-bs-dismiss="modal"
+        >
+          Regresar
+        </button>
+        <button class="btn btn-primary" onclick="NuevaPlaca()">Guardar</button>
+      </div>
     </div>
+  </div>
 </div>
 <!-- FIN DEL MODAL -->
 <style>
-    .hora-disponible {
-        cursor: pointer;
-        padding: 10px;
-        border: 1px solid #28a745;
-        margin: 5px 0;
-    }
+  .hora-disponible {
+    cursor: pointer;
+    padding: 10px;
+    border: 1px solid #28a745;
+    margin: 5px 0;
+  }
 
-    .hora-ocupada {
-        cursor: not-allowed;
-        padding: 10px;
-        border: 1px solid #dc3545;
-        margin: 5px 0;
-        color: #dc3545;
-    }
+  .hora-ocupada {
+    cursor: not-allowed;
+    padding: 10px;
+    border: 1px solid #dc3545;
+    margin: 5px 0;
+    color: #dc3545;
+  }
 </style>
 <!-- FIN DE MODALES -->
 <script>
+  $("#cliente").change(function () {
+    $.ajax({
+      url: "{{ url_for('sistema.traerMascotas') }}",
+      type: "POST",
+      data: {
+        cliente: $("#cliente option:selected").val(),
+      },
+      success: function (response) {
+        console.log(response);
+        // Limpiar las opciones anteriores
+        $("#mascota").empty();
 
-    $("#cliente").change(function () {
-        $.ajax({
-            url: "{{ url_for('sistema.traerMascotas') }}",
-            type: "POST",
-            data: {
-                cliente: $('#cliente option:selected').val(),
-            },
-            success: function (response) {
-                console.log(response);
-                // Limpiar las opciones anteriores
-                $('#mascota').empty();
+        // Agregar la opción por defecto
+        $("#mascota").append(
+          '<option value="Seleccione una mascota" disabled selected>Seleccione una mascota</option>'
+        );
 
-                // Agregar la opción por defecto
-                $('#mascota').append('<option value="Seleccione una mascota" disabled selected>Seleccione una mascota</option>');
-
-                // Iterar sobre las mascotas recibidas y agregarlas como opciones
-                response.mascotas.forEach(function (mascota) {
-                    $('#mascota').append('<option value="' + mascota.idMascota + '">' + mascota.Nombre_mascota + '</option>');
-                });
-            },
-            error: function (error) {
-                console.error("Error en la solicitud AJAX:", error);
-            },
+        // Iterar sobre las mascotas recibidas y agregarlas como opciones
+        response.mascotas.forEach(function (mascota) {
+          $("#mascota").append(
+            '<option value="' +
+              mascota.idMascota +
+              '">' +
+              mascota.Nombre_mascota +
+              "</option>"
+          );
         });
+      },
+      error: function (error) {
+        console.error("Error en la solicitud AJAX:", error);
+      },
     });
+  });
 
+  $("#cliente").select2({
+    width: $(this).data("width")
+      ? $(this).data("width")
+      : $(this).hasClass("w-100")
+      ? "150%"
+      : "style",
+    placeholder: $(this).data("placeholder"),
+    closeOnSelect: false,
+  });
 
+  function HorasDisponibles() {
+    $.ajax({
+      url: "{{ url_for('sistema.horasDisponibles') }}",
+      type: "POST",
+      data: {
+        fecha: $("#fecha").val(),
+      },
+      success: function (response) {
+        $("#hora").empty();
 
+        // Agregar la opción por defecto
+        $("#hora").append(
+          '<option value="Seleccione una hora" disabled selected>Seleccione una hora</option>'
+        );
 
-    $('#cliente').select2({
-        width: $(this).data('width') ? $(this).data('width') : $(this).hasClass('w-100') ? '150%' : 'style',
-        placeholder: $(this).data('placeholder'),
-        closeOnSelect: false,
-    });
-
-    function HorasDisponibles() {
-        $.ajax({
-            url: "{{ url_for('sistema.horasDisponibles') }}",
-            type: "POST",
-            data: {
-                fecha: $('#fecha').val(),
-            },
-            success: function (response) {
-                $('#hora').empty();
-
-                // Agregar la opción por defecto
-                $('#hora').append('<option value="Seleccione una hora" disabled selected>Seleccione una hora</option>');
-
-                // Iterar sobre las horas disponibles y agregarlas como opciones
-                response.horas_disponibles.forEach(function (hora) {
-                    $('#hora').append('<option value="' + hora + '">' + hora + '</option>');
-                });
-            },
-            error: function (error) {
-                console.error("Error en la solicitud AJAX:", error);
-            },
+        // Iterar sobre las horas disponibles y agregarlas como opciones
+        response.horas_disponibles.forEach(function (hora) {
+          $("#hora").append(
+            '<option value="' + hora + '">' + hora + "</option>"
+          );
         });
+      },
+      error: function (error) {
+        console.error("Error en la solicitud AJAX:", error);
+      },
+    });
+  }
 
-    }
-
-
-    function guardarConsulta() {
-        if ($('#cliente option:selected').val() == 'seleccione un cliente' || $('#mascota option:selected').val() == 'Seleccione una mascota' ||
-            $('#peso').val() == '' || $('#altura').val() == '' || $('#temperatura').val() == '' || $('#cliente option:selected').val() == 'Seleccione una hora' || $('#cliente option:selected').val() == 'Tipo de atención') {
-            Swal.fire({ icon: 'error', title: 'Error', confirmButtonText: 'Ok', text: 'Debe rellenar todos los campos' }).then((result) => { /* Read more about isConfirmed, isDenied below */
-                if (result.isConfirmed) {
-
-                }
-            })
-        } else {
-            $.ajax({
-                url: "{{ url_for('sistema.agendarCita') }}",
-                type: "POST",
-                data: {
-                    cliente: $('#cliente option:selected').val(),
-                    mascota: $('#mascota option:selected').val(),
-                    peso: $('#peso').val(),
-                    altura: $('#altura').val(),
-                    observacion: $('#observacion').val(),
-                    fecha: $('#fecha').val(),
-                    temperatura: $('#temperatura').val(),
-                    hora: $('#hora option:selected').val(),
-                    atencion: $('#cliente option:selected').val()
-                },
-                success: function (response) {
-                    Swal.fire({ icon: 'success', title: 'Éxito', confirmButtonText: 'Ok', text: 'Cita Agendada Correctamente' }).then((result) => { /* Read more about isConfirmed, isDenied below */
-                        if (result.isConfirmed) {
-                            cargareventos();
-                            $('#cerrar').click();
-                        }
-                    })
-                },
-                error: function (error) {
-                    console.error("Error en la solicitud AJAX:", error);
-                },
-            });
+  function guardarConsulta() {
+    if (
+      $("#cliente option:selected").val() == "seleccione un cliente" ||
+      $("#mascota option:selected").val() == "Seleccione una mascota" ||
+      $("#peso").val() == "" ||
+      $("#altura").val() == "" ||
+      $("#temperatura").val() == "" ||
+      $("#cliente option:selected").val() == "Seleccione una hora" ||
+      $("#cliente option:selected").val() == "Tipo de atención"
+    ) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        confirmButtonText: "Ok",
+        text: "Debe rellenar todos los campos",
+      }).then((result) => {
+        /* Read more about isConfirmed, isDenied below */
+        if (result.isConfirmed) {
         }
-
+      });
+    } else {
+      $.ajax({
+        url: "{{ url_for('sistema.agendarCita') }}",
+        type: "POST",
+        data: {
+          cliente: $("#cliente option:selected").val(),
+          mascota: $("#mascota option:selected").val(),
+          peso: $("#peso").val(),
+          altura: $("#altura").val(),
+          observacion: $("#observacion").val(),
+          fecha: $("#fecha").val(),
+          temperatura: $("#temperatura").val(),
+          hora: $("#hora option:selected").val(),
+          atencion: $("#cliente option:selected").val(),
+        },
+        beforeSend: function () {
+          Swal.fire({
+            html: '<div class="col-lg-12" style="z-index:99999;  display:absolute; width"><img  style="height: 80px;" src="../../static/sistema/images/logos/dots.gif" alt="loading" /><br/>Agendando Consulta...</div>',
+            showCancelButton: false,
+            showConfirmButton: false,
+            backdrop: "static",
+          }).then((result) => {
+            /* Read more about isConfirmed, isDenied below */
+            if (result.isConfirmed) {
+            }
+          });
+        },
+        success: function (response) {
+          Swal.fire({
+            icon: "success",
+            title: "Éxito",
+            confirmButtonText: "Ok",
+            text: "Cita Agendada Correctamente",
+          }).then((result) => {
+            /* Read more about isConfirmed, isDenied below */
+            if (result.isConfirmed) {
+              cargareventos();
+              $("#cerrar").click();
+            }
+          });
+        },
+        error: function (error) {
+          console.error("Error en la solicitud AJAX:", error);
+        },
+      });
     }
+  }
 
-
-    $(document).ready(function () {
-        HorasDisponibles();
-    });
+  $(document).ready(function () {
+    HorasDisponibles();
+  });
 </script>
 
 {% endblock %}

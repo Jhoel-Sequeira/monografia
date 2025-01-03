@@ -10,7 +10,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 import pandas as pd
 
 from controllers.excel import GenerarExcel_3
-from controllers.correo import enviar_correo, enviar_correo_registro
+from controllers.correo import enviar_correo, enviar_correo_receta, enviar_correo_registro
 
 def capturarHora():
     hi = datetime.now()
@@ -1342,7 +1342,7 @@ def tablaConsultasProductos():
         
         conn = conectar()
         cursor = conn.cursor()
-        query = "select cod_detalle,p.nom_producto,p.precio,a.cantidad from atencion_producto as a inner join producto as p on a.cod_producto = p.cod_producto where a.cod_atencion = ?"
+        query = "select a.cod_detalle,p.nom_producto,p.precio,a.cantidad,a.orientacion from atencion_producto as a inner join producto as p on a.cod_producto = p.cod_producto where a.cod_atencion = ?"
         cursor.execute(query,(atencion))
         consultas = cursor.fetchall()
 
@@ -1382,6 +1382,8 @@ def orientaciones():
         detalle = request.form['detalle']
         orientacion = request.form['orientacion']
 
+        print(detalle)
+        print(orientacion)
 
 
         conn = conectar()
@@ -1411,6 +1413,51 @@ def eliminarMedicamentoReceta():
         conn.commit()
         cursor.close()
         conn.close()
+        return 'HECHO'
+        
+    else:
+        return "No"
+    
+@bp.route('/recetar', methods=['POST'])
+def recetar():
+
+    if request.method == "POST":
+        detalle = request.form['atencion']
+        diagnostico = request.form['diagnostico']
+
+
+        conn = conectar()
+        cursor = conn.cursor()
+        query = 'UPDATE atencion set id_estado = 14, diagnostico = ? where cod_atencion = ?'
+        cursor.execute(query, (diagnostico,detalle))
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+        conn = conectar()
+        cursor = conn.cursor()
+        query = "select a.cod_detalle,p.nom_producto,p.precio,a.cantidad,a.orientacion from atencion_producto as a inner join producto as p on a.cod_producto = p.cod_producto where a.cod_atencion = ?"
+        cursor.execute(query,(detalle))
+        consultas = cursor.fetchall()
+
+        conn = conectar()
+        cursor = conn.cursor()
+        query = "select c.correo_cliente  from atencion as a inner join cliente as c on a.num_cliente = c.num_cliente where a.cod_atencion = ?"
+        cursor.execute(query,(detalle))
+        correo = cursor.fetchone()
+
+        conn = conectar()
+        cursor = conn.cursor()
+        query = "select diagnostico,cod_atencion from atencion where cod_atencion = ?"
+        cursor.execute(query,(detalle))
+        diagnostico = cursor.fetchall()
+
+        print(diagnostico)
+
+
+        enviar_correo_receta(current_app,"Usted tiene una nueva receta",correo[0],'recetar',consultas,diagnostico)
+
+
         return 'HECHO'
         
     else:
