@@ -65,11 +65,11 @@
                                     <span class="badge bg-primary rounded-3 fw-semibold">Agendado</span>
                                 </div>
                             </td>
-                            {%elif venta.NombreEstado == 'PENDIENTE'%}
+                            {%elif venta.NombreEstado == 'FINALIZADO'%}
                             <!-- BLUE -->
                             <td class="border-bottom-0">
                                 <div class="d-flex align-items-center gap-2">
-                                    <span class="badge bg-primary rounded-3 fw-semibold">Pendiente</span>
+                                    <span class="badge bg-success rounded-3 fw-semibold">Finalizado</span>
                                 </div>
                             </td>
                             {%elif venta.NombreEstado == 'CANCELADO'%}

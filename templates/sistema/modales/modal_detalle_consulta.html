@@ -94,6 +94,70 @@
                             <textarea name="" disabled class="form-control" id="">{{general.descripcion}}</textarea>
                         </div>
                     </div>
+                    <div class="row mt-3">
+                        <div class="col">
+                            <label class="form-label " for="form3Example2" style="margin-top: 20px;"><strong>Medicamentos
+                            </label>
+                            <div id="tabla_receta">
+                                <table
+  class="table text-nowrap mb-0 align-middle table-hover"
+  id="tabla_consultas_diarias"
+>
+  <thead class="text-dark fs-4">
+    <tr>
+      <th class="border-bottom-0">
+        <h6 class="fw-semibold mb-0">Producto</h6>
+      </th>
+      <th class="border-bottom-0">
+        <h6 class="fw-semibold mb-0">Cantidad</h6>
+      </th>
+      <th class="border-bottom-0">
+        <h6 class="fw-semibold mb-0">Orientación</h6>
+      </th>
+
+      <th class="border-bottom-0">
+        <h6 class="fw-semibold mb-0"></h6>
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    {%for venta in consultas%}
+    <tr id="" style="cursor: pointer">
+      <td class="border-bottom-0">
+        <span class="fw-normal">{{venta.nom_producto}}</span>
+      </td>
+      <td class="border-bottom-0">
+        <span class="fw-normal">{{venta.cantidad}}</span>
+      </td>
+
+      <td class="border-bottom-0">
+        <span class="fw-normal">
+          {%if venta.orientacion%}{{venta.orientacion}}{%else%}-{%endif%}</span>
+      </td>
+
+      <td class="border-bottom-0" style="text-align: end">
+        <span class="fw-normal"
+          ></span>
+      </td>
+    </tr>
+    {%endfor%}
+  </tbody>
+</table>
+                            </div>
+                            
+                            
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col">
+                            <label class="form-label " for="form3Example2" style="margin-top: 20px;"><strong>Diagnóstico
+                            </label>
+
+                            
+                            <textarea name="" disabled class="form-control" id="">{{general.diagnostico}}</textarea>
+                        </div>
+                    </div>
+
 
 
                 </div>
