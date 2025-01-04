@@ -1,274 +1,353 @@
 {%for general in detalle%}
-<div class="modal fade" id="modalDetalleConsulta" data-bs-backdrop="static"  tabindex="-1"
-    aria-labelledby="staticBackdropLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="staticBackdropLabel">Detalle Consulta</h5>
-                <button type="button" class="btn-close" id="cerrarDet" data-bs-dismiss="modal"
-                    aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <input type="hidden" name="" value="{{general.cod_venta}}" id="id">
-                <div class=" cuerpo-modal" style="background-color: white;">
-                    <div class="row mt-2">
-                        <div class="col" style="margin-top: 20px;">
-                            <label class="form-label " for="form3Example2"><strong>Cliente</strong></label>
-                            <input type="text" id="nombre" value="{{general.Nombre}}" class="form-control">
-
-                        </div>
-                        <div class="col" id="bas">
-                            <div class="row">
-                                <div class="col ">
-                                    <label class="form-label " for="form3Example2"
-                                        style="margin-top: 20px;"><strong>Mascota</strong> </label>
-
-                                    <input type="text" id="stock_critico" value="{{general.Nombre_mascota}}"
-                                        class="form-control">
-
-                                </div>
-                            </div>
-
-                        </div>
-                    </div>
-
-                    <div class="row mt-2">
-                        <div class="col">
-                            <label class="form-label " for="form3Example2"
-                                style="margin-top: 20px;"><strong>Especie</strong></label>
-                            <input type="text" id="precio" value="{{general.nom_especie}}" class="form-control">
-
-                        </div>
-                        <div class="col">
-                            <label class="form-label " for="form3Example2" style="margin-top: 20px;"><strong>Tipo
-                            </label>
-
-
-                            <input type="text" id="stock" value="{{general.tipo}}" class="form-control">
-
-                        </div>
-                        <div class="col">
-                            <label class="form-label " for="form3Example2" style="margin-top: 20px;"><strong>Estado
-                            </label>
-
-
-                            <input type="text" id="stock" value="{{general.NombreEstado}}" class="form-control">
-
-                        </div>
-
-                        
-
-                    </div>
-                    <div class="row mt-2 ">
-                        <div class="col">
-                            <label class="form-label " for="form3Example2"
-                                style="margin-top: 20px;"><strong>Peso</strong></label>
-                            <input type="text" id="precio" value="{{general.peso}}" class="form-control">
-
-                        </div>
-                        <div class="col">
-                            <label class="form-label " for="form3Example2" style="margin-top: 20px;"><strong>Altura</strong>
-                            </label>
-
-
-                            <input type="text" id="altura" value="{{general.altura}}" class="form-control">
-
-                        </div>
-                        <div class="col">
-                            <label class="form-label " for="form3Example2" style="margin-top: 20px;"><strong>Temperatura</strong>
-                            </label>
-
-
-                            <input type="text" id="temperatura" value="{{general.temperatura}}" class="form-control">
-
-                        </div>
-
-                        
-                    </div>
-                    <div class="row mt-3">
-                        <div class="col">
-                            <label class="form-label " for="form3Example2" style="margin-top: 20px;"><strong>Observación
-                            </label>
-
-                            
-                            <textarea name="" disabled class="form-control" id="">{{general.descripcion}}</textarea>
-                        </div>
-                    </div>
-                    <div class="row mt-3">
-                        <div class="col">
-                            <label class="form-label " for="form3Example2" style="margin-top: 20px;"><strong>Medicamentos
-                            </label>
-                            <div id="tabla_receta">
-                                <table
-  class="table text-nowrap mb-0 align-middle table-hover"
-  id="tabla_consultas_diarias"
+<div
+  class="modal fade"
+  id="modalDetalleConsulta"
+  data-bs-backdrop="static"
+  tabindex="-1"
+  aria-labelledby="staticBackdropLabel"
+  aria-hidden="true"
 >
-  <thead class="text-dark fs-4">
-    <tr>
-      <th class="border-bottom-0">
-        <h6 class="fw-semibold mb-0">Producto</h6>
-      </th>
-      <th class="border-bottom-0">
-        <h6 class="fw-semibold mb-0">Cantidad</h6>
-      </th>
-      <th class="border-bottom-0">
-        <h6 class="fw-semibold mb-0">Orientación</h6>
-      </th>
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="staticBackdropLabel">Detalle Consulta</h5>
+        <button
+          type="button"
+          class="btn-close"
+          id="cerrarDet"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <input type="text" name="" value="{{general.cod_atencion}}" id="id" />
+        <div class="cuerpo-modal" style="background-color: white">
+          <div class="row mt-2">
+            <div class="col" style="margin-top: 20px">
+              <label class="form-label" for="form3Example2"
+                ><strong>Cliente</strong></label
+              >
+              <input
+                type="text"
+                id="nombre"
+                value="{{general.Nombre}}"
+                class="form-control"
+              />
+            </div>
+            <div class="col" id="bas">
+              <div class="row">
+                <div class="col">
+                  <label
+                    class="form-label"
+                    for="form3Example2"
+                    style="margin-top: 20px"
+                    ><strong>Mascota</strong>
+                  </label>
 
-      <th class="border-bottom-0">
-        <h6 class="fw-semibold mb-0"></h6>
-      </th>
-    </tr>
-  </thead>
-  <tbody>
-    {%for venta in consultas%}
-    <tr id="" style="cursor: pointer">
-      <td class="border-bottom-0">
-        <span class="fw-normal">{{venta.nom_producto}}</span>
-      </td>
-      <td class="border-bottom-0">
-        <span class="fw-normal">{{venta.cantidad}}</span>
-      </td>
-
-      <td class="border-bottom-0">
-        <span class="fw-normal">
-          {%if venta.orientacion%}{{venta.orientacion}}{%else%}-{%endif%}</span>
-      </td>
-
-      <td class="border-bottom-0" style="text-align: end">
-        <span class="fw-normal"
-          ></span>
-      </td>
-    </tr>
-    {%endfor%}
-  </tbody>
-</table>
-                            </div>
-                            
-                            
-                        </div>
-                    </div>
-                    <div class="row mt-3">
-                        <div class="col">
-                            <label class="form-label " for="form3Example2" style="margin-top: 20px;"><strong>Diagnóstico
-                            </label>
-
-                            
-                            <textarea name="" disabled class="form-control" id="">{{general.diagnostico}}</textarea>
-                        </div>
-                    </div>
-
-
-
+                  <input
+                    type="text"
+                    id="stock_critico"
+                    value="{{general.Nombre_mascota}}"
+                    class="form-control"
+                  />
                 </div>
-                
+              </div>
             </div>
-            <input type="hidden" id="tienda" value="0">
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" id="uploadBtn" class="btn"
-                    style="background-color: rgb(178, 13, 13); color: white;" onclick="cancelar()"><i
-                        class="ti ti-x"></i> Cancelar</button>
-                <button type="button" id="desbloquear" class="btn "
-                    style="background-color: rgb(47, 133, 155); color: white;" onclick="printTicket($('#id').val())"><i
-                        class="ti ti-printer"></i> Imprimir</button>
+          </div>
 
+          <div class="row mt-2">
+            <div class="col">
+              <label
+                class="form-label"
+                for="form3Example2"
+                style="margin-top: 20px"
+                ><strong>Especie</strong></label
+              >
+              <input
+                type="text"
+                id="precio"
+                value="{{general.nom_especie}}"
+                class="form-control"
+              />
             </div>
+            <div class="col">
+              <label
+                class="form-label"
+                for="form3Example2"
+                style="margin-top: 20px"
+                ><strong>Tipo</strong>
+              </label>
+
+              <input
+                type="text"
+                id="stock"
+                value="{{general.tipo}}"
+                class="form-control"
+              />
+            </div>
+            <div class="col">
+              <label
+                class="form-label"
+                for="form3Example2"
+                style="margin-top: 20px"
+                ><strong>Estado</strong>
+              </label>
+
+              <input
+                type="text"
+                id="stock"
+                value="{{general.NombreEstado}}"
+                class="form-control"
+              />
+            </div>
+          </div>
+          <div class="row mt-2">
+            <div class="col">
+              <label
+                class="form-label"
+                for="form3Example2"
+                style="margin-top: 20px"
+                ><strong>Peso</strong></label
+              >
+              <input
+                type="text"
+                id="precio"
+                value="{{general.peso}}"
+                class="form-control"
+              />
+            </div>
+            <div class="col">
+              <label
+                class="form-label"
+                for="form3Example2"
+                style="margin-top: 20px"
+                ><strong>Altura</strong>
+              </label>
+
+              <input
+                type="text"
+                id="altura"
+                value="{{general.altura}}"
+                class="form-control"
+              />
+            </div>
+            <div class="col">
+              <label
+                class="form-label"
+                for="form3Example2"
+                style="margin-top: 20px"
+                ><strong>Temperatura</strong>
+              </label>
+
+              <input
+                type="text"
+                id="temperatura"
+                value="{{general.temperatura}}"
+                class="form-control"
+              />
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col">
+              <label
+                class="form-label"
+                for="form3Example2"
+                style="margin-top: 20px"
+                ><strong>Observación</strong>
+              </label>
+
+              <textarea name="" disabled class="form-control" id="">
+{{general.descripcion}}</textarea
+              >
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col ">
+                <div class="d-flex  justify-content-center">
+                    <label
+                class="form-label"
+                for="form3Example2"
+                style="margin-top: 20px"
+                ><strong>Medicamentos</strong>
+              </label>
+              <hr>
+                </div>
+              
+              <div id="tabla_receta">
+                <table
+                  class="table text-nowrap mb-0 align-middle table-hover"
+                  id="tabla_consultas_diarias"
+                >
+                  <thead class="text-dark fs-4">
+                    <tr>
+                      <th class="border-bottom-0">
+                        <h6 class="fw-semibold mb-0">Producto</h6>
+                      </th>
+                      <th class="border-bottom-0">
+                        <h6 class="fw-semibold mb-0">Cantidad</h6>
+                      </th>
+                      <th class="border-bottom-0">
+                        <h6 class="fw-semibold mb-0">Orientación</h6>
+                      </th>
+
+                      <th class="border-bottom-0">
+                        <h6 class="fw-semibold mb-0"></h6>
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {%for venta in consultas%}
+                    <tr id="" style="cursor: pointer">
+                      <td class="border-bottom-0">
+                        <span class="fw-normal">{{venta.nom_producto}}</span>
+                      </td>
+                      <td class="border-bottom-0">
+                        <span class="fw-normal">{{venta.cantidad}}</span>
+                      </td>
+
+                      <td class="border-bottom-0">
+                        <span class="fw-normal">
+                          {%if
+                          venta.orientacion%}{{venta.orientacion}}{%else%}-{%endif%}</span
+                        >
+                      </td>
+
+                      <td class="border-bottom-0" style="text-align: end">
+                        <span class="fw-normal"></span>
+                      </td>
+                    </tr>
+                    {%endfor%}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col">
+                <div class="d-flex  justify-content-center">
+                    <label
+                class="form-label"
+                for="form3Example2"
+                style="margin-top: 20px"
+                ><strong>Diagnóstico</strong>
+              </label>
+              <hr>
+                </div>
+
+              <textarea name="" disabled class="form-control" id="">
+                {{general.diagnostico}}</textarea
+              >
+            </div>
+          </div>
         </div>
+      </div>
+      <input type="hidden" id="tienda" value="0" />
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Close
+        </button>
+        <button
+          type="button"
+          id="uploadBtn"
+          class="btn"
+          style="background-color: rgb(178, 13, 13); color: white"
+          onclick="cancelar()"
+        >
+          <i class="ti ti-x"></i> Cancelar
+        </button>
+        <button
+          type="button"
+          id="desbloquear"
+          class="btn"
+          style="background-color: rgb(47, 133, 155); color: white"
+          onclick="printTicket($('#id').val())"
+        >
+          <i class="ti ti-printer"></i> Imprimir
+        </button>
+      </div>
     </div>
+  </div>
 </div>
 {%endfor%}
 
 <script>
-
-    function printTicket(id) {
-        // Construye la URL con el ID
-        var url = '/facturar?id=' + id;
-        // Abre una nueva ventana sin barras de herramientas
-        var newWindow = window.open(url, '_blank', "toolbar=no,scrollbars=yes,resizable=yes,location=no");
-        if (newWindow) {
-            // Si se pudo abrir la nueva ventana, enfócala
-            newWindow.focus();
-        } else {
-            // Si no se pudo abrir la nueva ventana (debido a un bloqueador de ventanas emergentes), muestra un mensaje
-            alert("No se pudo abrir la nueva ventana. Asegúrate de desactivar el bloqueador de ventanas emergentes.");
-        }
+  function printTicket(id) {
+    // Construye la URL con el ID
+    var url = "/printReceta?id=" + id;
+    // Abre una nueva ventana sin barras de herramientas
+    var newWindow = window.open(
+      url,
+      "_blank",
+      "toolbar=no,scrollbars=yes,resizable=yes,location=no"
+    );
+    if (newWindow) {
+      // Si se pudo abrir la nueva ventana, enfócala
+      newWindow.focus();
+    } else {
+      // Si no se pudo abrir la nueva ventana (debido a un bloqueador de ventanas emergentes), muestra un mensaje
+      alert(
+        "No se pudo abrir la nueva ventana. Asegúrate de desactivar el bloqueador de ventanas emergentes."
+      );
     }
+  }
 
-    function cancelar() {
+  function cancelar() {
+    Swal.fire({
+      title: "Anular Consulta",
+      text: "¿Desea cancelar la consulta?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Si",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        $.ajax({
+          url: "{{ url_for('sistema.cancelarFactura') }}",
+          type: "POST",
+          data: {
+            id: $("#id").val(),
+          },
 
-
-
-        Swal.fire({
-            title: "Anular Factura",
-            text: "Desea anular la factura.",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#3085d6",
-            cancelButtonColor: "#d33",
-            confirmButtonText: "Si"
-        }).then((result) => {
-            if (result.isConfirmed) {
-                $.ajax({
-                    url: "{{ url_for('sistema.cancelarFactura') }}",
-                    type: "POST",
-                    data: {
-                        id: $('#id').val(),
-                    },
-
-
-                    success: function (response) {
-                        Swal.fire({
-                            title: "Anulada!",
-                            text: "Se ha anulado la factura.",
-                            icon: "success"
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                $('#cerrarDet').click();
-                                cargarCompras();  // Recargar el inventario
-
-                            }
-                        });
-                    },
-                    error: function (error) {
-                        console.log(error);
-                    }
-                });
-
-
-
-
-
-
-            }
+          success: function (response) {
+            Swal.fire({
+              title: "Anulada!",
+              text: "Se ha anulado la factura.",
+              icon: "success",
+            }).then((result) => {
+              if (result.isConfirmed) {
+                $("#cerrarDet").click();
+                cargarCompras(); // Recargar el inventario
+              }
+            });
+          },
+          error: function (error) {
+            console.log(error);
+          },
         });
-
-
-
-
-
-
-
-
-    }
-
-
-
-
-
-    document.querySelectorAll('.cuerpo-modal input, .cuerpo-modal select, .cuerpo-modal file').forEach(element => {
-        element.disabled = true;
+      }
     });
+  }
+
+  document
+    .querySelectorAll(
+      ".cuerpo-modal input, .cuerpo-modal select, .cuerpo-modal file"
+    )
+    .forEach((element) => {
+      element.disabled = true;
+    });
+  var isDisabled = false; // Iniciamos con los elementos desactivados
+
+  // Verifica si la variable ya está definida
+  if (typeof isDisabled === "undefined") {
     var isDisabled = false; // Iniciamos con los elementos desactivados
+  }
 
-    // Verifica si la variable ya está definida
-    if (typeof isDisabled === 'undefined') {
-        var isDisabled = false; // Iniciamos con los elementos desactivados
-    }
-
-    document.querySelectorAll('.cuerpo-modal input, .cuerpo-modal select, .cuerpo-modal file').forEach(element => {
-        element.disabled = true;
+  document
+    .querySelectorAll(
+      ".cuerpo-modal input, .cuerpo-modal select, .cuerpo-modal file"
+    )
+    .forEach((element) => {
+      element.disabled = true;
     });
-
-    
 </script>

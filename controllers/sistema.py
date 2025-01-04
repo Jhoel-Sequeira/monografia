@@ -1273,7 +1273,7 @@ def detalleConsulta():
 
 
         print(detalle)
-        return render_template('sistema/modales/modal_detalle_consulta.html', detalle=detalle,)
+        return render_template('sistema/modales/modal_detalle_consulta.html', detalle=detalle,consultas = consultas)
     else:
         return "No"
     
@@ -1470,6 +1470,182 @@ def recetar():
         
     else:
         return "No"
+    
+@bp.route('/printReceta', methods=['POST', 'GET'])
+def printReceta():
+    num = request.args.get('id')
+
+    conn = conectar()
+    cursor = conn.cursor()
+    query = "select a.cod_atencion,a.fecha_atencion,c.nombres_cliente + ' ' + c.apellidos_cliente as Nombre,e.NombreEstado,m.Nombre_mascota,es.nom_especie,ta.tipo,a.peso,a.altura,a.temperatura,a.descripcion,a.diagnostico from atencion as a inner join cliente as c on a.num_cliente = c.num_cliente inner join estado as e on a.id_estado = e.id_estado inner join mascota as m on a.idMascota = m.idMascota inner join tipo_atencion as ta on a.tipo_atencion = ta.cod_tipo inner join raza as r on m.id_raza = r.id_raza inner join especie as es on r.id_especie = es.id_especie where a.cod_atencion = ? order by a.cod_atencion DESC"
+    cursor.execute(query,(num))
+    ticket = cursor.fetchone()
+
+    conn = conectar()
+    cursor = conn.cursor()
+    query = "select a.cod_detalle,p.nom_producto,p.precio,a.cantidad,a.orientacion from atencion_producto as a inner join producto as p on a.cod_producto = p.cod_producto where a.cod_atencion = ?"
+    cursor.execute(query,(num))
+    detalle = cursor.fetchall()
+
+    print(ticket)
+    print(detalle)
+
+    fecha_factura = ticket[1].strftime("%Y-%m-%d") if isinstance(ticket[1], datetime) else str(ticket[1])
+    hora_factura = ticket[1].strftime("%I:%M %p") if isinstance(ticket[1], datetime) else str(ticket[1])
+    
+
+    pdf = FPDF('P', 'mm',  (140, 215.9))
+    pdf.set_margins(5.5, 5.5, 5.5)
+    pdf.set_display_mode(zoom=100, layout='continuous')
+    pdf.add_page()
+    
+    x = 0
+    y = 0
+    width = 30
+    height = 0 
+    imagePath = 'static/sistema/images/logos/logo.png'
+
+    pdf.image(imagePath, x, y, width, height)
+    
+    pdf.set_font('Arial', 'B', 30)
+    pdf.set_text_color(0, 0, 0)
+    pdf.set_font('Arial', 'B', 14)
+    pdf.multi_cell(0, 5, 'Veterinaria El Buen Productor', 0, "C")
+    pdf.ln(20)
+    
+    
+
+    # Configura el tamaño y las posiciones de los elementos en una línea
+    pdf.set_font('Arial', 'B', 10)
+    pdf.cell(25, 10, 'Consulta No: ', ln=0)  # Sin salto de línea
+    pdf.set_font('Arial', '', 10)
+    pdf.cell(30, 10, str(ticket[0]), ln=0)
+    pdf.ln(8)
+
+    pdf.set_font('Arial', 'B', 10)
+    pdf.cell(25, 5, 'Cliente: ')
+    pdf.set_font('Arial', '', 10)
+    pdf.cell(60, 5, ticket[2].upper())
+    pdf.ln(6)
+
+    pdf.set_font('Arial', 'B', 10)
+    pdf.cell(20, 5, 'Fecha: ', ln=0)
+    pdf.set_font('Arial', '', 10)
+    pdf.cell(30, 5, fecha_factura, ln=0)
+    
+
+    pdf.set_font('Arial', 'B', 10)
+    pdf.cell(10, 5, 'Hora: ', ln=0)
+    pdf.set_font('Arial', '', 10)
+    pdf.cell(10, 5, hora_factura, ln=1)  # Salto de línea al final
+
+    
+    
+    
+
+    pdf.set_font('Arial', 'B', 10)
+    pdf.cell(18, 5, 'Mascota: ')
+    pdf.set_font('Arial', '', 10)
+    pdf.cell(30, 5, ticket[4].upper())
+    
+
+    pdf.set_font('Arial', 'B', 10)
+    pdf.cell(15, 5, 'Especie: ')
+    pdf.set_font('Arial', '', 10)
+    pdf.cell(25, 5, ticket[5].upper())
+
+
+    pdf.set_font('Arial', 'B', 10)
+    pdf.cell(15, 5, 'Tipo: ')
+    pdf.set_font('Arial', '', 10)
+    pdf.cell(25, 5, ticket[6].upper())
+    pdf.ln(6)
+
+    pdf.set_font('Arial', 'B', 10)
+    pdf.cell(15, 5, 'Peso: ')
+    pdf.set_font('Arial', '', 10)
+    pdf.cell(25, 5, str(ticket[7])+'lb')
+
+
+    pdf.set_font('Arial', 'B', 10)
+    pdf.cell(15, 5, 'Altura: ')
+    pdf.set_font('Arial', '', 10)
+    pdf.cell(20, 5, str(ticket[8])+'cm')
+
+    pdf.set_font('Arial', 'B', 10)
+    pdf.cell(25, 5, 'Temperatura: ')
+    pdf.set_font('Arial', '', 10)
+    pdf.cell(20, 5, str(ticket[9])+'°C')
+    pdf.ln(10)
+
+    pdf.set_line_width(0.2) 
+    pdf.set_font('Arial', 'B', 10)
+    
+        # Encabezados de la tabla
+    pdf.cell(30, 10, 'Producto', 1)
+    pdf.cell(15, 10, 'Cantidad', 1)
+    pdf.cell(30, 10, 'Orientacion', 1)
+    pdf.ln(10)  # Salto de línea
+
+    # Iterar sobre los resultados y calcular el descuento
+    for fila in detalle:
+        nom_producto = str(fila[1]).upper()  # Nombre del producto en mayúsculas
+        cantidad = str(fila[3])  # Cantidad comprada
+        descuento_raw = str(fila[4])  # Descuento aplicado en porcentaje o monto
+
+        
+
+        # Imprimir los datos en el PDF
+        pdf.set_line_width(0.0)  # Establecer un borde más fino
+
+        pdf.set_font('Arial', '', 10)
+
+        # Fila de datos
+        pdf.cell(30, 10, nom_producto, 1, 0)  # Borde para la celda de producto
+        pdf.cell(15, 10, str(cantidad), 1, 0, 'C')  # Cantidad centrada con borde fino
+        
+        pdf.cell(30, 10, str(descuento_raw), 1, 0, 'C')  # Descuento centrado con borde y nueva línea
+
+        pdf.ln(10)  # Aumenta el espacio entre filas a 6 unidades
+
+   
+    pdf.ln(9)  # Salto de línea
+
+    pdf.set_font('Arial', 'B', 10)
+    pdf.cell(25, 10, 'Diagnóstico: ')
+    pdf.set_font('Arial', '', 10)
+    pdf.cell(25, 10, str(ticket[11].upper()))
+    pdf.ln(1)
+
+        
+    pdf_output = pdf.output(dest='S').encode('latin1') 
+
+    response = make_response(pdf_output)
+    response.headers['Content-Type'] = 'application/pdf'
+    response.headers['Content-Disposition'] = 'inline; filename=ticket.pdf'
+
+
+    conn = conectar()
+    cursor = conn.cursor()
+
+                    
+                    # Query de actualización del producto
+    query = '''
+            UPDATE venta
+            SET cod_estado = 7
+            WHERE cod_venta = ?
+    '''
+                    
+                    # Ejecutar la consulta SQL
+    cursor.execute(query, (num))
+    conn.commit()
+
+                    # Cerrar la conexión
+    cursor.close()
+    conn.close()
+
+
+    return response
 
 # FIN DEL MODULO DE CONSULTAS
 
