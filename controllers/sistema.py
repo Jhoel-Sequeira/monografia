@@ -487,7 +487,8 @@ def facturar():
         query = """
             	SELECT 
                     v.cod_venta, 
-                    v.fecha_venta, 
+                    v.fecha_venta,
+                    
                     vendedor.nombres_cliente + ' ' + vendedor.apellidos_cliente AS vendedor,
                     SUM(dv.cantidad * p.precio - dv.precio_venta) AS total_venta
                 FROM 
@@ -519,6 +520,8 @@ def facturar():
     detalle = cursor.fetchall()
 
     print(detalle)
+
+    print(ticket)
 
     fecha_factura = ticket[1].strftime("%Y-%m-%d") if isinstance(ticket[1], datetime) else str(ticket[1])
     hora_factura = ticket[1].strftime("%I:%M %p") if isinstance(ticket[1], datetime) else str(ticket[1])
@@ -575,7 +578,7 @@ def facturar():
     pdf.set_font('Arial', 'B', 7.5)
     pdf.cell(25, 10, 'Vendedor: ')
     pdf.set_font('Arial', '', 7.5)
-    pdf.cell(25, 10, ticket[3].upper())
+    pdf.cell(25, 10, str(ticket[3]).upper())
     pdf.ln(9)
 
     pdf.set_line_width(0.2) 
@@ -623,11 +626,18 @@ def facturar():
 
         pdf.ln(10)  # Aumenta el espacio entre filas a 6 unidades
 
-    pdf.set_font('Arial', 'B', 7.5)  # Título "Total"
-    pdf.cell(25, 30, 'Total: ')
-    pdf.set_font('Arial', '', 30)  # Aumentar el tamaño de la fuente para el valor
-    pdf.cell(65, 30, 'C$ '+str(ticket[4]), 0, 1, 'R')  # Alinear a la derecha
-    pdf.ln(9)  # Salto de línea
+    if no_tiene ==1:
+        pdf.set_font('Arial', 'B', 7.5)  # Título "Total"
+        pdf.cell(25, 30, 'Total: ')
+        pdf.set_font('Arial', '', 30)  # Aumentar el tamaño de la fuente para el valor
+        pdf.cell(65, 30, 'C$ '+str(ticket[4]), 0, 1, 'R')  # Alinear a la derecha
+        pdf.ln(9)  # Salto de línea
+    else:
+        pdf.set_font('Arial', 'B', 7.5)  # Título "Total"
+        pdf.cell(25, 30, 'Total: ')
+        pdf.set_font('Arial', '', 30)  # Aumentar el tamaño de la fuente para el valor
+        pdf.cell(65, 30, 'C$ '+str(ticket[3]), 0, 1, 'R')  # Alinear a la derecha
+        pdf.ln(9)  # Salto de línea 
 
         
     pdf_output = pdf.output(dest='S').encode('latin1') 
@@ -745,6 +755,59 @@ def listadoProductosCaja():
     
 
     return render_template('sistema/tablas/tabla-caja.html',medicamentos = medicamentos)
+
+@bp.route('/agregarReceta', methods=['POST'])
+def agregarReceta():
+
+    num = request.form['num']
+    receta = request.form['receta']
+    print(num)
+
+
+    conn = conectar()
+    cursor = conn.cursor()
+    query = "select p.cod_producto,a.cantidad from atencion_producto as a inner join producto as p on a.cod_producto = p.cod_producto where a.cod_atencion = ?"
+    cursor.execute(query,(receta))
+    receta = cursor.fetchall()
+
+    insert_query = """
+    INSERT INTO Det_venta (cod_producto_1,cod_venta_1,Cantidad,precio_venta) VALUES (?,?,?,0)
+    """
+
+    for cod_producto, cantidad in receta:
+        cursor.execute(insert_query, (cod_producto,num, cantidad))
+
+
+    conn = conectar()
+    cursor = conn.cursor()
+    query = "select dv.cod_detalle,p.nom_producto,dv.cantidad,p.precio,p.stock,p.stock_critico,dv.precio_venta as descuento from Det_venta as dv inner join producto as p on dv.cod_producto_1 = p.cod_producto where dv.cod_venta_1 = ?"
+    cursor.execute(query,(num))
+    medicamentos = cursor.fetchall()
+    
+
+    return render_template('sistema/tablas/tabla-caja.html',medicamentos = medicamentos)
+
+
+@bp.route('/buscarReceta', methods=['POST'])
+def buscarReceta():
+
+    receta = request.form['receta']
+   
+
+
+    conn = conectar()
+    cursor = conn.cursor()
+    query = "select p.cod_producto,a.cantidad from atencion_producto as a inner join producto as p on a.cod_producto = p.cod_producto where a.cod_atencion = ?"
+    cursor.execute(query,(receta))
+    receta = cursor.fetchall()
+
+ 
+    if receta:
+        return 'Encontrado'
+    else:
+        return 'No'
+
+    
 
 
 @bp.route('/validarFactura', methods=['POST'])
@@ -1471,6 +1534,44 @@ def recetar():
     else:
         return "No"
     
+@bp.route('/reenviarReceta', methods=['POST'])
+def reenviarReceta():
+
+    if request.method == "POST":
+        detalle = request.form['atencion']
+
+
+
+        conn = conectar()
+        cursor = conn.cursor()
+        query = "select a.cod_detalle,p.nom_producto,p.precio,a.cantidad,a.orientacion from atencion_producto as a inner join producto as p on a.cod_producto = p.cod_producto where a.cod_atencion = ?"
+        cursor.execute(query,(detalle))
+        consultas = cursor.fetchall()
+
+        conn = conectar()
+        cursor = conn.cursor()
+        query = "select c.correo_cliente  from atencion as a inner join cliente as c on a.num_cliente = c.num_cliente where a.cod_atencion = ?"
+        cursor.execute(query,(detalle))
+        correo = cursor.fetchone()
+
+        conn = conectar()
+        cursor = conn.cursor()
+        query = "select diagnostico,cod_atencion from atencion where cod_atencion = ?"
+        cursor.execute(query,(detalle))
+        diagnostico = cursor.fetchall()
+
+        print(diagnostico)
+
+
+        enviar_correo_receta(current_app,"Usted tiene una nueva receta",correo[0],'recetar',consultas,diagnostico)
+
+
+        return 'HECHO'
+        
+    else:
+        return "No"
+
+    
 @bp.route('/printReceta', methods=['POST', 'GET'])
 def printReceta():
     num = request.args.get('id')
@@ -1564,7 +1665,7 @@ def printReceta():
     pdf.set_font('Arial', 'B', 10)
     pdf.cell(15, 5, 'Peso: ')
     pdf.set_font('Arial', '', 10)
-    pdf.cell(25, 5, str(ticket[7])+'lb')
+    pdf.cell(30, 5, str(ticket[7])+'lb')
 
 
     pdf.set_font('Arial', 'B', 10)
@@ -1582,9 +1683,9 @@ def printReceta():
     pdf.set_font('Arial', 'B', 10)
     
         # Encabezados de la tabla
-    pdf.cell(30, 10, 'Producto', 1)
-    pdf.cell(15, 10, 'Cantidad', 1)
-    pdf.cell(30, 10, 'Orientacion', 1)
+    pdf.cell(50, 10, 'Producto', 1)
+    pdf.cell(30, 10, 'Cantidad', 1)
+    pdf.cell(50, 10, 'Orientaciones', 1)
     pdf.ln(10)  # Salto de línea
 
     # Iterar sobre los resultados y calcular el descuento
@@ -1601,10 +1702,10 @@ def printReceta():
         pdf.set_font('Arial', '', 10)
 
         # Fila de datos
-        pdf.cell(30, 10, nom_producto, 1, 0)  # Borde para la celda de producto
-        pdf.cell(15, 10, str(cantidad), 1, 0, 'C')  # Cantidad centrada con borde fino
+        pdf.cell(50, 10, nom_producto, 1, 0)  # Borde para la celda de producto
+        pdf.cell(30, 10, str(cantidad), 1, 0, 'C')  # Cantidad centrada con borde fino
         
-        pdf.cell(30, 10, str(descuento_raw), 1, 0, 'C')  # Descuento centrado con borde y nueva línea
+        pdf.cell(50, 10, str(descuento_raw), 1, 0, 'C')  # Descuento centrado con borde y nueva línea
 
         pdf.ln(10)  # Aumenta el espacio entre filas a 6 unidades
 
@@ -1613,6 +1714,7 @@ def printReceta():
 
     pdf.set_font('Arial', 'B', 10)
     pdf.cell(25, 10, 'Diagnóstico: ')
+    pdf.ln(5)
     pdf.set_font('Arial', '', 10)
     pdf.cell(25, 10, str(ticket[11].upper()))
     pdf.ln(1)
