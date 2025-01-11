@@ -8,7 +8,7 @@
             </div>
 
             <div class="table-responsive">
-                <table class="table text-nowrap mb-0 align-middle table-hover " id="tabla_inventario">
+                <table class="table text-nowrap mb-0 align-middle table-hover " id="tabla_ventas">
                     <thead class="text-dark fs-4">
                         <tr>
                             <th class="border-bottom-0">
@@ -96,7 +96,7 @@
 <div id="modal-detalle-venta"></div>
 <input id="detalleVenta" type="hidden" data-bs-toggle="modal" data-bs-target="#modalDetalleFactura">
 <script>
-    var table = $('#tabla_inventario').DataTable({
+    var table = $('#tabla_ventas').DataTable({
         "language": {
             "url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Spanish.json",
             "emptyTable": "Sin Datos",
@@ -107,7 +107,7 @@
         "info": false,
         "ordering": false
     });
-    $("#tabla_inventario tr").click(function () {
+    $("#tabla_ventas tr").click(function () {
         // MANDAMOS A TRAER LOS DATOS
         var id = $(this).attr("id");
 
@@ -129,11 +129,12 @@
         });
 
     });
-    function buscarRegistros() {
+    function buscarDash() {
         var searchTerm = $('#Buscador').val();
 
         // Aplica el término de búsqueda a DataTables
-        $('#tabla_inventario').DataTable().search(searchTerm).draw();
+        $('#tabla_ventas').DataTable().search(searchTerm).draw();
     };
-    $('#Buscador').on('keyup', buscarRegistros)
+    $('#Buscador').on('keyup', buscarDash)
+    
 </script>

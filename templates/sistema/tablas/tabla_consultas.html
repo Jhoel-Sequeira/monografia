@@ -91,7 +91,7 @@
 <div id="modal-detalle-consulta"></div>
 <input id="detalleConsulta" type="hidden" data-bs-toggle="modal" data-bs-target="#modalDetalleConsulta">
 <script>
-    var table = $('#tabla_inventario').DataTable({
+    var table = $('#tabla_consultas').DataTable({
         "language": {
             "url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Spanish.json",
             "emptyTable": "Sin Datos",
@@ -128,7 +128,7 @@
         var searchTerm = $('#Buscador').val();
 
         // Aplica el término de búsqueda a DataTables
-        $('#tabla_inventario').DataTable().search(searchTerm).draw();
+        $('#tabla_consultas').DataTable().search(searchTerm).draw();
     };
     $('#Buscador').on('keyup', buscarRegistros)
 </script>

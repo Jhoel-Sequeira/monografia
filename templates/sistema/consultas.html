@@ -24,13 +24,7 @@
         cargarCompras();
 
     });
-    function buscarRegistros() {
-        var searchTerm = $('#tabla_inventario').val();
-
-        // Aplica el término de búsqueda a DataTables
-        $('#tabla_inventario').DataTable().search(searchTerm).draw();
-    };
-    $('#Buscador').on('keyup', buscarRegistros)
+    
     function cargarCompras() {
         $.ajax({
             url: "{{ url_for('sistema.tablaConsultas') }}",

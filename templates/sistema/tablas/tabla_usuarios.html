@@ -130,4 +130,11 @@
             }
         });
     });
+    function buscarDash() {
+        var searchTerm = $('#Buscador').val();
+
+        // Aplica el término de búsqueda a DataTables
+        $('#tabla_usuarios').DataTable().search(searchTerm).draw();
+    };
+    $('#Buscador').on('keyup', buscarDash)
 </script>
