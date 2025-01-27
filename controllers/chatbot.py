@@ -67,6 +67,31 @@ def procesar_receta(solicitud, usuario,app):
         # Agrega tu lógica para consultar los usuarios en la base de datos
         #CONSULTA LIMITADA
         #receta = db1.execute("select dr.Medicamento,dr.Pasos,dr.Cantidad,dr.Diagnostico from Consulta as c inner join Usuarios as u ON c.IdUsuario = u.Id_Usuario inner join Recetas as r on c.Id_Consulta = r.IdConsulta inner join DetalleReceta as dr on r.Id_Receta = dr.IdReceta WHERE u.Id_Usuario = :correo ORDER BY c.Fecha DESC limit 1", correo = usuario)
+        conn = conectar()
+        cursor = conn.cursor()
+        query = "select a.cod_detalle,p.nom_producto,p.precio,a.cantidad,a.orientacion from atencion_producto as a inner join producto as p on a.cod_producto = p.cod_producto where a.cod_atencion = ?"
+        cursor.execute(query,(detalle))
+        consultas = cursor.fetchall()
+
+        conn = conectar()
+        cursor = conn.cursor()
+        query = "select c.correo_cliente  from atencion as a inner join cliente as c on a.num_cliente = c.num_cliente where a.cod_atencion = ?"
+        cursor.execute(query,(detalle))
+        correo = cursor.fetchone()
+
+        conn = conectar()
+        cursor = conn.cursor()
+        query = "select diagnostico,cod_atencion from atencion where cod_atencion = ?"
+        cursor.execute(query,(detalle))
+        diagnostico = cursor.fetchall()
+
+        print(diagnostico)
+
+
+        enviar_correo_receta(current_app,"Usted tiene una nueva receta",correo[0],'recetar',consultas,diagnostico)
+
+        
+        
         receta = db1.execute("select dr.* from Consulta as c inner join Usuarios as u ON c.IdUsuario = u.Id_Usuario inner join Mascota as m On c.IdMascota = m.Id_Mascota inner join Recetas as r on c.Id_Consulta = r.IdConsulta inner join DetalleReceta as dr on r.Id_Receta = dr.IdReceta WHERE m.IdUsuario = :correo ORDER BY c.Fecha DESC", correo = usuario)
         correo = db1.execute("select Correo from Usuarios WHERE Id_Usuario = :correo ", correo = usuario)
         
