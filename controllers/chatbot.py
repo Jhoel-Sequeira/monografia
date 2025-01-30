@@ -4,7 +4,8 @@ import requests
 from datetime import date
 from datetime import datetime, timedelta
 from cs50 import SQL
-from controllers.correo import enviar_correo, enviar_correo_registro
+from flask import Blueprint, jsonify, render_template, request,session,redirect,make_response,current_app
+from controllers.correo import enviar_correo, enviar_correo_receta, enviar_correo_registro
 from conexion import conectar
 nlp = spacy.load('es_core_news_sm')
 
@@ -52,9 +53,10 @@ def procesar_consulta(solicitud, usuario):
         conn.close()
         if len(citas) == 0:
             return "No tiene registro de citas."
-
+        print(citas[0])
         fecha_hora = citas[0]
-        fecha, hora = fecha_hora.split(' ')
+        fecha = fecha_hora.strftime('%Y-%m-%d')  # Ejemplo: '2025-01-03'
+        hora = fecha_hora.strftime('%H:%M:%S')   # Ejemplo: '13:00:00'
 
         retorno = f"Su ultima cita fue: {fecha} a las {hora}."
         return retorno
@@ -67,53 +69,68 @@ def procesar_receta(solicitud, usuario,app):
         # Agrega tu lógica para consultar los usuarios en la base de datos
         #CONSULTA LIMITADA
         #receta = db1.execute("select dr.Medicamento,dr.Pasos,dr.Cantidad,dr.Diagnostico from Consulta as c inner join Usuarios as u ON c.IdUsuario = u.Id_Usuario inner join Recetas as r on c.Id_Consulta = r.IdConsulta inner join DetalleReceta as dr on r.Id_Receta = dr.IdReceta WHERE u.Id_Usuario = :correo ORDER BY c.Fecha DESC limit 1", correo = usuario)
+        
+        
+        conn = conectar()
+        cursor = conn.cursor()
+        query = "select top 1 a.cod_atencion,c.correo_cliente  from atencion a inner join cliente as c on a.num_cliente = c.num_cliente where c.num_cliente = ? order by fecha_atencion desc"
+        cursor.execute(query,(usuario))
+        cod_atencion = cursor.fetchone()
+
+        correo = cod_atencion[1]
+
+        
         conn = conectar()
         cursor = conn.cursor()
         query = "select a.cod_detalle,p.nom_producto,p.precio,a.cantidad,a.orientacion from atencion_producto as a inner join producto as p on a.cod_producto = p.cod_producto where a.cod_atencion = ?"
-        cursor.execute(query,(detalle))
+        cursor.execute(query,(cod_atencion[0]))
         consultas = cursor.fetchall()
 
-        conn = conectar()
-        cursor = conn.cursor()
-        query = "select c.correo_cliente  from atencion as a inner join cliente as c on a.num_cliente = c.num_cliente where a.cod_atencion = ?"
-        cursor.execute(query,(detalle))
-        correo = cursor.fetchone()
 
         conn = conectar()
         cursor = conn.cursor()
         query = "select diagnostico,cod_atencion from atencion where cod_atencion = ?"
-        cursor.execute(query,(detalle))
+        cursor.execute(query,(cod_atencion[0]))
         diagnostico = cursor.fetchall()
 
         print(diagnostico)
 
-
-        enviar_correo_receta(current_app,"Usted tiene una nueva receta",correo[0],'recetar',consultas,diagnostico)
-
-        
-        
-        receta = db1.execute("select dr.* from Consulta as c inner join Usuarios as u ON c.IdUsuario = u.Id_Usuario inner join Mascota as m On c.IdMascota = m.Id_Mascota inner join Recetas as r on c.Id_Consulta = r.IdConsulta inner join DetalleReceta as dr on r.Id_Receta = dr.IdReceta WHERE m.IdUsuario = :correo ORDER BY c.Fecha DESC", correo = usuario)
-        correo = db1.execute("select Correo from Usuarios WHERE Id_Usuario = :correo ", correo = usuario)
-        
-        if receta:
-            diagnostico = db1.execute('select c.Diagnostico,re.Id_Receta From Consulta as c inner join Recetas as re ON c.Id_Consulta = re.IdConsulta Where re.Id_Receta = :id order by re.Id_Receta Desc limit 1',id = receta[0]['IdReceta'])
-            
-            enviar_correo(app,"Usted tiene una nueva receta",correo[0]['Correo'],"","",receta,diagnostico)
+        if consultas:
+            enviar_correo_receta(current_app,"Usted tiene una nueva receta",correo,'recetar',consultas,diagnostico)
             return "Receta Enviada.."
         else:
             return "Usted no tiene ninguna receta."
+
     elif 'receta' in solicitud and 'tener' in solicitud and ('producto' in solicitud or 'existe' in solicitud or 'existencia' in solicitud):
         # Agrega tu lógica para consultar los usuarios en la base de datos
-        receta = db1.execute("select dr.Medicamento,dr.Cantidad from Consulta as c inner JOIN Mascota as m on c.IdMascota = m.Id_Mascota inner join Usuarios as u ON c.IdUsuario = u.Id_Usuario inner join Recetas as r on c.Id_Consulta = r.IdConsulta inner join DetalleReceta as dr on r.Id_Receta = dr.IdReceta WHERE m.IdUsuario = :correo ORDER BY c.Fecha DESC ", correo = usuario)
+        conn = conectar()
+        cursor = conn.cursor()
+        query = "select top 1 a.cod_atencion,c.correo_cliente  from atencion a inner join cliente as c on a.num_cliente = c.num_cliente where c.num_cliente = ? order by fecha_atencion desc"
+        cursor.execute(query,(usuario))
+        cod_atencion = cursor.fetchone()
+
+        correo = cod_atencion[1]
+
+        
+        conn = conectar()
+        cursor = conn.cursor()
+        query = "select p.cod_producto,p.nom_producto,a.cantidad,a.orientacion from atencion_producto as a inner join producto as p on a.cod_producto = p.cod_producto where a.cod_atencion = ?"
+        cursor.execute(query,(cod_atencion[0]))
+        receta = cursor.fetchall()
+        
         control = 1
         retorno = ""
         if receta:
             for item in receta:
-                existencia = db1.execute("select * from Producto where Nombre = :nombre and Stock > :cant ", nombre = item['Medicamento'],cant = item['Cantidad'])
+                conn = conectar()
+                cursor = conn.cursor()
+                query = "select * from Producto where cod_producto = ? and Stock > ? "
+                cursor.execute(query,(item[0],item[2]))
+                existencia = cursor.fetchone()
                 if not existencia:
-                    retorno += "\n Aun no contamos con este producto: "+item['Medicamento'] +"\n"
+                    retorno += "\n Aun no contamos con este producto: "+item[1] +"\n"
                 else:
-                    retorno += "\n Contamos con este producto: "+item['Medicamento']+"\n"
+                    retorno += "\n Contamos con este producto: "+item[1]+"\n"
             return retorno
         else:
             return "Usted no tiene recetas."   
@@ -140,7 +157,7 @@ def obtener_proximo_dia_semana(dia_semana):
 
 
 def es_feriado_nacional(fecha):
-    url = f"https://calendarific.com/api/v2/holidays?api_key=TU_CLAVE_DE_API&country=NI&year={fecha.year}&month={fecha.month}&day={fecha.day}"
+    url = f"https://calendarific.com/api/v2/holidays?api_key=zQNr5LqhJK3UHlgIkShftXX0g9oRnHlK&country=NI&year={fecha.year}&month={fecha.month}&day={fecha.day}"
     response = requests.get(url)
     
     if response.status_code == 200:
@@ -156,7 +173,7 @@ def es_feriado_nacional(fecha):
 
 
 def procesar_abrir(solicitud, usuario):
-    if 'proximo' in solicitud or 'este' in solicitud:
+    if 'proximo' in solicitud or 'este' in solicitud or 'abrirar' in solicitud or 'abrir' in solicitud:
         if 'lunes' in solicitud:
             fecha = obtener_proximo_dia_semana("lunes")
             if es_feriado_nacional(fecha):

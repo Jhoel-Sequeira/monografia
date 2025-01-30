@@ -1569,6 +1569,124 @@ TIMELINE */
 }
 
 
+
+
+
+
+.chatbot {
+  width: 400px;
+  height: 500px;
+  background: #fff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.chat-window {
+  flex: 1;
+  padding: 10px;
+  overflow-y: auto;
+  border-bottom: 1px solid #ddd;
+}
+
+
+
+.chat-bubble.bot {
+  background-color: #e9f5ff;
+  color: #333;
+  text-align: left;
+}
+
+.chat-bubble.user {
+  background-color: #d4edda;
+  color: #333;
+  text-align: right;
+  margin-left: auto;
+}
+
+.chat-input {
+  display: flex;
+  padding: 10px;
+  border-top: 1px solid #ddd;
+  background-color: #f9f9f9;
+}
+
+.chat-input input {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  font-size: 14px;
+  outline: none;
+}
+
+.chat-input button {
+  margin-left: 10px;
+  padding: 10px 15px;
+  background-color: #007bff;
+  border: none;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.chat-input button:hover {
+  background-color: #0056b3;
+}
+
+.chat-bubble i {
+  margin-right: 5px;
+  color: #ffffff;
+}
+
+.burbuja{
+  font-size: 16px;
+  padding: 5px;
+  background-color: #7bb0e9;
+  border-bottom-right-radius: 10px;
+  border-bottom-left-radius: 10px;
+  border-top-right-radius: 10px;
+  color: white;
+}
+
+.burbujaCliente{
+  margin-left: 20px;
+  width: 98%;
+  padding: 5px;
+  font-size: 16px;
+  background-color: #7be99c;
+  border-bottom-right-radius: 10px;
+  border-bottom-left-radius: 10px;
+  border-top-left-radius: 10px;
+  color: white;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 .Chatbot {
   border-inline-start-color: #eee;
 }
@@ -1586,6 +1704,12 @@ TIMELINE */
   color: black;
   font-size: 12px;
   align-items: start;
+  margin: 0px 5px;
+}
+.chat-bubble1 .fas{
+  color: rgb(114, 114, 114);
+  font-size: 20px;
+
 }
 
 .floating-access-button {
