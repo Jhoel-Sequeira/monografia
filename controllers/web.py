@@ -763,7 +763,10 @@ def recibirMensaje():
 
 
 # FIN CHATBOT
+# BUSCAR USUARIOS EXISTENTES
 
+
+# FIN BUSCAR USUARIOS
 @bp.route('/servicios')
 def servicios():
     return render_template('web/servicios.html')
