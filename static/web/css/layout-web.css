@@ -1543,8 +1543,9 @@ TIMELINE */
 
   background-color: white;
   height: 352px;
-  overflow-y: scroll;
+  overflow: scroll;
   position: relative;
+  margin: 1;
   padding: 0;
 }
 
@@ -1662,6 +1663,9 @@ TIMELINE */
   border-bottom-left-radius: 10px;
   border-top-left-radius: 10px;
   color: white;
+}
+.chat-messages::--webkit-scrollbar {
+	display: none !important;
 }
 
 
