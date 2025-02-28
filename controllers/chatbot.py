@@ -3,7 +3,7 @@ import spacy
 import requests
 from datetime import date
 from datetime import datetime, timedelta
-from cs50 import SQL
+
 from flask import Blueprint, jsonify, render_template, request,session,redirect,make_response,current_app
 from controllers.correo import enviar_correo, enviar_correo_receta, enviar_correo_registro
 from conexion import conectar
