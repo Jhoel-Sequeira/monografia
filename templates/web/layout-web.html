@@ -20,7 +20,7 @@
         integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
     <!-- js files -->
     <script src="../../static/web/js/validacion_registro_usuario.js"></script>
-    <script src="../../static/js/Validaciones-contraseña-codigos.js"></script>
+
     <!-- Animaciones js -->
     <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/> -->
 
@@ -61,11 +61,11 @@
             <a href="/tienda">Tienda</a>
             <a href="/servicios">Servicios</a>
             <a href="/clientes">Clientes</a>
-            {%if rol == "Cliente"%}
+            {%if session.rol == "CLIENTE"%}
             <a href="/consultas">Mis Consultas</a>
             {%endif%}
         </nav>
-        {%if rol == "Cliente"%}
+        {%if session.rol == "CLIENTE"%}
         <div class="icons1">
             <div class="fas fa-bars" id="menu-btn1"></div>
             <a href="/deslog" class="fas fa-sign-out-alt"></a>

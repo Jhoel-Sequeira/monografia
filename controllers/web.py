@@ -30,6 +30,8 @@ from openpyxl import Workbook
 from openpyxl.drawing.image import Image
 from openpyxl.styles import Alignment,Font,Border,Side
 
+from controllers.correo import enviar_usuario
+
 bp = Blueprint('web', __name__)
 
 
@@ -96,12 +98,16 @@ def login():
                     session["pass"] = contraseña
                     session['rol'] = rows[6]
 
-                    if session['rol'] == 'administrador' or session['rol'] != 'usuario':
+                    if session['rol'] == 'administrador' or session['rol'] == 'usuario':
                          return redirect('/sistema')  # Cambia esto por la ruta correcta de sistema.py
                     else:
                         #session['last_seen'] = datetime.now()
+                         #aca traemos las consultas del cliente logeado
+                    
                         
-                        return 'exito'
+                        #receta = db1.execute('select * from DetalleReceta Where IdReceta = :rec',rec = historial[0]['Id_Receta'])
+                        return render_template('web/cliente.html',mascota = '',rol =session["rol"],nombre =session["nombre"], cons = '')
+                                
 
                     
             else:
@@ -111,6 +117,34 @@ def login():
 
 
 # FIN LOGIN
+
+# INICIO CONSULTAS
+@bp.route('/traerCitas')
+def traerCitas():
+    
+    conn = conectar()
+    cursor = conn.cursor()
+    query = "select a.cod_atencion,c.nombres_cliente,a.fecha_atencion,e.NombreEstado from atencion as a inner join cliente as c on a.num_cliente = c.num_cliente INNER JOIN estado as e on a.id_estado = e.id_estado where e.NombreEstado = 'AGENDADO' and c.num_cliente = ?"
+    cursor.execute(query,(session['id']))
+    agendas = cursor.fetchall()
+    agenda= []
+    for fila in agendas:
+        fecha_inicio = fila[2]
+        fecha_fin = fecha_inicio + timedelta(minutes=30)  # Suma 30 minutos a la hora de inicio
+
+        agendas = {
+            'numero': fila[0],
+            'cliente': fila[1],
+            'estado': fila[3],
+            'fecha': fecha_inicio.strftime('%Y-%m-%d %H:%M:%S'),  
+            'fechafin': fecha_fin.strftime('%Y-%m-%d %H:%M:%S') 
+        }
+        agenda.append(agendas)
+
+    return ''+str(agenda)
+
+
+#FIN CONSULTAS
 
 # Buscador de la tienda
 @bp.route('/buscarProducto', methods=['POST'])
@@ -764,9 +798,141 @@ def recibirMensaje():
 
 # FIN CHATBOT
 # BUSCAR USUARIOS EXISTENTES
+@bp.route('/buscarusu', methods =["POST","GET"])
+def buscarusu():
+    if request.method == "POST":
+        usuario = request.form['usuario']
+        
+        conn = conectar()
+        cursor = conn.cursor()
+        query = 'SELECT * from Credenciales WHERE Usuario = ?'
+        cursor.execute(query,(usuario))
+        existente = cursor.fetchone()
+        if existente:
+            return "ya hay"
+        else:
+            return "no existe"
 
+@bp.route('/buscarCorreo', methods =["POST","GET"])
+def buscarCorreo():
+    if request.method == "POST":
+        correo = request.form['correo']
+        
+        conn = conectar()
+        cursor = conn.cursor()
+        query = 'SELECT * from cliente WHERE correo_cliente like ?'
+        cursor.execute(query,(correo+'%'))
+        existente = cursor.fetchone()
+        if existente:
+            return "ya hay"
+        else:
+            return "no existe"
 
 # FIN BUSCAR USUARIOS
+#  AÑADIR USUARIO
+@bp.route('/nuevou',methods=["GET", "POST"])
+def nuevou():
+    if request.method == "POST":
+        nombres = request.form['nombres']
+        apellidos = request.form['apellidos']
+        direccion = request.form['direccion']
+        telefono = request.form['telefono']
+        celular = request.form['celular']
+        correo = request.form['correo']
+        usuario = request.form['loginUser']
+        contraseña = request.form['loginPassword']
+        flag = request.form['flag']
+        print(flag)
+        print("ENTROOOO")
+        if flag:
+            rol = request.form['rol']
+            # verificacion = db1.execute('SELECT * from credenciales Where Usuario = :u',u = usuario)
+            # db1.execute("INSERT INTO Credenciales VALUES(NULL,:usu,:passw,:rol)",usu = usuario,passw = generate_password_hash(contraseña),rol = rol)
+            
+            conn = conectar()
+            cursor = conn.cursor()
+            query = 'INSERT INTO credenciales (usuario,contrasena,rol,cargo) VALUES (?,?,?,?)'
+            cursor.execute(query, (usuario,generate_password_hash(contraseña),rol,4))
+            conn.commit()
+            cursor.close()
+            
+            # credenciales = db1.execute('select Id_Credenciales from Credenciales  order by Id_Credenciales desc limit 1')
+
+
+            conn = conectar()
+            cursor = conn.cursor()
+            query = 'SELECT id_credencial from credenciales order by id_credencial desc'
+            cursor.execute(query)
+            existente = cursor.fetchone()
+
+
+
+            # db1.execute("INSERT INTO cliente VALUES(NULL,:name,:lastna,:tel,:cel,:corr,:dir,1,:cred,null)",
+            #             name=nombres , lastna=apellidos , tel = telefono,cel = celular,corr = correo,dir=direccion,cred = credenciales[0]['Id_Credenciales'])
+            
+            conn = conectar()
+            cursor = conn.cursor()
+            query = 'INSERT INTO cliente (nombres_cliente,id_estado,apellidos_cliente,direccion_cliente,correo_cliente,id_credencial,telefono) VALUES (?,1,?,?,?,?,?)'
+            cursor.execute(query, (nombres,apellidos,direccion,correo,existente[0],telefono))
+            conn.commit()
+            cursor.close()
+
+
+            return "yes"
+        else:
+            conn = conectar()
+            cursor = conn.cursor()
+            query = 'INSERT INTO credenciales (usuario,contrasena,rol,cargo) VALUES (?,?,?,?)'
+            cursor.execute(query, (usuario,generate_password_hash(contraseña),4,4))
+            conn.commit()
+            cursor.close()
+            
+            # credenciales = db1.execute('select Id_Credenciales from Credenciales  order by Id_Credenciales desc limit 1')
+
+
+            conn = conectar()
+            cursor = conn.cursor()
+            query = 'SELECT id_credencial from credenciales order by id_credencial desc'
+            cursor.execute(query)
+            existente = cursor.fetchone()
+
+
+
+            # db1.execute("INSERT INTO cliente VALUES(NULL,:name,:lastna,:tel,:cel,:corr,:dir,1,:cred,null)",
+            #             name=nombres , lastna=apellidos , tel = telefono,cel = celular,corr = correo,dir=direccion,cred = credenciales[0]['Id_Credenciales'])
+            
+            conn = conectar()
+            cursor = conn.cursor()
+            query = 'INSERT INTO cliente (nombres_cliente,id_estado,apellidos_cliente,direccion_cliente,correo_cliente,id_credencial,telefono) VALUES (?,1,?,?,?,?,?)'
+            cursor.execute(query, (nombres,apellidos,direccion,correo,existente[0],telefono))
+            conn.commit()
+            cursor.close()
+
+            return 'yes'
+    else:
+        return render_template('nuevous.html')
+    
+
+@bp.route('/correo',methods=["GET", "POST"])
+def correo():
+    if request.method == "POST":
+        flag = request.form['flag']
+        print(flag)
+        if flag == "usuario":
+            nombres = request.form['nombres']
+            apellidos = request.form['apellidos']
+            correoc = request.form['correo']
+            usuario = request.form['loginUser']
+            contraseña = request.form['loginPassword']
+            
+            enviar_usuario(current_app,"Bienvenido a Nuestra Familia",correoc,'usuario',usuario,contraseña)
+            return "done"
+        
+       
+    else:
+        return render_template('nuevous.html')
+
+# FIN AÑADIR USUARIO
 @bp.route('/servicios')
 def servicios():
     return render_template('web/servicios.html')
@@ -775,3 +941,7 @@ def servicios():
 def clientes():
     return render_template('web/clientes.html')
 
+@bp.route('/cerrarSesion')
+def cerrarSesion():
+    session.clear()
+    return render_template('web/index.html')

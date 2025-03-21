@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 import os
 import locale
 from fpdf import FPDF
-from flask import Blueprint, jsonify, render_template, request,session,redirect,make_response,current_app
+from flask import Blueprint, jsonify, render_template, request,session,redirect,make_response,current_app,url_for
 from functools import wraps
 from conexion import conectar
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -35,7 +35,7 @@ def sistema_route():
 @bp.route('/deslog')
 def deslog():
     session.clear()
-    return render_template('sistema/home.html')
+    return redirect(url_for('web.home'))
 
 # MODULO: INVENTARIO
 

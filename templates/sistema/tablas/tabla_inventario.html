@@ -3,13 +3,24 @@
         <div class="card-body p-4">
             <div class="d-sm-flex d-block align-items-center justify-content-between mb-9">
                 <h5 class="card-title fw-semibold mb-4">Productos</h5>
-                
-                <button class="btn btn-primary" id="agregar" onclick="agregarProducto()">Agregar</button>
 
+                <button class="btn btn-primary" id="agregar" onclick="agregarProducto()">
+                    Agregar
+                </button>
+            </div>
+            <div class="d-sm-flex d-block align-items-center justify-content-between mb-9 bg-primary">
+                <div class="row p-3">
+                    <div class="col" style="width: 10px !important;">
+                        <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#filtromodal">
+                            <i class="fa-solid fa-filter"></i>
+                        </button>
+                    </div>
+                   
+                </div>
             </div>
 
             <div class="table-responsive">
-                <table class="table text-nowrap mb-0 align-middle table-hover " id="tabla_inventario">
+                <table class="table text-nowrap mb-0 align-middle table-hover" id="tabla_inventario">
                     <thead class="text-dark fs-4">
                         <tr>
                             <th class="border-bottom-0">
@@ -59,7 +70,6 @@
                                 <!-- <h6 class="fw-semibold mb-1">{{producto.stock_critico}}</h6> -->
                             </td>
                             <td class="border-bottom-0">
-
                                 <span class="fw-normal">{{producto.unidad}}</span>
                                 <!-- <h6 class="fw-semibold mb-1">{{producto.nom_proveedor}}</h6> -->
                             </td>
@@ -83,18 +93,221 @@
         </div>
     </div>
 </div>
+<div class="modal fade " id="filtromodal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Filtros</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="container mt-3" id="filtro">
+                    <div class="row">
+                        <div class="col-12">
+                            <select multiple name="filtro" id="filtroOpc" class="filter-multi-select">
+
+                                <!-- <option value="1">Proveedor</option> -->
+                                <option value="2">Fecha</option>
+                                <!-- <option value="3">Estado</option>
+                                <option value="4">Digitador</option>
+                                <option value="5">Verificador</option> -->
+                            </select>
+
+                        </div>
+
+                    </div>
+                    <div class="row mt-3 justify-content-start" id="filtrosInputs">
+                        <div class="col-6" id="proveedor_filtro">
+                            <div class="form-outline">
+                                <label class="form-label" for="proveedor">Nombre proveedor</label>
+                                <input type="text" id="IdProveedor" value="" style="text-transform:uppercase;"
+                                    onkeyup="this.value=this.value.toUpperCase()" style="text-transform:uppercase;"
+                                    name="IdProveedor" placeholder="Ingrese el nombre..." required="required"
+                                    class="form-control" value="" />
+
+                            </div>
+                            <div style="background-color:#fff;position: relative; height: 20%; width: 100%; margin-left: 0px;"
+                                id="totalprov">
+                                <div class="info" id="listaproveedor">
+                                </div>
+                            </div>
+                            <input type="hidden" name="" id="provedor_id">
+
+
+                        </div>
+
+                        <div class="col-6" id="fecha_filtro">
+                            <div class="form-outline">
+                                <label class="form-label" for="proveedor">Fecha</label>
+                                <input type="text" id="Fecha" value="" name="Fecha" placeholder="Ingrese la cédula..."
+                                    required="required" class="form-control" value="" />
+
+                            </div>
+                            <input type="hidden" placeholder="Pick date rage" id="1" value="" />
+                            <input type="hidden" placeholder="Pick date rage" id="2" value="" />
+                        </div>
+                        <div class="col-6" id="estado_filtro">
+                            <div class="form-outline">
+                                <label class="form-label" for="proveedor">Estado</label>
+
+                                <select class="form-control" name="IdEstado" id="IdEstado">
+                                    <!-- <option value="3">Pendiente</option> -->
+                                    <option value="4">Completado</option>
+                                    <option value="5">Por validar</option>
+                                    <option value="6">Cancelado</option>
+                                    <option value="9">Validado</option>
+                                    <!-- <option value="7">Desbloqueados</option> -->
+                                </select>
+
+                            </div>
+
+                        </div>
+
+                        <div class="col-6" id="digitador_filtro">
+                            <div class="form-outline">
+                                <label class="form-label" for="proveedor">Digitador</label>
+
+                                <select name="IdDigitador" class="form-control" id="IdDigitador">
+                                    
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-6" id="verificador_filtro">
+                            <div class="form-outline">
+                                <label class="form-label" for="proveedor">Verificador</label>
+
+                                <select name="IdVerificador" class="form-control" id="IdVerificador">
+                                    
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <!-- x -->
+                <button type="button" onclick="filtrar()" class="btn btn-primary">Buscar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+
+    var fecha = new Date();
+    hoyf = formatearFecha(fecha);
+
+    function formatearFecha(fecha) {
+        var formatted_date = (fecha.getMonth() + 1) + "/" + fecha.getDate() + "/" + fecha.getFullYear()
+        return formatted_date;
+    }
+    moment.locale('es');
+    $("#Fecha").daterangepicker(
+        {
+            "locale": {
+
+                "format": "YYYY-MM-DD",
+                "separator": " a ",
+                "applyLabel": "Aplicar",
+                "cancelLabel": "Cancelar",
+                "fromLabel": "Desde",
+                "toLabel": "hasta",
+                "customRangeLabel": "Custom",
+            }
+        },
+        function (start, end, label) {
+
+            $("#1").val(start.format("YYYY-MM-DD"));
+            $("#2").val(end.format("YYYY-MM-DD"));
+
+        }
+    );
+</script>
 
 <script>
-    var table = $('#tabla_inventario').DataTable({
-        "language": {
-            "url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Spanish.json",
-            "emptyTable": "Sin Datos",
-            "zeroRecords": "No se encontraron registros coincidentes",
+   
+    $(document).on("change", "#filtroOpc", function (event) {
+        var selected = $('#filtroOpc').val();
+        $.ajax({
+            url: "/valorTablaAdminInv",
+            type: "POST",
+            data: {
+                valor: selected,
+                po: $('#buscarAdmin').val()
+
+            },
+            success: function (response) {
+                $('#tabla-adm').html(response);
+                $('#tabla-adm').append(response.htmlresponse);
+            },
+            error: function (error) { // console.log(error);
+            }
+        });
+
+    });
+    function vacioVer() {
+        opc = "po"
+        $.ajax({
+            url: "/valorTablaAdminInv",
+            type: "POST",
+            data: {
+                valor: opc,
+                po: ""
+
+            },
+            success: function (response) {
+                $('#tabla-adm').html(response);
+                $('#tabla-adm').append(response.htmlresponse);
+            },
+            error: function (error) { // console.log(error);
+            }
+        });
+    }
+    $(document).ready(function () {
+      
+
+    });
+    var opc = "po";
+    var buscar = function () {
+        var proveedor = $('#buscarAdmin').val();
+        if (proveedor != "") {
+            $.ajax({
+                url: "/valorTablaAdminInv",
+                type: "POST",
+                data: {
+                    valor: opc,
+                    po: $('#buscarAdmin').val()
+
+                },
+                success: function (response) {
+                    $('#tabla-adm').html(response);
+                    $('#tabla-adm').append(response.htmlresponse);
+                },
+                error: function (error) { // console.log(error);
+                }
+            });
+        } else {
+            vacioVer();
+
+            $('#contenerLista').hide();
+        }
+
+
+    }
+    $("#buscarAdmin").on('keyup', buscar);
+
+</script>
+
+<script>
+    var table = $("#tabla_inventario").DataTable({
+        language: {
+            url: "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Spanish.json",
+            emptyTable: "Sin Datos",
+            zeroRecords: "No se encontraron registros coincidentes",
         },
-        "lengthChange": false,
-        "searching": true,
-        "info": false,
-        "ordering": false
+        lengthChange: false,
+        searching: true,
+        info: false,
+        ordering: false,
     });
     $("#tabla_inventario tr").click(function () {
         // MANDAMOS A TRAER LOS DATOS
@@ -104,26 +317,181 @@
             url: "{{ url_for('sistema.mostrarDetalleProducto') }}",
             type: "POST",
             data: {
-                num: id
+                num: id,
+            },
+            success: function (response) {
+                $("#modal-detalle").html(response);
+                $("#modal-detalle").append(response.htmlresponse);
+                $("#launchDetalle").click();
+            },
+            error: function (error) {
+                // console.log(error);
+            },
+        });
+    });
+
+    function buscarDash() {
+        var searchTerm = $("#Buscador").val();
+
+        // Aplica el término de búsqueda a DataTables
+        $("#tabla_inventario").DataTable().search(searchTerm).draw();
+    }
+    $("#Buscador").on("keyup", buscarDash);
+
+
+
+
+    // OCULTAMOS TODOS LOS FILTROS DE LOS TEXTOS
+    $('#proveedor_filtro').hide();
+    $('#fecha_filtro').hide();
+    $('#estado_filtro').hide();
+    $('#digitador_filtro').hide();
+    $('#verificador_filtro').hide();
+
+
+    $('#filtroOpc').filterMultiSelect({
+        selectAllText: 'Todo',
+        placeholderText: 'filtrar por..',
+        filterText: 'buscar',
+        caseSensitive: true,
+    });
+    $('#filtroOpc').on("optionselected", function (e) {
+
+        var filtro = e.detail.label
+        var b = true;
+        var filtroJson = JSON.stringify(getJson(b), null, "  ");
+        $('#filtrosInput').text(filtroJson);
+        //    MANDAMOS A ESCRIBIR LOS FILTROS QUE HA SELECCIONADO EL USUARIO
+        if (filtro == 'Proveedor') {
+            $('#proveedor_filtro').show();
+
+        } else if (filtro == 'Fecha') {
+            $('#fecha_filtro').show();
+
+        } else if (filtro == 'Estado') {
+            $('#estado_filtro').show();
+
+        } else if (filtro == 'Digitador') {
+            $('#digitador_filtro').show();
+
+        } else if (filtro == 'Verificador') {
+            $('#verificador_filtro').show();
+
+        }
+
+    });
+
+    // BUSCAR PROVEEDOR
+
+    var buscarProveedor = function () {
+        if ($("#IdProveedor").val() != "") {
+
+            $.ajax({
+                url: "/buscarProveedorApi",
+                type: "POST",
+                data: {
+                    proveedor: $("#IdProveedor").val(),
+                },
+                success: function (response) {
+                    $("#listaproveedor").html(response);
+                    $("#listaproveedor").append(response.htmlresponse);
+                    $("#listaproveedor").show();
+                    $("#totalprov").show();
+                    $("#busqueda button[name=det]").click(function () {
+                        $('#provedor_id').val($(this).val())
+                        $("#IdProveedor").val($(this).text());
+                        $("#listaproveedor").hide();
+                        $("#totalprov").hide();
+                    });
+                },
+                error: function (error) {
+                    // console.log(error);
+                },
+            });
+        } else {
+            $("#listaproveedor").hide();
+            $("#totalprov").hide();
+        }
+
+
+
+
+    }
+    $("#IdProveedor").on('keyup', buscarProveedor);
+
+    // =========================
+
+
+
+
+
+
+
+
+    $('#filtroOpc').on("optiondeselected", function (e) {
+
+        var filtros = e.detail.label;
+        var b = true;
+        var filtroJson = JSON.stringify(getJson(b), null, "  ");
+
+
+
+        if (filtros == 'Proveedor') {
+            $('#proveedor_filtro').hide();
+
+        } else if (filtros == 'Fecha') {
+            $('#fecha_filtro').hide();
+
+        } else if (filtros == 'Estado') {
+            $('#estado_filtro').hide();
+
+        } else if (filtros == 'Digitador') {
+            $('#digitador_filtro').hide();
+
+        } else if (filtros == 'Verificador') {
+            $('#verificador_filtro').hide();
+
+        }
+    });
+
+    var getJson = function (b) {
+        var result = $.fn.filterMultiSelect.applied
+            .map((e) => JSON.parse(e.getSelectedOptionsAsJson(b)))
+            .reduce((prev, curr) => {
+                prev = {
+                    ...prev,
+                    ...curr,
+                };
+                return prev;
+            });
+        return result;
+    }
+    // new MultiSelectTag('filtroOpc')  // id
+    function filtrar() {
+
+        var inputs = $('#filtrosInputs :input:visible');
+        var values = {};
+
+        inputs.each(function () {
+            values[this.name] = $(this).val();
+        });
+
+        console.log(values);
+        var JSon = JSON.stringify(values);
+        $.ajax({
+            url: "/addFiltroInv",
+            type: "POST",
+            data: {
+                filtro: JSon,
 
             },
             success: function (response) {
-
-                $('#modal-detalle').html(response);
-                $('#modal-detalle').append(response.htmlresponse);
-                $('#launchDetalle').click();
+                $('#tabla-adm').html(response);
+                $('#tabla-adm').append(response.htmlresponse);
             },
             error: function (error) { // console.log(error);
             }
         });
+    }
 
-    });
-
-    function buscarDash() {
-        var searchTerm = $('#Buscador').val();
-
-        // Aplica el término de búsqueda a DataTables
-        $('#tabla_inventario').DataTable().search(searchTerm).draw();
-    };
-    $('#Buscador').on('keyup', buscarDash)
 </script>

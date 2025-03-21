@@ -70,7 +70,7 @@ $(document).ready(function () {
       alert("a")
   
       $.ajax({
-        url: '/buscarUsuarioNuevo',
+        url: "{{ url_for('web.buscarUsuarioNuevo') }}",
         type: 'POST',
         data: {
           usuario: usuario,
@@ -144,7 +144,7 @@ $(document).ready(function () {
   
   function añadir() {
     $.ajax({
-      url: '/nuevou',
+      url: "{{ url_for('web.nuevou') }}",
       type: 'POST',
       data: {
         nombres: $('#nombre').val(),
@@ -160,7 +160,7 @@ $(document).ready(function () {
       },
       success: function (response) {
         $.ajax({
-          url: '/correo',
+          url: "{{ url_for('web.correo') }}",
           type: 'POST',
           data: {
             nombres: $('#nombre').val(),
