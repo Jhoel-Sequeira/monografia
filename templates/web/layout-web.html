@@ -67,6 +67,16 @@
         </nav>
         {%if session.rol == "CLIENTE"%}
         <div class="icons1">
+            {%if session%}
+            
+            <a   href="/carrito"  class="fas fa-shopping-cart" ></a>
+                <span  id="cart-count" class="cart-count">0</span>
+            </a>
+            {%else%}
+            <a   onclick="log()" class="fas fa-shopping-cart" ></a>
+                <span  id="cart-count" class="cart-count">0</span>
+            </a>
+            {%endif%}
             <div class="fas fa-bars" id="menu-btn1"></div>
             <a href="/deslog" class="fas fa-sign-out-alt"></a>
         </div>

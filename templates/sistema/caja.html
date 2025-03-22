@@ -390,19 +390,19 @@
   <script>
     function agregarReceta() {
       crearFacturaReceta("");
-      alert('fuera receta');
-      // 
+      alert("fuera receta");
+      //
     }
-    function recetaAFactura(){
+    function recetaAFactura() {
       $.ajax({
         url: "{{ url_for('sistema.agregarReceta') }}",
         type: "POST",
         data: {
           num: $("#facturaId").val(),
-          receta: $("#receta").val()
+          receta: $("#receta").val(),
         },
         success: function (response) {
-          alert('ese')
+          alert("ese");
           cargarCaja();
           total();
         },
@@ -454,18 +454,45 @@
       } else {
         descuento = 0;
       }
+
       $.ajax({
-        url: "/ingresarMedicamento",
+        url: "/comprobarStock",
         type: "POST",
         data: {
-          venta: $("#facturaId").val(),
           cantidad: $("#cantidad").val(),
           medicamento: $("#Idproducto").val(),
-          descuento: descuento,
         },
         success: function (response) {
-          cargarCaja();
-          total();
+          if (response == "si") {
+            $.ajax({
+              url: "/ingresarMedicamento",
+              type: "POST",
+              data: {
+                venta: $("#facturaId").val(),
+                cantidad: $("#cantidad").val(),
+                medicamento: $("#Idproducto").val(),
+                descuento: descuento,
+              },
+              success: function (response) {
+                cargarCaja();
+                total();
+              },
+              error: function (error) {
+                // console.log(error);
+              },
+            });
+          } else {
+            Toastify({
+              text: "Lo sentimos no tenemos ese stock disponible.",
+              gravity: "top", // `top` or `bottom`
+              position: "right",
+              className: "info",
+              duration: 3000,
+              style: {
+                background: "#5852a19d",
+              },
+            }).showToast();
+          }
         },
         error: function (error) {
           // console.log(error);
@@ -594,7 +621,6 @@
     }
 
     function crearFactura(cliente) {
-      
       $.ajax({
         url: "{{ url_for('sistema.crearFactura') }}",
         type: "POST",
@@ -602,16 +628,13 @@
           cliente: cliente,
           num: $("#facturaId").val(),
         },
-        success: function (response) {
-         
-        },
+        success: function (response) {},
         error: function (error) {
           // console.log(error);
         },
       });
     }
     function crearFacturaReceta(cliente) {
-      
       $.ajax({
         url: "{{ url_for('sistema.crearFactura') }}",
         type: "POST",
@@ -620,7 +643,6 @@
           num: $("#facturaId").val(),
         },
         success: function (response) {
-         
           recetaAFactura();
         },
         error: function (error) {

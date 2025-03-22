@@ -47,6 +47,10 @@ stop_words_personalizado = set(STOP_WORDS) - set(palabras_excluidas)
 nlp.Defaults.stop_words = stop_words_personalizado
 
 
+def capturarHora():
+    hi = datetime.now()
+    return hi
+
 @bp.route('/')
 def home():
 
@@ -98,7 +102,7 @@ def login():
                     session["pass"] = contraseña
                     session['rol'] = rows[6]
 
-                    if session['rol'] == 'administrador' or session['rol'] == 'usuario':
+                    if session['rol'] == 'ADMINISTRADOR' or session['rol'] == 'USUARIO':
                          return redirect('/sistema')  # Cambia esto por la ruta correcta de sistema.py
                     else:
                         #session['last_seen'] = datetime.now()
@@ -567,6 +571,33 @@ def cargarProductosCarrito():
             datos = ''
 
         return render_template('web/otros/traer_productos.html', producto=datos)
+
+
+@bp.route('/generarOrdenCompra', methods=['POST'])
+def generarOrdenCompra():
+        FechaActual = capturarHora()  
+        conn = conectar()
+        cursor = conn.cursor()
+        query = 'SELECT cc.id_carrito from carrito_compra as cc inner join estado as e on cc.id_estado = e.id_estado where cc.num_cliente = ? and cc.id_estado == 2 '
+        cursor.execute(query,(session['id']))
+        carrito = cursor.fetchone()
+
+
+        conn = conectar()
+        cursor = conn.cursor()
+        query = 'INSERT INTO venta (fecha_venta,Total,num_cliente,vendedor,cod_estado,id_carrito) VALUES (?,?,?,?,8,?)'
+        cursor.execute(query, (FechaActual,0,session['id'],1,carrito[0]))
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+        return 'Orden Generada'
+
+
+
+
+
+
 
 @bp.route('/seguimiento', methods=['POST'])
 def seguimiento():

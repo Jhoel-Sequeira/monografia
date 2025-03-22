@@ -449,7 +449,23 @@ def crearFactura():
 
     return 'hecho'
 # SE INGRESA EL MEDICAMENTO A LA FACTURA CREADA
+@bp.route('/comprobarStock', methods=['POST', 'GET'])
+def comprobarStock():
+    if request.method == "POST":
+        medicamento = request.form['medicamento']
+        cantidad = request.form['cantidad']
 
+        conn = conectar()
+        cursor = conn.cursor()
+        query = "select stock from producto where cod_producto = ? "
+        cursor.execute(query,(medicamento))
+        stock = cursor.fetchone()
+
+        if stock[0] > int(cantidad):
+            return 'si'
+        else:
+    
+            return 'no'
 
 @bp.route('/facturar', methods=['POST', 'GET'])
 def facturar():
@@ -515,11 +531,12 @@ def facturar():
 
     conn = conectar()
     cursor = conn.cursor()
-    query = "select p.nom_producto,dv.cantidad,p.precio,p.stock,p.stock_critico,dv.precio_venta as descuento from Det_venta as dv inner join producto as p on dv.cod_producto_1 = p.cod_producto where dv.cod_venta_1 = ?"
+    query = "select p.nom_producto,dv.cantidad,p.precio,p.stock,p.stock_critico,dv.precio_venta as descuento,p.cod_producto from Det_venta as dv inner join producto as p on dv.cod_producto_1 = p.cod_producto where dv.cod_venta_1 = ?"
     cursor.execute(query,(num))
     detalle = cursor.fetchall()
 
     print(detalle)
+
 
     print(ticket)
 
@@ -593,10 +610,40 @@ def facturar():
 
     # Iterar sobre los resultados y calcular el descuento
     for fila in detalle:
+
         nom_producto = str(fila[0]).upper()  # Nombre del producto en mayúsculas
         cantidad = float(fila[1])  # Cantidad comprada
         precio = float(fila[2])  # Precio unitario
         descuento_raw = float(fila[5])  # Descuento aplicado en porcentaje o monto
+
+        conn = conectar()
+        cursor = conn.cursor()
+
+                        
+                        # Query de actualización del producto
+        query = '''
+                UPDATE producto
+                SET stock -= ?
+                WHERE cod_producto = ?
+        '''
+                        
+                        # Ejecutar la consulta SQL
+        cursor.execute(query, (cantidad,fila[6]))
+        conn.commit()
+
+                        # Cerrar la conexión
+        cursor.close()
+        conn.close()
+
+
+
+
+
+
+
+
+
+   
 
         # Calcular el descuento
         subtotal = cantidad * precio
@@ -666,6 +713,7 @@ def facturar():
     cursor.close()
     conn.close()
 
+    
 
     return response
 
