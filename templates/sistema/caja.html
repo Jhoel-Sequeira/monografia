@@ -425,8 +425,7 @@
         url: "/comprobarStockReceta",
         type: "POST",
         data: {
-          cantidad: $("#cantidad").val(),
-          medicamento: $("#Idproducto").val(),
+          num: $("#facturaId").val()
         },
         success: function (response) {
 
