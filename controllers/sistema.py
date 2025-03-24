@@ -461,11 +461,111 @@ def comprobarStock():
         cursor.execute(query,(medicamento))
         stock = cursor.fetchone()
 
-        if stock[0] > int(cantidad):
+        if stock[0] >= int(cantidad):
             return 'si'
         else:
     
             return 'no'
+        
+@bp.route('/comprobarStockReceta', methods=['POST', 'GET'])
+def comprobarStockReceta():
+    if request.method == "POST":
+        medicamento = request.form['medicamento']
+        cantidad = request.form['cantidad']
+
+        conn = conectar()
+        cursor = conn.cursor()
+        query = "select p.cod_producto,a.cantidad from atencion_producto as a inner join producto as p on a.cod_producto = p.cod_producto where a.cod_atencion = ?"
+        cursor.execute(query,(receta))
+        receta = cursor.fetchall()
+
+        insert_query = """
+        INSERT INTO Det_venta (cod_producto_1,cod_venta_1,Cantidad,precio_venta) VALUES (?,?,?,0)
+        """
+
+        for cod_producto, cantidad in receta:
+            cursor.execute(insert_query, (cod_producto,num, cantidad))
+
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+
+
+        conn = conectar()
+        cursor = conn.cursor()
+        query = "select stock from producto where cod_producto = ? "
+        cursor.execute(query,(medicamento))
+        stock = cursor.fetchone()
+
+        if stock[0] >= int(cantidad):
+            return 'si'
+        else:
+    
+            return 'no'
+        
+@bp.route('/eliminarProductoCaja', methods=['POST', 'GET'])
+def eliminarProductoCaja():
+    if request.method == "POST":
+        medicamento = request.form['num']
+        venta = request.form['venta']
+
+
+        conn = conectar()
+        cursor = conn.cursor()
+        query = "select cantidad,cod_producto_1 from Det_venta where cod_venta_1 = ? and cod_detalle = ? "
+        cursor.execute(query,(venta,medicamento))
+        cantidad = cursor.fetchone()
+
+        conn = conectar()
+        cursor = conn.cursor()
+        query = "delete Det_venta where cod_venta_1 = ? AND cod_detalle = ? "
+        cursor.execute(query,(venta,medicamento))
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+        conn = conectar()
+        cursor = conn.cursor()
+        query = 'update producto set stock += ? where cod_producto = ?'
+        cursor.execute(query, (cantidad[0],cantidad[1]))
+        conn.commit()
+        cursor.close()
+        conn.close()
+      
+
+    return 'si'
+
+@bp.route('/limpiarCaja', methods=['POST', 'GET'])
+def limpiarCaja():
+    if request.method == "POST":
+        venta = request.form['venta']
+
+        conn = conectar()
+        cursor = conn.cursor()
+        query = "select cantidad,cod_producto_1 from Det_venta where cod_venta_1 = ? "
+        cursor.execute(query,(venta))
+        cantidad = cursor.fetchone()
+
+        conn = conectar()
+        cursor = conn.cursor()
+        query = "delete Det_venta where cod_venta_1 = ? "
+        cursor.execute(query,(venta))
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+        conn = conectar()
+        cursor = conn.cursor()
+        query = 'update producto set stock += ? where cod_producto = ?'
+        cursor.execute(query, (cantidad[0],cantidad[1]))
+        conn.commit()
+        cursor.close()
+        conn.close()
+      
+
+    return 'si'
+        
 
 @bp.route('/facturar', methods=['POST', 'GET'])
 def facturar():
@@ -765,7 +865,13 @@ def ingresarMedicamento():
             cursor.close()
             conn.close()
         
-       
+        conn = conectar()
+        cursor = conn.cursor()
+        query = 'update producto set stock -= ? where cod_producto = ?'
+        cursor.execute(query, (cantidad,medicamento))
+        conn.commit()
+        cursor.close()
+        conn.close()
        
 
     return 'hecho'
@@ -806,6 +912,9 @@ def listadoProductosCaja():
 
 @bp.route('/agregarReceta', methods=['POST'])
 def agregarReceta():
+     
+    nohay = []
+    hay = []
 
     num = request.form['num']
     receta = request.form['receta']
@@ -814,9 +923,20 @@ def agregarReceta():
 
     conn = conectar()
     cursor = conn.cursor()
-    query = "select p.cod_producto,a.cantidad from atencion_producto as a inner join producto as p on a.cod_producto = p.cod_producto where a.cod_atencion = ?"
+    query = "select p.cod_producto,a.cantidad,p.nom_producto from atencion_producto as a inner join producto as p on a.cod_producto = p.cod_producto where a.cod_atencion = ?"
     cursor.execute(query,(receta))
     receta = cursor.fetchall()
+
+    for cod_producto, cantidad, nom_producto in receta:
+        conn = conectar()
+        cursor = conn.cursor()
+        query = "select cantidad from producto where cod_producto = ?"
+        cursor.execute(query,(cod_producto))
+        Stock = cursor.fetchone()
+
+        if receta[1] > Stock:
+            nohay.append(nom_producto)
+
 
     insert_query = """
     INSERT INTO Det_venta (cod_producto_1,cod_venta_1,Cantidad,precio_venta) VALUES (?,?,?,0)
@@ -825,7 +945,10 @@ def agregarReceta():
     for cod_producto, cantidad in receta:
         cursor.execute(insert_query, (cod_producto,num, cantidad))
 
-
+    conn.commit()
+    cursor.close()
+    conn.close()
+       
     conn = conectar()
     cursor = conn.cursor()
     query = "select dv.cod_detalle,p.nom_producto,dv.cantidad,p.precio,p.stock,p.stock_critico,dv.precio_venta as descuento from Det_venta as dv inner join producto as p on dv.cod_producto_1 = p.cod_producto where dv.cod_venta_1 = ?"
@@ -839,22 +962,31 @@ def agregarReceta():
 @bp.route('/buscarReceta', methods=['POST'])
 def buscarReceta():
 
-    receta = request.form['receta']
+    codigo = request.form['receta']
    
 
-
+    print(codigo)
     conn = conectar()
     cursor = conn.cursor()
     query = "select p.cod_producto,a.cantidad from atencion_producto as a inner join producto as p on a.cod_producto = p.cod_producto where a.cod_atencion = ?"
-    cursor.execute(query,(receta))
+    cursor.execute(query,(codigo))
     receta = cursor.fetchall()
 
- 
+    print(receta)
     if receta:
-        return 'Encontrado'
+        return 'receta'
     else:
-        return 'No'
+        conn = conectar()
+        cursor = conn.cursor()
+        query = "select * FROM venta where cod_estado = 15 and cod_venta = ?"
+        cursor.execute(query,(codigo))
+        orden = cursor.fetchall()
 
+        if orden:
+            return 'orden'
+        else:
+
+            return 'no'
     
 
 

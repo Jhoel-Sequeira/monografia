@@ -1,39 +1,70 @@
 <div class="table-container">
   <table class="table" id="tabla-caja">
-    <thead style="background-color: white !important;">
+    <thead style="background-color: white !important">
       <tr>
-        <th style="width: 180px;">Producto</th>
+        <th style="width: 180px">Producto</th>
         <th>Cantidad</th>
         <th>Descuento</th>
-        <th style="width: 100px;">Subtotal</th>
+        <th style="width: 100px">Subtotal</th>
+        <th></th>
       </tr>
     </thead>
-    <tbody style="background-color: transparent !important" class="overflow-hidden">
+    <tbody
+      style="background-color: transparent !important"
+      class="overflow-hidden"
+    >
       {% for medicamento in medicamentos %}
-      <tr id="{{medicamento.cod_detalle}}" style="background-color: transparent!important">
+      <tr
+        id="{{medicamento.cod_detalle}}"
+        style="background-color: transparent !important"
+      >
         <td>{{medicamento.nom_producto}}</td>
         <td>{{medicamento.cantidad}}</td>
         <td>
           {% if medicamento.descuento == 0.0 %}
           <!-- No mostrar nada si el descuento es 0.0 -->
-          {% elif medicamento.descuento < 1 %} {{ medicamento.descuento * 100 }}% <!-- Si es porcentaje -->
-            {% else %}
-            C$ {{ medicamento.descuento }} <!-- Si es cantidad -->
-            {% endif %}
+          {% elif medicamento.descuento < 1 %} {{ medicamento.descuento * 100
+          }}%
+          <!-- Si es porcentaje -->
+          {% else %} C$ {{ medicamento.descuento }}
+          <!-- Si es cantidad -->
+          {% endif %}
         </td>
         <td>
-          {% set subtotal = medicamento.precio * medicamento.cantidad %}
-
-          {% if medicamento.descuento == 0.0 %}
-          {% set descuento_aplicado = 0 %}
-          {% elif medicamento.descuento < 1 %} {% set descuento_aplicado=subtotal * medicamento.descuento %} {% else %}
-            {% set descuento_aplicado=medicamento.descuento %} {% endif %} {% set total=subtotal - descuento_aplicado %}
-            C$ {{ total }} </td>
-       
+          {% set subtotal = medicamento.precio * medicamento.cantidad %} {% if
+          medicamento.descuento == 0.0 %} {% set descuento_aplicado = 0 %} {%
+          elif medicamento.descuento < 1 %} {% set descuento_aplicado=subtotal *
+          medicamento.descuento %} {% else %} {% set
+          descuento_aplicado=medicamento.descuento %} {% endif %} {% set
+          total=subtotal - descuento_aplicado %} C$ {{ total }}
+        </td>
+        <td
+          style="
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100px;
+          "
+        >
+          <button
+            type="button"
+            name="eliminar"
+            class="btn btn-danger"
+            value="{{medicamento.cod_detalle}}"
+            style="
+              height: 20px;
+              width: 20px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              padding: 0;
+            "
+          >
+            <i class="fas fa-trash" style="font-size: 10px"></i>
+          </button>
+        </td>
       </tr>
       {% endfor %}
-
-
     </tbody>
   </table>
 </div>
@@ -98,111 +129,26 @@
   }
 </style>
 <script>
-  $("#tabla-caja button[name=editarProductos]").click(function () {
+  
+  $("#tabla-caja button[name=eliminar]").click(function () {
     id = $(this).val();
-
+    alert(id)
     $.ajax({
-      url: "/corregirProductos",
+      url: "{{ url_for('sistema.eliminarProductoCaja') }}",
       type: "POST",
       data: {
         num: id,
+        venta: $("#facturaId").val(),
       },
       success: function (response) {
-
-        Swal.fire({
-          title: "Editar Insumo!",
-          text: "Complete los datos",
-          html: '<div id="selectInsumo" ></div>',
-          preConfirm: (value) => {
-            if (($('#cantidadEdit').val() <= 0)) {
-              Swal.showValidationMessage(
-                'Debe ingresar datos válidos.' + $('#cantidad').val()
-              )
-            }
-          },
-
-          showCancelButton: true,
-          confirmButtonText: 'Guardar',
-          cancelButtonText: 'Cancelar',
-
-          showDenyButton: true,
-          denyButtonText: 'Eliminar',
-        }).then((result) => {
-
-          if (result.isConfirmed) {
-            tipo = $("#descuento").val()
-            valor = $('#cantidadEdit').val()
-            $.ajax({
-              url: "/actualizarCantidad",
-              type: "POST",
-              data: {
-                num: id,
-                cantidad: valor,
-                descuento: tipo,
-
-              },
-              success: function (response) {
-                Swal.fire('Actualizado!', 'El insumo ha sido actualizado.', 'success');
+        
                 cargarCaja();
                 total();
-              },
-              error: function (error) {
-                // console.log(error);
-              },
-            });
-
-
-          }
-          else if (result.isDenied) {
-            // Si el usuario presiona "Eliminar"
-            Swal.fire({
-              title: '¿Está seguro?',
-              text: "¡No podrás revertir esta acción!",
-              icon: 'warning',
-              showCancelButton: true,
-              confirmButtonText: 'Sí, eliminar',
-              cancelButtonText: 'Cancelar',
-            }).then((deleteResult) => {
-              if (deleteResult.isConfirmed) {
-
-                $.ajax({
-                  url: "/eliminarCaja",
-                  type: "POST",
-                  data: {
-                    num: id
-
-                  },
-                  success: function (response) {
-                    Swal.fire('Guardado!', 'El insumo ha sido actualizado.', 'success');
-                    cargarCaja();
-                    total();
-                  },
-                  error: function (error) {
-                    // console.log(error);
-                  },
-                });
-
-
-
-
-                // Aquí puedes manejar la lógica para eliminar el insumo
-                Swal.fire('Eliminado!', 'El insumo ha sido eliminado.', 'success');
-
-                // Aquí puedes hacer alguna llamada AJAX o redirigir
-                // $.ajax({...}); o location.reload(); 
-              }
-            });
-          }
-
-
-        });
-        $('#selectInsumo').html(response);
-        $('#selectInsumo').append(response.htmlresponse);
+        
       },
       error: function (error) {
         // console.log(error);
       },
     });
-
   });
 </script>

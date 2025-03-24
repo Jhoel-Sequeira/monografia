@@ -102,7 +102,7 @@ def login():
                     session["pass"] = contraseña
                     session['rol'] = rows[6]
 
-                    if session['rol'] == 'ADMINISTRADOR' or session['rol'] == 'USUARIO':
+                    if session['rol'] == 'ADMINISTRADOR' or session['rol'] == 'USUARIO' or session['rol'] == 'VETERINARIO':
                          return redirect('/sistema')  # Cambia esto por la ruta correcta de sistema.py
                     else:
                         #session['last_seen'] = datetime.now()
@@ -585,7 +585,7 @@ def generarOrdenCompra():
 
         conn = conectar()
         cursor = conn.cursor()
-        query = 'INSERT INTO venta (fecha_venta,Total,num_cliente,vendedor,cod_estado,id_carrito) VALUES (?,?,?,?,8,?)'
+        query = 'INSERT INTO venta (fecha_venta,Total,num_cliente,vendedor,cod_estado,id_carrito) VALUES (?,?,?,?,15,?)'
         cursor.execute(query, (FechaActual,0,session['id'],1,carrito[0]))
         conn.commit()
         cursor.close()
