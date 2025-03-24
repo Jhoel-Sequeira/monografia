@@ -106,14 +106,33 @@
     }
     function generarOrden() {
         $.ajax({
-            url: "{{ url_for('web.cargarProductosCarrito') }}",
+            url: "{{ url_for('web.generarOrdenCompra') }}",
             type: "POST",
+            beforeSend: function () {
+                Swal.fire({
+                html: '<div class="col-lg-12" style="z-index:99999;  display:absolute; width"><img  style="height: 80px;" src="../../static/sistema/images/logos/dots.gif" alt="loading" /><br/>Agendando Consulta...</div>',
+                showCancelButton: false,
+                showConfirmButton: false,
+                backdrop: "static",
+                }).then((result) => {
+                /* Read more about isConfirmed, isDenied below */
+                if (result.isConfirmed) {
+                }
+                });
+            },
             data: {
             },
             success: function (response) {
-                $("#productos_car").html(response);
-                $("#productos_car").append(response.htmlresponse);
-
+                Swal.fire({
+                    icon: "success",
+                    title: "Éxito",
+                    confirmButtonText: "Ok",
+                    html: `Orden de compra generada!!<br><span style="font-weight: bold; font-size: 20px;">${response}</span>`,
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Acción cuando se confirme
+                    }
+                });
             },
             error: function (error) {
                 // console.log(error);

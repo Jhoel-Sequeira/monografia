@@ -397,10 +397,31 @@
 
   <script>
     function cargarCodigo() {
+    
+
       crearFacturaReceta("");
     }
     function Limpiar() {
-      $.ajax({
+      if($('#receta').val() !== ''){
+        $.ajax({
+          url: "{{ url_for('sistema.limpiarCajaSinRetorno') }}",
+          type: "POST",
+          data: {
+            venta: $("#facturaId").val(),
+          },
+          success: function (response) {
+            cargarCaja();
+            total();
+            $('#receta').val('');
+            $('#receta').prop('disabled', false);
+            $("#resultadoReceta").hide();
+          },
+          error: function (error) {
+            // console.log(error);
+          },
+        });
+      }else{
+        $.ajax({
         url: "{{ url_for('sistema.limpiarCaja') }}",
         type: "POST",
         data: {
@@ -414,23 +435,27 @@
           // console.log(error);
         },
       });
+      }
+
     }
     function agregarReceta() {
+      $('#receta').prop('disabled', true);
+      
       crearFacturaReceta("");
 
       //
     }
     function recetaAFactura() {
-      $.ajax({
-        url: "/comprobarStockReceta",
-        type: "POST",
-        data: {
-          num: $("#facturaId").val()
-        },
-        success: function (response) {
+      // $.ajax({
+      //   url: "/comprobarStockReceta",
+      //   type: "POST",
+      //   data: {
+      //     num: $("#facturaId").val()
+      //   },
+      //   success: function (response) {
 
-        },
-      });
+      //   },
+      // });
 
       $.ajax({
         url: "{{ url_for('sistema.agregarReceta') }}",
@@ -440,8 +465,9 @@
           receta: $("#receta").val(),
         },
         success: function (response) {
-          alert(response);
-          cargarCaja();
+          $("#tabla-caja").html(response);
+          $("#tabla-caja").append(response.htmlresponse);
+          // cargarCaja();
           total();
         },
         error: function (error) {
@@ -785,8 +811,12 @@
     });
 
     function Facturar() {
-      printTicket($("#facturaId").val());
       traerId();
+      cargarCaja();
+      total();
+      $('#receta').prop('disabled', false);
+      printTicket($("#facturaId").val());
+      
     }
     function validarProductos(callback) {
       $.ajax({

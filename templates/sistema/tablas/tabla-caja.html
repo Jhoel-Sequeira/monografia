@@ -69,6 +69,24 @@
   </table>
 </div>
 
+
+{% if otros %}
+<script>
+  let productosSinStock = "{{ otros|join(', ') }}"; // Convertir la lista en una cadena separada por comas
+
+  Toastify({
+    text: `Lo sentimos, no tenemos stock disponible de: ${productosSinStock}.`,
+    gravity: "top",
+    position: "right",
+    className: "info",
+    duration: 5000,
+    style: {
+      background: "#5852a19d",
+    },
+  }).showToast();
+</script>
+{% endif %}
+
 <style>
   /* Contenedor de la tabla */
   table thead th {
@@ -129,26 +147,41 @@
   }
 </style>
 <script>
-  
   $("#tabla-caja button[name=eliminar]").click(function () {
     id = $(this).val();
-    alert(id)
-    $.ajax({
-      url: "{{ url_for('sistema.eliminarProductoCaja') }}",
-      type: "POST",
-      data: {
-        num: id,
-        venta: $("#facturaId").val(),
-      },
-      success: function (response) {
-        
-                cargarCaja();
-                total();
-        
-      },
-      error: function (error) {
-        // console.log(error);
-      },
-    });
+
+    if ($("#receta").val() !== "") {
+      $.ajax({
+        url: "{{ url_for('sistema.eliminarProductoCajaSin') }}",
+        type: "POST",
+        data: {
+          num: id,
+          venta: $("#facturaId").val(),
+        },
+        success: function (response) {
+          cargarCaja();
+          total();
+        },
+        error: function (error) {
+          // console.log(error);
+        },
+      });
+    } else {
+      $.ajax({
+        url: "{{ url_for('sistema.eliminarProductoCaja') }}",
+        type: "POST",
+        data: {
+          num: id,
+          venta: $("#facturaId").val(),
+        },
+        success: function (response) {
+          cargarCaja();
+          total();
+        },
+        error: function (error) {
+          // console.log(error);
+        },
+      });
+    }
   });
 </script>

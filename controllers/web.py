@@ -30,7 +30,7 @@ from openpyxl import Workbook
 from openpyxl.drawing.image import Image
 from openpyxl.styles import Alignment,Font,Border,Side
 
-from controllers.correo import enviar_usuario
+from controllers.correo import enviar_usuario,enviar_correo_orden
 
 bp = Blueprint('web', __name__)
 
@@ -578,7 +578,7 @@ def generarOrdenCompra():
         FechaActual = capturarHora()  
         conn = conectar()
         cursor = conn.cursor()
-        query = 'SELECT cc.id_carrito from carrito_compra as cc inner join estado as e on cc.id_estado = e.id_estado where cc.num_cliente = ? and cc.id_estado == 2 '
+        query = 'SELECT cc.id_carrito from carrito_compra as cc inner join estado as e on cc.id_estado = e.id_estado where cc.num_cliente = ? and cc.id_estado = 2 '
         cursor.execute(query,(session['id']))
         carrito = cursor.fetchone()
 
@@ -591,7 +591,15 @@ def generarOrdenCompra():
         cursor.close()
         conn.close()
 
-        return 'Orden Generada'
+        conn = conectar()
+        cursor = conn.cursor()
+        query = 'SELECT top 1 v.cod_venta,c.correo_cliente from venta as v inner join cliente as c on v.num_cliente = c.num_cliente where v.num_cliente = ? order by v.cod_venta desc '
+        cursor.execute(query,(session['id']))
+        id = cursor.fetchone()
+
+        enviar_correo_orden(current_app,"Bienvenido a Nuestra Familia",id[1],'orden',id[0])
+        
+        return str(id[0])
 
 
 

@@ -536,6 +536,32 @@ def eliminarProductoCaja():
 
     return 'si'
 
+@bp.route('/eliminarProductoCajaSin', methods=['POST', 'GET'])
+def eliminarProductoCajaSin():
+    if request.method == "POST":
+        medicamento = request.form['num']
+        venta = request.form['venta']
+
+
+        conn = conectar()
+        cursor = conn.cursor()
+        query = "select cantidad,cod_producto_1 from Det_venta where cod_venta_1 = ? and cod_detalle = ? "
+        cursor.execute(query,(venta,medicamento))
+        cantidad = cursor.fetchone()
+
+        conn = conectar()
+        cursor = conn.cursor()
+        query = "delete Det_venta where cod_venta_1 = ? AND cod_detalle = ? "
+        cursor.execute(query,(venta,medicamento))
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+      
+      
+
+    return 'si'
+
 @bp.route('/limpiarCaja', methods=['POST', 'GET'])
 def limpiarCaja():
     if request.method == "POST":
@@ -566,6 +592,29 @@ def limpiarCaja():
 
     return 'si'
         
+@bp.route('/limpiarCajaSinRetorno', methods=['POST', 'GET'])
+def limpiarCajaSinRetorno():
+    if request.method == "POST":
+        venta = request.form['venta']
+
+        conn = conectar()
+        cursor = conn.cursor()
+        query = "select cantidad,cod_producto_1 from Det_venta where cod_venta_1 = ? "
+        cursor.execute(query,(venta))
+        cantidad = cursor.fetchone()
+
+        conn = conectar()
+        cursor = conn.cursor()
+        query = "delete Det_venta where cod_venta_1 = ? "
+        cursor.execute(query,(venta))
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+        
+      
+
+    return 'si'
 
 @bp.route('/facturar', methods=['POST', 'GET'])
 def facturar():
@@ -912,51 +961,76 @@ def listadoProductosCaja():
 
 @bp.route('/agregarReceta', methods=['POST'])
 def agregarReceta():
-     
     nohay = []
     hay = []
 
     num = request.form['num']
-    receta = request.form['receta']
-    print(num)
+    cod_atencion = request.form['receta']
 
+    print(num)
 
     conn = conectar()
     cursor = conn.cursor()
-    query = "select p.cod_producto,a.cantidad,p.nom_producto from atencion_producto as a inner join producto as p on a.cod_producto = p.cod_producto where a.cod_atencion = ?"
-    cursor.execute(query,(receta))
-    receta = cursor.fetchall()
 
-    for cod_producto, cantidad, nom_producto in receta:
-        conn = conectar()
-        cursor = conn.cursor()
-        query = "select cantidad from producto where cod_producto = ?"
-        cursor.execute(query,(cod_producto))
-        Stock = cursor.fetchone()
+    # Obtener productos de la receta
+    query = """SELECT p.cod_producto, a.cantidad, p.nom_producto, p.stock 
+               FROM atencion_producto AS a 
+               INNER JOIN producto AS p ON a.cod_producto = p.cod_producto 
+               WHERE a.cod_atencion = ?"""
+    cursor.execute(query, (cod_atencion,))
+    receta_productos = cursor.fetchall()
 
-        if receta[1] > Stock:
+    for cod_producto, cantidad, nom_producto, stock in receta_productos:
+        if stock is not None and stock >= cantidad:
+            hay.append((cod_producto, cantidad))  # Guardamos solo los productos con stock suficiente
+        else:
             nohay.append(nom_producto)
 
+    
 
-    insert_query = """
-    INSERT INTO Det_venta (cod_producto_1,cod_venta_1,Cantidad,precio_venta) VALUES (?,?,?,0)
-    """
+    # Insertar solo los productos con stock suficiente en Det_venta
+    insert_query = """INSERT INTO Det_venta (cod_producto_1, cod_venta_1, Cantidad, precio_venta) 
+                      VALUES (?, ?, ?, 0)"""
 
-    for cod_producto, cantidad in receta:
-        cursor.execute(insert_query, (cod_producto,num, cantidad))
+    for cod_producto, cantidad in hay:
+        cursor.execute(insert_query, (cod_producto, num, cantidad))
 
     conn.commit()
     cursor.close()
     conn.close()
-       
+
+    print(nohay)
+    # Si no hay productos insertados, evitamos la consulta
+    if not hay:
+        return render_template('sistema/tablas/tabla-caja.html', medicamentos=[], otros=nohay)
+
+    # Conectar de nuevo para obtener solo los productos que se insertaron en Det_venta
     conn = conectar()
     cursor = conn.cursor()
-    query = "select dv.cod_detalle,p.nom_producto,dv.cantidad,p.precio,p.stock,p.stock_critico,dv.precio_venta as descuento from Det_venta as dv inner join producto as p on dv.cod_producto_1 = p.cod_producto where dv.cod_venta_1 = ?"
-    cursor.execute(query,(num))
-    medicamentos = cursor.fetchall()
+    placeholders = ",".join("?" * len(hay))  # Crear placeholders dinámicos según la cantidad de productos insertados
+    query = """SELECT dv.cod_detalle, p.nom_producto, dv.cantidad, p.precio, 
+                      p.stock, p.stock_critico, dv.precio_venta as descuento 
+               FROM Det_venta AS dv 
+               INNER JOIN producto AS p ON dv.cod_producto_1 = p.cod_producto 
+               WHERE dv.cod_venta_1 = ? 
+               AND dv.cod_producto_1 IN ({})""".format(placeholders)
     
+    # Extraer solo los códigos de producto de los que se insertaron
+    params = [num] + [prod[0] for prod in hay]  
+    cursor.execute(query, params)
+    medicamentos = cursor.fetchall()
 
-    return render_template('sistema/tablas/tabla-caja.html',medicamentos = medicamentos)
+    cursor.close()
+    conn.close()
+
+    print(nohay)
+    print("Productos sin stock:", nohay)
+    print("Productos con stock:", hay)
+
+    return render_template('sistema/tablas/tabla-caja.html', medicamentos=medicamentos, otros = nohay)
+
+
+
 
 
 @bp.route('/buscarReceta', methods=['POST'])
