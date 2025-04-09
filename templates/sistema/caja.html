@@ -125,11 +125,20 @@
               >Las constraseñas no coinciden</label
             >
           </div>
-          <div class="col" style="margin-top: 30px">
+          <div class="col d-none" id="recetas" style="margin-top: 30px">
             <button
               id="agregarReceta"
               class="btn btn-success"
               onclick="agregarReceta()"
+            >
+              <i class="ti ti-clipboard-search"></i> Cargar
+            </button>
+          </div>
+          <div class="col d-none" id="ordenes" style="margin-top: 30px">
+            <button
+              id="agregarOrden"
+              class="btn btn-success"
+              onclick="agregarOrden()"
             >
               <i class="ti ti-clipboard-search"></i> Cargar
             </button>
@@ -396,13 +405,18 @@
   </div>
 
   <script>
-    function cargarCodigo() {
-    
+    function agregarOrden(){
 
+      ordenAFactura();
+
+
+      
+    }
+    function cargarCodigo() {
       crearFacturaReceta("");
     }
     function Limpiar() {
-      if($('#receta').val() !== ''){
+      if ($("#receta").val() !== "") {
         $.ajax({
           url: "{{ url_for('sistema.limpiarCajaSinRetorno') }}",
           type: "POST",
@@ -412,53 +426,64 @@
           success: function (response) {
             cargarCaja();
             total();
-            $('#receta').val('');
-            $('#receta').prop('disabled', false);
+            $("#receta").val("");
+            $("#receta").prop("disabled", false);
             $("#resultadoReceta").hide();
           },
           error: function (error) {
             // console.log(error);
           },
         });
-      }else{
+      } else {
         $.ajax({
-        url: "{{ url_for('sistema.limpiarCaja') }}",
+          url: "{{ url_for('sistema.limpiarCaja') }}",
+          type: "POST",
+          data: {
+            venta: $("#facturaId").val(),
+          },
+          success: function (response) {
+            cargarCaja();
+            total();
+          },
+          error: function (error) {
+            // console.log(error);
+          },
+        });
+      }
+    }
+    function agregarReceta() {
+      $("#receta").prop("disabled", true);
+
+      crearFacturaReceta("");
+
+      //
+    }
+    function recetaAFactura() {
+      
+
+      $.ajax({
+        url: "{{ url_for('sistema.agregarReceta') }}",
         type: "POST",
         data: {
-          venta: $("#facturaId").val(),
+          num: $("#facturaId").val(),
+          receta: $("#receta").val(),
         },
         success: function (response) {
-          cargarCaja();
+          $("#tabla-caja").html(response);
+          $("#tabla-caja").append(response.htmlresponse);
+          // cargarCaja();
           total();
         },
         error: function (error) {
           // console.log(error);
         },
       });
-      }
-
     }
-    function agregarReceta() {
-      $('#receta').prop('disabled', true);
+    function ordenAFactura() {
       
-      crearFacturaReceta("");
-
-      //
-    }
-    function recetaAFactura() {
-      // $.ajax({
-      //   url: "/comprobarStockReceta",
-      //   type: "POST",
-      //   data: {
-      //     num: $("#facturaId").val()
-      //   },
-      //   success: function (response) {
-
-      //   },
-      // });
 
       $.ajax({
-        url: "{{ url_for('sistema.agregarReceta') }}",
+        url: "{{ url_for('sistema.agregarOrden') }}",
         type: "POST",
         data: {
           num: $("#facturaId").val(),
@@ -511,6 +536,7 @@
 
     // Aqui va la parte de ingreso de medicamento con el lector de barra
     function ingresarMedicamentos() {
+      var producto = $("#Idproducto").val();
       if ($("#tipo_descuento").val() == 1 && $("#descuento").val() > 0) {
         descuento = $("#descuento").val() / 100;
       } else if ($("#tipo_descuento").val() == 2 && $("#descuento").val() > 0) {
@@ -524,7 +550,7 @@
         type: "POST",
         data: {
           cantidad: $("#cantidad").val(),
-          medicamento: $("#Idproducto").val(),
+          medicamento: producto,
         },
         success: function (response) {
           if (response == "si") {
@@ -534,14 +560,16 @@
               data: {
                 venta: $("#facturaId").val(),
                 cantidad: $("#cantidad").val(),
-                medicamento: $("#Idproducto").val(),
+                medicamento: producto,
                 descuento: descuento,
               },
               success: function (response) {
                 $("#producto").val("");
                 $("#Idproducto").val("");
                 $("#cantidad").val(1);
+
                 cargarCaja();
+
                 total();
               },
               error: function (error) {
@@ -587,7 +615,7 @@
             if ($("#clienteExistente").is(":checked")) {
               crearFactura($("#clientes option:selected").val());
             } else {
-              crearFactura("");
+              crearFactura(2);
             }
 
             ingresarMedicamentos();
@@ -659,6 +687,8 @@
         data: {},
         success: function (response) {
           $("#facturaId").val(response);
+          $("#receta").val('');
+          $("#resultadoReceta").hide();
           cargarCaja();
           total();
         },
@@ -811,12 +841,41 @@
     });
 
     function Facturar() {
+      $.ajax({
+        url: "/validarProductos",
+        type: "POST",
+        data: {
+          num: $("#facturaId").val(),
+        },
+        success: function (response) {
+          if (response == "si") {
+            $("#receta").prop("disabled", false);
+            printTicket($("#facturaId").val());
+
+            // Esperar 1 segundo (1000 milisegundos) antes de ejecutar refrescar
+            setTimeout(function () {
+              refrescar();
+            }, 1000);
+          } else {
+            Swal.fire({
+              icon: "warning",
+              title: "Error",
+              confirmButtonText: "Ok",
+              text: "Debe agregar al menos un producto para facturar",
+            }).then((result) => {
+              /* Read more about isConfirmed, isDenied below */
+              if (result.isConfirmed) {
+              }
+            });
+          }
+        },
+        error: function (error) {
+          // console.log(error);
+        },
+      });
+    }
+    function refrescar() {
       traerId();
-      cargarCaja();
-      total();
-      $('#receta').prop('disabled', false);
-      printTicket($("#facturaId").val());
-      
     }
     function validarProductos(callback) {
       $.ajax({
@@ -897,14 +956,34 @@
             receta: $("#receta").val(),
           },
           success: function (response) {
-            if (response === "receta" || response === "orden") {
+            if (response === "receta" ) {
               $("#resultadoReceta").attr(
                 "class",
                 "control-label col-md-12 text-success"
               );
-              $("#resultadoReceta").html("Codigo Encontrado!");
+              $("#resultadoReceta").html("Receta Encontrada!");
               $("#resultadoReceta").show();
-            } else {
+
+              $('#ordenes').attr(
+                "class",
+                "d-none"
+              );
+              $('#recetas').removeClass("d-none");
+            }else if (response === "orden") {
+              $("#resultadoReceta").attr(
+                "class",
+                "control-label col-md-12 text-success"
+              );
+              $("#resultadoReceta").html("Orden de compra Encontrada!");
+              $("#resultadoReceta").show();
+              $('#recetas').attr(
+                "class",
+                "d-none"
+              );
+              $('#ordenes').removeClass("d-none");
+
+            } 
+             else {
               $("#resultadoReceta").attr(
                 "class",
                 "control-label col-md-12 text-danger"

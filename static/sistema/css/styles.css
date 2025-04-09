@@ -20460,3 +20460,7 @@ ul {
 .filtroLabel{
 color: white !important;
 }
+
+.modal-backdrop {
+    display: none;
+  }

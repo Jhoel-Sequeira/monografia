@@ -355,7 +355,7 @@ def traerId():
 
     conn = conectar()
     cursor = conn.cursor()
-    query = "select top 1 cod_venta from venta where cod_estado = 7 order by cod_venta desc "
+    query = "select top 1 cod_venta from venta order by cod_venta desc "
     cursor.execute(query)
     ultimaventa = cursor.fetchone()
     if ultimaventa:
@@ -1029,6 +1029,67 @@ def agregarReceta():
 
     return render_template('sistema/tablas/tabla-caja.html', medicamentos=medicamentos, otros = nohay)
 
+@bp.route('/agregarOrden', methods=['POST'])
+def agregarOrden():
+    nohay = []
+    hay = []
+
+    num = request.form['num']
+    cod_atencion = request.form['receta']
+
+    print(num)
+
+    conn = conectar()
+    cursor = conn.cursor()
+
+    # Obtener productos de la receta
+    query = """select p.cod_producto,dv.cantidad,p.nom_producto,p.stock from venta as v 
+                inner join Det_venta as dv on v.cod_venta = dv.cod_venta_1 inner join producto as p on dv.cod_producto_1 = p.cod_producto 
+                where v.cod_venta = ?"""
+    cursor.execute(query, (cod_atencion,))
+    receta_productos = cursor.fetchall()
+
+    for cod_producto, cantidad, nom_producto, stock in receta_productos:
+        if stock is not None and stock >= cantidad:
+            hay.append((cod_producto, cantidad))  # Guardamos solo los productos con stock suficiente
+        else:
+            nohay.append(nom_producto)
+
+  
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+    print(nohay)
+    # Si no hay productos insertados, evitamos la consulta
+    if not hay:
+        return render_template('sistema/tablas/tabla-caja.html', medicamentos=[], otros=nohay)
+
+    # Conectar de nuevo para obtener solo los productos que se insertaron en Det_venta
+    conn = conectar()
+    cursor = conn.cursor()
+    placeholders = ",".join("?" * len(hay))  # Crear placeholders dinámicos según la cantidad de productos insertados
+    query = """SELECT dv.cod_detalle, p.nom_producto, dv.cantidad, p.precio, 
+                      p.stock, p.stock_critico, dv.precio_venta as descuento 
+               FROM Det_venta AS dv 
+               INNER JOIN producto AS p ON dv.cod_producto_1 = p.cod_producto 
+               WHERE dv.cod_venta_1 = ? 
+               AND dv.cod_producto_1 IN ({})""".format(placeholders)
+    
+    # Extraer solo los códigos de producto de los que se insertaron
+    params = [num] + [prod[0] for prod in hay]  
+    cursor.execute(query, params)
+    medicamentos = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
+    print(nohay)
+    print("Productos sin stock:", nohay)
+    print("Productos con stock:", hay)
+
+    return render_template('sistema/tablas/tabla-caja.html', medicamentos=medicamentos, otros = nohay)
+
 
 
 
@@ -1115,6 +1176,13 @@ def tablaCompras():
 
 #  FIN CARGA DE LA TABLA
 
+# TRAER CLIENTE DE LA ORDEN DE COMPRA
+
+# INICIO DE LA CARGA DE LA TABLA
+
+
+# FIN CLIENTE ORDEN DE COMPRA
+
 # DETALLE DE LA FACTURA
 @bp.route('/detalleFactura', methods=['POST'])
 def detalleFactura():
@@ -1136,12 +1204,24 @@ def detalleFactura():
         cursor.execute(query,(num))
         general = cursor.fetchall()
 
-        return render_template('sistema/modales/modal_detalle_factura.html', detalle=detalle, general = general)
+        if general:
+
+
+            return render_template('sistema/modales/modal_detalle_factura.html', detalle=detalle, general = general)
+        else:
+            conn = conectar()
+            cursor = conn.cursor()
+            query = "SELECT v.cod_venta, CONVERT(DATE, v.fecha_venta) AS fecha,FORMAT(v.fecha_venta, 'HH:mm') AS hora,c.nombres_cliente + ' ' + c.apellidos_cliente AS cliente, cred.usuario AS vendedor, SUM(dv.cantidad * p.precio - dv.precio_venta) AS total_venta, e.NombreEstado AS estado FROM venta AS v INNER JOIN cliente AS vendedor ON vendedor.num_cliente = v.vendedor INNER JOIN Det_venta AS dv ON v.cod_venta = dv.cod_venta_1 INNER JOIN producto AS p ON dv.cod_producto_1 = p.cod_producto INNER JOIN estado AS e ON v.cod_estado = e.id_estado INNER JOIN cliente AS c on v.num_cliente = c.num_cliente INNER JOIN credenciales as cred on vendedor.id_credencial = cred.id_credencial where cod_venta = ? GROUP BY v.cod_venta, CONVERT(DATE, v.fecha_venta), FORMAT(v.fecha_venta, 'HH:mm'),c.nombres_cliente,c.apellidos_cliente, vendedor.nombres_cliente, vendedor.apellidos_cliente, e.NombreEstado,cred.usuario ;"
+            cursor.execute(query,(num))
+            general = cursor.fetchall()
+
+            return render_template('sistema/modales/modal_detalle_factura.html', detalle=detalle, general = general)
         
     else:
         return "No"
 
 # FIN DETALLE DE LA FACTURA
+
 
 # INICIO DEL MODAL DE REGISTRAR UNA VENTA
 @bp.route('/modalAgregarVenta', methods=['POST'])
