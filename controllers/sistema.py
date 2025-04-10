@@ -355,7 +355,7 @@ def traerId():
 
     conn = conectar()
     cursor = conn.cursor()
-    query = "select top 1 cod_venta from venta order by cod_venta desc "
+    query = "select top 1 cod_venta from venta where cod_estado != 8 order by cod_venta desc "
     cursor.execute(query)
     ultimaventa = cursor.fetchone()
     if ultimaventa:
