@@ -934,7 +934,7 @@ def totalCaja():
     print(num)
     conn = conectar()
     cursor = conn.cursor()
-    query = "SELECT SUM(dv.cantidad * p.precio) AS total_venta FROM Det_venta AS dv INNER JOIN producto AS p ON dv.cod_producto_1 = p.cod_producto where dv.cod_venta_1 = ?"
+    query = "SELECT SUM(dv.cantidad * (p.precio - dv.precio_venta)) AS total_venta FROM Det_venta AS dv INNER JOIN producto AS p ON dv.cod_producto_1 = p.cod_producto where dv.cod_venta_1 = ?"
     cursor.execute(query,(num))
     total = cursor.fetchone()
     print(total)
