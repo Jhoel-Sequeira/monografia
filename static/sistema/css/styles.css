@@ -11,6 +11,21 @@
 
 :root,
 [data-bs-theme=light] {
+    /* ************************ */
+	--light-green-1: #78fa78;
+	--grey: #eee;
+	--dark-grey: #AAAAAA;
+	--dark: #342E37;
+	--red: #DB504A;
+	--yellow: #FFCE26;
+	--waiting: #ff3f26;
+	--green: #03ff2d;
+	--light-yellow: #FFF2C6;
+	--light-green: #0da10d;
+	--orange: #FD7238;
+	--light-orange: #FFE0D3;
+	--light-red: #a10d0d;
+
     --bs-blue: #5D87FF;
     --bs-indigo: #6610f2;
     --bs-purple: #6f42c1;
@@ -155,6 +170,21 @@
 }
 
 [data-bs-theme=dark] {
+    /* ************************ */
+	--light-green-1: #78fa78;
+	--grey: #eee;
+	--dark-grey: #AAAAAA;
+	--dark: #342E37;
+	--red: #DB504A;
+	--yellow: #FFCE26;
+	--waiting: #ff3f26;
+	--green: #03ff2d;
+	--light-yellow: #FFF2C6;
+	--light-green: #0da10d;
+	--orange: #FD7238;
+	--light-orange: #FFE0D3;
+	--light-red: #a10d0d;
+
     --bs-body-color: #5A6A85;
     --bs-body-color-rgb: 90, 106, 133;
     --bs-body-bg: #212529;
@@ -20464,3 +20494,4 @@ color: white !important;
 .modal-backdrop {
     display: none;
   }
+

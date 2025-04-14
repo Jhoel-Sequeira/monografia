@@ -8,6 +8,8 @@ from functools import wraps
 from conexion import conectar
 from werkzeug.security import check_password_hash, generate_password_hash
 import pandas as pd
+from run import socketio
+
 
 from controllers.excel import GenerarExcel_3
 from controllers.correo import enviar_correo, enviar_correo_receta, enviar_correo_registro
@@ -25,6 +27,7 @@ def login_required(f):
     return decorated_function
 
 bp = Blueprint('sistema', __name__)
+
 
 @bp.route('/sistema')
 @login_required
@@ -914,9 +917,11 @@ def ingresarMedicamento():
             cursor.close()
             conn.close()
         
+
+        print('cantidad: ', cantidad)
         conn = conectar()
         cursor = conn.cursor()
-        query = 'update producto set stock -= ? where cod_producto = ?'
+        query = 'update producto set stock = stock-? where cod_producto = ?'
         cursor.execute(query, (cantidad,medicamento))
         conn.commit()
         cursor.close()
@@ -2651,3 +2656,14 @@ def hospFact():
 
 
 #FIN DEL MODULO DE HOSPITALIZACION
+
+# WEBSOCKET
+# SOCKET EMIT
+@socketio.on('dato_nuevo')
+def handle_nuevo_dato(data):
+    print('entro')
+    emit('actualizacion_tabla', data, broadcast=True)
+
+
+
+# FIN WEBSOCKET

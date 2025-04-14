@@ -3,21 +3,14 @@
         <div class="card-body p-4">
             <div class="d-sm-flex d-block align-items-center justify-content-between mb-9">
                 <h5 class="card-title fw-semibold mb-4">Productos</h5>
-
+                <button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#filtromodal">
+                    <i class="ti ti-adjustments-horizontal"></i>
+                </button>
                 <button class="btn btn-primary" id="agregar" onclick="agregarProducto()">
                     Agregar
                 </button>
             </div>
-            <div class="d-sm-flex d-block align-items-center justify-content-center mb-9 bg-primary">
-                <div class="row p-3">
-                    <div class="col " style="width: 10px !important;">
-                        <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#filtromodal">
-                            <i class="ti ti-adjustments-horizontal"></i>
-                        </button>
-                    </div>
-                   
-                </div>
-            </div>
+           
 
             <div class="table-responsive">
                 <table class="table text-nowrap mb-0 align-middle table-hover" id="tabla_inventario">
@@ -47,6 +40,9 @@
                             </th>
                             <th class="border-bottom-0">
                                 <h6 class="fw-semibold mb-0">Precio</h6>
+                            </th>
+                            <th class="border-bottom-0">
+                                <h6 class="fw-semibold mb-0">Estado</h6>
                             </th>
                         </tr>
                     </thead>
@@ -85,6 +81,22 @@
                                 <span class="fw-normal">{{producto.precio}} C$</span>
                                 <!-- <h6 class="fw-semibold mb-0 fs-4">{{producto.precio}}</h6> -->
                             </td>
+                            {%if producto.stock > producto.stock_critico%}
+                            <td class="border-bottom-0">
+                                <span class="status finished">Disponible</span>
+                                <!-- <h6 class="fw-semibold mb-0 fs-4">{{producto.precio}}</h6> -->
+                            </td>
+                            {%elif  producto.stock_critico > producto.stock and producto.stock > 0%}
+                            <td class="border-bottom-0">
+                                <span class="status pending">Bajo Stock</span>
+                                <!-- <h6 class="fw-semibold mb-0 fs-4">{{producto.precio}}</h6> -->
+                            </td>
+                            {%elif  producto.stock >= 0%}
+                            <td class="border-bottom-0">
+                                <span class="status canceled">Sin Stock</span>
+                                <!-- <h6 class="fw-semibold mb-0 fs-4">{{producto.precio}}</h6> -->
+                            </td>
+                            {%endif%}
                         </tr>
                         {%endfor%}
                     </tbody>
@@ -296,6 +308,11 @@
     $("#buscarAdmin").on('keyup', buscar);
 
 </script>
+<style>
+    .viewbar .placeholder{
+        background-color: transparent;
+    }
+</style>
 
 <script>
     var table = $("#tabla_inventario").DataTable({
@@ -347,7 +364,7 @@
     $('#estado_filtro').hide();
     $('#digitador_filtro').hide();
     $('#verificador_filtro').hide();
-
+    
 
     $('#filtroOpc').filterMultiSelect({
         selectAllText: 'Todo',

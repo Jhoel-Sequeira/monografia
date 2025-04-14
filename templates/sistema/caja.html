@@ -6,6 +6,8 @@
 <!-- inject:css -->
 <link rel="stylesheet" href="css/style.css" />
 <link rel="stylesheet" href="../../../static/sistema/css/assets/css/caja.css" />
+<!-- ======= SOCKET IO ====== -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.3.1/socket.io.js"></script>
 
 {%endblock%} {% block contenido %}
 <div class="container">
@@ -564,6 +566,7 @@
                 descuento: descuento,
               },
               success: function (response) {
+                alert('ingreso')
                 $("#producto").val("");
                 $("#Idproducto").val("");
                 $("#cantidad").val(1);
@@ -851,10 +854,13 @@
           if (response == "si") {
             $("#receta").prop("disabled", false);
             printTicket($("#facturaId").val());
-
+            // var socket = io.connect('http://' + document.domain + ':' + location.port);
+            
+            //   socket.emit('dato_nuevo', 0);
             // Esperar 1 segundo (1000 milisegundos) antes de ejecutar refrescar
             setTimeout(function () {
               refrescar();
+              
             }, 1000);
           } else {
             Swal.fire({

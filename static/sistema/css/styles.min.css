@@ -10,7 +10,7 @@
 
 :root,
 [data-bs-theme="light"] {
-  --light-green: #0da10d;
+  --light-green: #0b8f0b;
   --bs-blue: #5d87ff;
   --bs-indigo: #6610f2;
   --bs-purple: #6f42c1;
@@ -20577,4 +20577,24 @@ button {
   .container-xl {
     max-width: 1600px !important;
   }
+}
+
+
+table tr td .status {
+	font-size: 10px;
+	padding: 6px 16px;
+	color: var(--light);
+	border-radius: 20px;
+	font-weight: 700;
+}
+
+
+table tr td .status.finished {
+	background: var(--light-green);
+}
+table tr td .status.pending {
+	background: var(--orange);
+}
+table tr td .status.canceled {
+	background: var(--red);
 }
