@@ -89,23 +89,20 @@ def addFiltroInv():
         data = json.loads(filtro)
         headers = []
         if data:
-            consultaBase = '''
-            select p.cod_producto,p.nom_producto,e.NombreEstado,pro.cod_proveedor,t.tipos,p.precio,p.stock,p.stock_critico from producto as p  inner join estado as e on p.id_estado = e.id_estado inner join tipo as t on p.tipo_producto = t.cod_tipo
-            inner jo    in proveedor as pro on p.cod_proveedor = pro.cod_proveedor
-            where'''
+            consultaBase = '''select p.cod_producto,p.nom_producto,e.NombreEstado,pro.cod_proveedor,t.tipos,p.precio,p.stock,p.stock_critico from producto as p  inner join estado as e on p.id_estado = e.id_estado inner join tipo as t on p.tipo_producto = t.cod_tipo inner join proveedor as pro on p.cod_proveedor = pro.cod_proveedor where'''
             for clave in data.keys():
                 headers.append(clave)
             consulta = ''
             contador = 0
-
+            valores_stock = []
             for value in data.values():
                 print(headers[contador] )
-                if "stock" in headers[contador]:
-                    fechas = value
-                    fechas = fechas.split('a')
-                    print(value)
-                    consulta += 'p.stock'+' BETWEEN "' + \
-                        fechas[0]+'" AND "'+''+fechas[1]+'" AND '
+                if "stock" in headers[contador].lower():
+                    valores_stock.append(int(value))
+                    if valores_stock:
+                        stock_min = min(valores_stock)
+                        stock_max = max(valores_stock)
+                        consulta += f' p.stock BETWEEN {stock_min} AND {stock_max} AND '
                 elif headers[contador] == "cod_proveedor":
                     a = 1
                     
@@ -154,16 +151,15 @@ def addFiltroInv():
             consulta_total = consultaBase+' '+consulta[:-4]
             print(consulta_total)
         else:
-             consultaBase = '''
-            select p.cod_producto,p.nom_producto,e.NombreEstado,pro.cod_proveedor,t.tipos,p.precio,p.stock,p.stock_critico from producto as p  inner join estado as e on p.id_estado = e.id_estado inner join tipo as t on p.tipo_producto = t.cod_tipo
-            inner jo    in proveedor as pro on p.cod_proveedor = pro.cod_proveedor
+             consultaBase = '''select p.cod_producto,p.nom_producto,e.NombreEstado,pro.cod_proveedor,t.tipos,p.precio,p.stock,p.stock_critico from producto as p  inner join estado as e on p.id_estado = e.id_estado inner join tipo as t on p.tipo_producto = t.cod_tipo
+            inner join proveedor as pro on p.cod_proveedor = pro.cod_proveedor
             '''
         print(consulta_total)
         conn = conectar()
         cursor = conn.cursor()
         query = " "+consulta_total
         cursor.execute(query)
-        productos = cursor.fetcall()    
+        productos = cursor.fetchall()    
 
         conn = conectar()
         cursor = conn.cursor()
