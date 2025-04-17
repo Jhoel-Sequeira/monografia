@@ -854,9 +854,9 @@
           if (response == "si") {
             $("#receta").prop("disabled", false);
             printTicket($("#facturaId").val());
-            // var socket = io.connect('http://' + document.domain + ':' + location.port);
+            var socket = io.connect('http://' + document.domain + ':' + location.port);
             
-            //   socket.emit('dato_nuevo', 0);
+              socket.emit('dato_nuevo', 0);
             // Esperar 1 segundo (1000 milisegundos) antes de ejecutar refrescar
             setTimeout(function () {
               refrescar();

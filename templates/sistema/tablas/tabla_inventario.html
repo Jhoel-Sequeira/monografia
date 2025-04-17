@@ -10,7 +10,7 @@
                     Agregar
                 </button>
             </div>
-           
+
 
             <div class="table-responsive">
                 <table class="table text-nowrap mb-0 align-middle table-hover" id="tabla_inventario">
@@ -86,12 +86,12 @@
                                 <span class="status finished">Disponible</span>
                                 <!-- <h6 class="fw-semibold mb-0 fs-4">{{producto.precio}}</h6> -->
                             </td>
-                            {%elif  producto.stock_critico > producto.stock and producto.stock > 0%}
+                            {%elif producto.stock_critico > producto.stock and producto.stock > 0%}
                             <td class="border-bottom-0">
                                 <span class="status pending">Bajo Stock</span>
                                 <!-- <h6 class="fw-semibold mb-0 fs-4">{{producto.precio}}</h6> -->
                             </td>
-                            {%elif  producto.stock >= 0%}
+                            {%elif producto.stock >= 0%}
                             <td class="border-bottom-0">
                                 <span class="status canceled">Sin Stock</span>
                                 <!-- <h6 class="fw-semibold mb-0 fs-4">{{producto.precio}}</h6> -->
@@ -118,10 +118,12 @@
                         <div class="col-12">
                             <select multiple name="filtro" id="filtroOpc" class="filter-multi-select">
 
-                                <!-- <option value="1">Proveedor</option> -->
-                                <option value="2">Fecha</option>
-                                <!-- <option value="3">Estado</option>
-                                <option value="4">Digitador</option>
+                                <option value="1">Proveedor</option>
+                                <option value="2">Stock</option>
+                                <option value="3">Estado</option>
+                                <option value="4">Categoría</option>
+
+                                <!-- <option value="4">Digitador</option>
                                 <option value="5">Verificador</option> -->
                             </select>
 
@@ -132,9 +134,9 @@
                         <div class="col-6" id="proveedor_filtro">
                             <div class="form-outline">
                                 <label class="form-label" for="proveedor">Nombre proveedor</label>
-                                <input type="text" id="IdProveedor" value="" style="text-transform:uppercase;"
+                                <input type="text" id="cod_proveedor" value="" style="text-transform:uppercase;"
                                     onkeyup="this.value=this.value.toUpperCase()" style="text-transform:uppercase;"
-                                    name="IdProveedor" placeholder="Ingrese el nombre..." required="required"
+                                    name="cod_proveedor" placeholder="Ingrese el nombre..." required="required"
                                     class="form-control" value="" />
 
                             </div>
@@ -148,26 +150,26 @@
 
                         </div>
 
-                        <div class="col-6" id="fecha_filtro">
+                        <div class="col-6" id="stock">
                             <div class="form-outline">
-                                <label class="form-label" for="proveedor">Fecha</label>
-                                <input type="text" id="Fecha" value="" name="Fecha" placeholder="Ingrese la cédula..."
-                                    required="required" class="form-control" value="" />
+                                <label class="form-label" for="proveedor">Stock</label>
+                                <!-- <input type="text" class="mt-2" id="sampleSlider" /> -->
 
+                                <input type="number" min="1" max="100"  class="" name="stock1"/> <input type="number" min="1" max="100" class="" name="stock" id="val2" />
+                                    
+                                
+                                
                             </div>
-                            <input type="hidden" placeholder="Pick date rage" id="1" value="" />
-                            <input type="hidden" placeholder="Pick date rage" id="2" value="" />
                         </div>
                         <div class="col-6" id="estado_filtro">
                             <div class="form-outline">
                                 <label class="form-label" for="proveedor">Estado</label>
 
-                                <select class="form-control" name="IdEstado" id="IdEstado">
+                                <select class="form-control" name="id_estado" id="id_estado">
                                     <!-- <option value="3">Pendiente</option> -->
-                                    <option value="4">Completado</option>
-                                    <option value="5">Por validar</option>
-                                    <option value="6">Cancelado</option>
-                                    <option value="9">Validado</option>
+                                    <option value="4">Disponibles</option>
+                                    <option value="5">Sin Stock</option>
+                                    <option value="6">Bajo Stock</option>
                                     <!-- <option value="7">Desbloqueados</option> -->
                                 </select>
 
@@ -175,24 +177,22 @@
 
                         </div>
 
-                        <div class="col-6" id="digitador_filtro">
+                        <div class="col-6" id="categoria_filtro">
                             <div class="form-outline">
-                                <label class="form-label" for="proveedor">Digitador</label>
+                                <label class="form-label" for="proveedor">Categoría</label>
 
-                                <select name="IdDigitador" class="form-control" id="IdDigitador">
-                                    
+                                <select class="form-control" name="tipo_producto" id="tipo_producto">
+                                    <!-- <option value="3">Pendiente</option> -->
+                                    {%for tipo in categoria%}
+                                    <option value="{{tipo.cod_tipo}}">{{tipo.tipos}}</option>
+                                    {%endfor%}
+                                    <!-- <option value="7">Desbloqueados</option> -->
+                                </select>
+
                                 </select>
                             </div>
                         </div>
-                        <div class="col-6" id="verificador_filtro">
-                            <div class="form-outline">
-                                <label class="form-label" for="proveedor">Verificador</label>
 
-                                <select name="IdVerificador" class="form-control" id="IdVerificador">
-                                    
-                                </select>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -203,6 +203,33 @@
         </div>
     </div>
 </div>
+<script>
+
+
+
+    $(document).ready(function () {
+        setTimeout(function () {
+            var mySlider = new rSlider({
+                target: '#sampleSlider',
+                values: [1, 2, 3, 4, 5, 6, 7, 8,9,10,20,30,50,60,80,100],
+                range: true,
+                tooltip: true,
+                scale: true,
+                labels: true,
+                set: [1, 100],
+                onChange: function (vals) {
+                    // vals es un array con dos valores [min, max]
+                    document.getElementById('val1').value = vals[0];
+                    document.getElementById('val2').value = vals[2];
+                }
+
+            });
+            document.getElementById('val1').value = mySlider.getValue()[0];
+            document.getElementById('val2').value = mySlider.getValue()[3];
+        }, 3500);
+    });
+</script>
+
 <script>
 
     var fecha = new Date();
@@ -236,7 +263,7 @@
 </script>
 
 <script>
-   
+
     $(document).on("change", "#filtroOpc", function (event) {
         var selected = $('#filtroOpc').val();
         $.ajax({
@@ -275,7 +302,7 @@
         });
     }
     $(document).ready(function () {
-      
+
 
     });
     var opc = "po";
@@ -309,7 +336,7 @@
 
 </script>
 <style>
-    .viewbar .placeholder{
+    .viewbar .placeholder {
         background-color: transparent;
     }
 </style>
@@ -360,11 +387,10 @@
 
     // OCULTAMOS TODOS LOS FILTROS DE LOS TEXTOS
     $('#proveedor_filtro').hide();
-    $('#fecha_filtro').hide();
+    $('#stock').hide();
     $('#estado_filtro').hide();
-    $('#digitador_filtro').hide();
-    $('#verificador_filtro').hide();
-    
+    $('#categoria_filtro').hide();
+
 
     $('#filtroOpc').filterMultiSelect({
         selectAllText: 'Todo',
@@ -382,17 +408,14 @@
         if (filtro == 'Proveedor') {
             $('#proveedor_filtro').show();
 
-        } else if (filtro == 'Fecha') {
-            $('#fecha_filtro').show();
+        } else if (filtro == 'Stock') {
+            $('#stock').show();
 
         } else if (filtro == 'Estado') {
             $('#estado_filtro').show();
 
-        } else if (filtro == 'Digitador') {
-            $('#digitador_filtro').show();
-
-        } else if (filtro == 'Verificador') {
-            $('#verificador_filtro').show();
+        } else if (filtro == 'Categoría') {
+            $('#categoria_filtro').show();
 
         }
 
@@ -456,17 +479,14 @@
         if (filtros == 'Proveedor') {
             $('#proveedor_filtro').hide();
 
-        } else if (filtros == 'Fecha') {
-            $('#fecha_filtro').hide();
+        } else if (filtros == 'Stock') {
+            $('#stock').hide();
 
         } else if (filtros == 'Estado') {
             $('#estado_filtro').hide();
 
-        } else if (filtros == 'Digitador') {
-            $('#digitador_filtro').hide();
-
-        } else if (filtros == 'Verificador') {
-            $('#verificador_filtro').hide();
+        } else if (filtros == 'Categoría') {
+            $('#categoria_filtro').hide();
 
         }
     });
@@ -495,6 +515,7 @@
 
         console.log(values);
         var JSon = JSON.stringify(values);
+        alert(JSon)
         $.ajax({
             url: "/addFiltroInv",
             type: "POST",

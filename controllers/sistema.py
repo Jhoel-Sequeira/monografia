@@ -1,5 +1,6 @@
 # controllers/sistema.py
 from datetime import datetime, timedelta
+import json
 import os
 import locale
 from fpdf import FPDF
@@ -61,10 +62,120 @@ def tablaProductos():
         query = 'select p.cod_producto,p.nom_producto,p.precio,p.stock,p.stock_critico,prov.nom_proveedor,t.tipos,u.nombre as unidad,e.NombreEstado as estado from producto as p inner join proveedor as prov on p.cod_proveedor = prov.cod_proveedor inner join tipo as t on p.tipo_producto = t.cod_tipo inner join unidades as u on p.unidad = u.cod_unidad inner join estado as e on p.id_estado = e.id_estado'
         cursor.execute(query)
         productos = cursor.fetchall()
-        return render_template('sistema/tablas/tabla_inventario.html', productos=productos)
+
+
+        conn = conectar()
+        cursor = conn.cursor()
+        query = 'select * from tipo'
+        cursor.execute(query)
+        categoria = cursor.fetchall()
+
+
+        return render_template('sistema/tablas/tabla_inventario.html', productos=productos, categoria = categoria)
         
     else:
         return "No"
+
+
+@bp.route('/addFiltroInv', methods=["POST", "GET"])
+def addFiltroInv():
+    if request.method == "POST":
+        filtro = request.form['filtro']
+        # cur = mysql.connection.cursor()
+        # cur.execute("select v.Id_Verificacion,v.Fecha,v.PO,v.NoBoleta,pc.NombrePuntoCompra,e.NombreEstado, p.NombreProveedor from tb_verificacion as v inner join tb_proveedor as p ON v.IdProveedor = p.Id_Proveedor inner join tb_puntocompra as pc ON v.IdPuntoCompra = pc.Id_PuntoCompra inner join tb_estado as e on v.IdEstado = e.Id_Estado where v.PO like %s and v.IdEstado = 6",[po+'%'])
+        # verificaciones = cur.fetchall()
+        # mysql.connection.commit()
+        # primero es tener la consulta base
+        data = json.loads(filtro)
+        headers = []
+        if data:
+            consultaBase = '''
+            select p.cod_producto,p.nom_producto,e.NombreEstado,pro.cod_proveedor,t.tipos,p.precio,p.stock,p.stock_critico from producto as p  inner join estado as e on p.id_estado = e.id_estado inner join tipo as t on p.tipo_producto = t.cod_tipo
+            inner jo    in proveedor as pro on p.cod_proveedor = pro.cod_proveedor
+            where'''
+            for clave in data.keys():
+                headers.append(clave)
+            consulta = ''
+            contador = 0
+
+            for value in data.values():
+                print(headers[contador] )
+                if "stock" in headers[contador]:
+                    fechas = value
+                    fechas = fechas.split('a')
+                    print(value)
+                    consulta += 'p.stock'+' BETWEEN "' + \
+                        fechas[0]+'" AND "'+''+fechas[1]+'" AND '
+                elif headers[contador] == "cod_proveedor":
+                    a = 1
+                    
+                    conn = conectar()
+                    cursor = conn.cursor()
+                    query = 'SELECT cod_proveedor from proveedor where nom_proveedor = ?'
+                    cursor.execute(query,(value))
+                    idprov = cursor.fetcone()
+
+                    print("aqui se muestra el proveedor:")
+                    print(idprov)
+
+                    if idprov:
+                        conn = conectar()
+                        cursor = conn.cursor()
+                        query = 'SELECT cod_proveedor from proveedor where nom_proveedor = ?'
+                        cursor.execute(query,(value))
+                        idprov = cursor.fetcone()
+
+                        consulta += 'p.'+headers[contador] + \
+                            ' = '+str(idprov[0]) + ' AND '
+                    else:
+                        conn = conectar()
+                        cursor = conn.cursor()
+                        query = 'SELECT cod_proveedor from proveedor where nom_proveedor = ?'
+                        cursor.execute(query,(value))
+                        idprov = cursor.fetcone()
+                        # LLAMAMOS AL PROVEEDOR DE NOMBRE TAL
+                        cur = mysql.connection.cursor()
+                        cur.execute(
+                            'SELECT Id_Proveedor from tb_proveedor where NombreProveedor = %s', [value])
+                        idprov = cur.fetchone()
+
+                        consulta += 'p.'+headers[contador] + \
+                            ' = '+str(idprov[0]) + ' AND '
+
+                    # consulta += 'date(v.'+headers[contador]+') BETWEEN "'+fechas[0]+'" AND "'+''+fechas[1]+'" AND '
+                else:
+                    
+                    
+                    consulta += 'p.stock'+' BETWEEN "' + \
+                        fechas[0]+'" AND "'+''+fechas[1]+'" AND '
+                    
+                contador += 1
+                # consultaBase += ' AND '+data
+            consulta_total = consultaBase+' '+consulta[:-4]
+            print(consulta_total)
+        else:
+             consultaBase = '''
+            select p.cod_producto,p.nom_producto,e.NombreEstado,pro.cod_proveedor,t.tipos,p.precio,p.stock,p.stock_critico from producto as p  inner join estado as e on p.id_estado = e.id_estado inner join tipo as t on p.tipo_producto = t.cod_tipo
+            inner jo    in proveedor as pro on p.cod_proveedor = pro.cod_proveedor
+            '''
+        print(consulta_total)
+        conn = conectar()
+        cursor = conn.cursor()
+        query = " "+consulta_total
+        cursor.execute(query)
+        productos = cursor.fetcall()    
+
+        conn = conectar()
+        cursor = conn.cursor()
+        query = 'select * from tipo'
+        cursor.execute(query)
+        categoria = cursor.fetchall()
+
+
+     
+        return render_template('sistema/tablas/tabla_inventario.html', productos=productos, categoria = categoria)
+
+
 
 # FIN DE LA CARGA DE PRODUCTOS 
 
