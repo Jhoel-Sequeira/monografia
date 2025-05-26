@@ -1,40 +1,16 @@
 {% block contenido %}
-<div
-  class="modal fade"
-  id="agendarConsulta"
-  data-bs-backdrop="static"
-  data-bs-keyboard="false"
-  tabindex="-1"
-  aria-labelledby="staticBackdropLabel"
-  aria-hidden="true"
->
+<div class="modal fade" id="agendarConsulta" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+  aria-labelledby="staticBackdropLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-fullscreen-md-down">
     <div class="modal-content">
       <div class="row p-3">
         <div class="row mt-2">
           <div class="col">
-            <label class="form-label" for="form3Example2"
-              ><strong>Cliente</strong
-              ><i
-                class="ti ti-plus"
-                aria-hidden="true"
-                title="Agregar Nuevo Conductor"
-                data-bs-target="#agregarCliente"
-                data-bs-toggle="modal"
-                data-bs-dismiss="modal"
-                style="color: red; font-size: 15px"
-              ></i
-            ></label>
-            <select
-              class="form-select"
-              id="cliente"
-              data-placeholder="Seleccione un rol"
-            >
-              <option
-                selected="true"
-                value="seleccione un cliente"
-                disabled="disabled"
-              >
+            <label class="form-label" for="form3Example2"><strong>Cliente</strong><i class="ti ti-plus"
+                aria-hidden="true" title="Agregar Nuevo Conductor" data-bs-target="#agregarCliente"
+                data-bs-toggle="modal" data-bs-dismiss="modal" style="color: red; font-size: 15px"></i></label>
+            <select class="form-select" id="cliente" data-placeholder="Seleccione un rol">
+              <option selected="true" value="seleccione un cliente" disabled="disabled">
                 seleccione un cliente
               </option>
               {% for cliente in clientes %}
@@ -46,46 +22,21 @@
             </select>
           </div>
           <div class="col">
-            <label class="form-label" for="form3Example2"
-              ><strong>Mascota</strong
-              ><i
-                class="ti ti-plus"
-                aria-hidden="true"
-                title="Agregar Nuevo Conductor"
-                data-bs-target="#agregarMascota"
-                data-bs-toggle="modal"
-                data-bs-dismiss="modal"
-                style="color: red; font-size: 15px"
-              ></i
-            ></label>
-            <select
-              class="form-select"
-              id="mascota"
-              data-placeholder="Seleccione una mascota"
-            ></select>
+            <label class="form-label" for="form3Example2"><strong>Mascota</strong><i class="ti ti-plus"
+                aria-hidden="true" title="Agregar Nuevo Conductor" data-bs-target="#agregarMascota"
+                data-bs-toggle="modal" data-bs-dismiss="modal" style="color: red; font-size: 15px"></i></label>
+            <select class="form-select" id="mascota" data-placeholder="Seleccione una mascota"></select>
           </div>
         </div>
         <div class="row mt-2">
           <div class="col">
-            <label class="form-label" for="form3Example2"
-              ><strong>Tipo Atención</strong></label
-            >
-            <select
-              class="form-select"
-              id="tipoAtencion"
-              data-placeholder="Seleccione un rol"
-            >
-              <option
-                selected="true"
-                value="Tipo de atención"
-                disabled="disabled"
-              >
-                seleccione un cliente
-              </option>
+            <label class="form-label" for="form3Example2"><strong>Tipo Atención</strong></label>
+            <select class="form-select" id="tipoAtencion1" data-placeholder="Seleccione un rol">
+            
 
               {% for atencion in atencion %}
 
-              <option value="{{ atencion.cod_atencion}}">
+              <option value="{{ atencion.cod_tipo}}">
                 {{ atencion.tipo }}
               </option>
               {% endfor %}
@@ -93,88 +44,47 @@
           </div>
 
           <div class="col">
-            <label class="form-label" for="form3Example2"
-              ><strong> Peso</strong></label
-            >
+            <label class="form-label" for="form3Example2"><strong> Peso</strong></label>
 
             <input type="number" name="" class="form-control" id="peso" />
           </div>
           <div class="col">
-            <label class="form-label" for="form3Example2"
-              ><strong> Altura</strong></label
-            >
+            <label class="form-label" for="form3Example2"><strong> Altura</strong></label>
 
             <input type="number" name="" class="form-control" id="altura" />
           </div>
 
           <div class="col">
-            <label class="form-label" for="form3Example2"
-              ><strong> Temperatura</strong></label
-            >
+            <label class="form-label" for="form3Example2"><strong> Temperatura</strong></label>
 
-            <input
-              type="number"
-              name=""
-              class="form-control"
-              id="temperatura"
-            />
+            <input type="number" name="" class="form-control" id="temperatura" />
           </div>
         </div>
 
         <div class="row mt-2">
           <div class="col">
-            <label class="form-label" for="form3Example2"
-              ><strong>Fecha</strong></label
-            >
-            <input
-              type="date"
-              class="form-control"
-              id="fecha"
-              value="{{fecha}}"
-              disabled
-            />
+            <label class="form-label" for="form3Example2"><strong>Fecha</strong></label>
+            <input type="date" class="form-control" id="fecha" value="{{fecha}}" disabled />
           </div>
           <div class="col">
-            <label class="form-label" for="timePicker"
-              ><strong>Hora</strong></label
-            >
-            <select
-              class="form-select"
-              id="hora"
-              data-placeholder="Seleccione una hora"
-            ></select>
+            <label class="form-label" for="timePicker"><strong>Hora</strong></label>
+            <select class="form-select" id="hora" data-placeholder="Seleccione una hora"></select>
           </div>
         </div>
         <div class="row mt-2">
           <div class="col">
-            <label class="form-label" for="form3Example2"
-              ><strong>Observación</strong></label
-            >
-            <textarea
-              name=""
-              class="form-control"
-              rows="4"
-              id="observacion"
-            ></textarea>
+            <label class="form-label" for="form3Example2"><strong>Observación</strong></label>
+            <textarea name="" class="form-control" rows="4" id="observacion"></textarea>
           </div>
         </div>
       </div>
       <div class="row m-3">
         <div class="modal-footer">
-          <button
-            type="button"
-            class="btn btn-secondary"
-            id="cerrar"
-            data-bs-dismiss="modal"
-          >
+          <button type="button" class="btn btn-secondary" id="cerrar" data-bs-dismiss="modal">
             Close
           </button>
 
-          <button
-            type="button"
-            onclick="guardarConsulta()"
-            class="btn btn-primary"
-          >
+          <button type="button" onclick="guardarConsulta()" class="btn btn-primary">
             Agendar
           </button>
         </div>
@@ -184,15 +94,8 @@
 </div>
 
 <!-- MODALES -->
-<div
-  class="modal fade"
-  id="agregarCliente"
-  data-bs-backdrop="static"
-  data-bs-keyboard="false"
-  tabindex="-1"
-  aria-labelledby="staticBackdropLabel"
-  aria-hidden="true"
->
+<div class="modal fade" id="agregarCliente" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+  aria-labelledby="staticBackdropLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
@@ -245,13 +148,8 @@
         </div>
       </div>
       <div class="modal-footer">
-        <button
-          class="btn btn-secondary"
-          data-bs-target="#agendarConsulta"
-          id="regresar"
-          data-bs-toggle="modal"
-          data-bs-dismiss="modal"
-        >
+        <button class="btn btn-secondary" data-bs-target="#agendarConsulta" id="regresar" data-bs-toggle="modal"
+          data-bs-dismiss="modal">
           Regresar
         </button>
         <button class="btn btn-primary" onclick="NuevoConductor()">
@@ -262,50 +160,85 @@
   </div>
 </div>
 
-<div
-  class="modal fade"
-  id="agregarMascota"
-  data-bs-backdrop="static"
-  data-bs-keyboard="false"
-  tabindex="-1"
-  aria-labelledby="staticBackdropLabel"
-  aria-hidden="true"
->
+<div class="modal fade" id="agregarMascota" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+  aria-labelledby="staticBackdropLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalToggleLabel2">
-          Agregar Mascota
-        </h5>
+        <h5 class="modal-title" id="exampleModalToggleLabel2">Agregar Mascota</h5>
         <!-- <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> -->
       </div>
       <div class="modal-body">
         <div class="row mt-3">
-          <div class="col-lg-12">
+          <div class="col-lg">
             <div class="form-group" id="camionModal">
-              <label for="txtPlacaV" class="form-label">Placa</label>
+              <label for="txtPlacaV" class=" form-label">Nombre</label>
 
-              <input type="text" id="PlacaNueva" class="form-control" />
+              <input type="text" id="nombreMascota" class="form-control">
+            </div>
+          </div>
+
+        </div>
+        <div class="row mt-3">
+          <div class="col-lg">
+            <div class="form-group" id="camionModal">
+              <label for="txtPlacaV" class=" form-label">Especie</label>
+
+              <select name="" class="form-select" id="especie">
+                <option value="Seleccione una mascota" disabled selected>Seleccione una especie</option>
+                {%for especie in especies%}
+                <option value="{{especie.id_especie}}">{{especie.nom_especie}}</option>
+                {%endfor%}
+              </select>
+            </div>
+          </div>
+          <div class="col-lg">
+            <div class="form-group" id="camionModal">
+              <label for="txtPlacaV" class=" form-label">Raza</label>
+              <select name="" class="form-select" id="raza">
+
+              </select>
+
+            </div>
+          </div>
+        </div>
+        <div class="row mt-3">
+          <div class="col-lg">
+            <div class="form-group" id="camionModal">
+              <label for="txtPlacaV" class=" form-label">Sexo</label>
+
+              <select name="" id="sexo" class="form-select">
+                <option value="M">Macho</option>
+                <option value="H">Hembra</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-lg">
+            <div class="form-group" id="camionModal">
+              <label for="txtPlacaV" class=" form-label">Color</label>
+
+              <input type="text" id="color" class="form-control">
+            </div>
+          </div>
+          <div class="col-lg">
+            <div class="form-group" id="camionModal">
+              <label for="txtPlacaV" class=" form-label">Edad</label>
+
+              <input type="number" id="edad" class="form-control">
             </div>
           </div>
         </div>
       </div>
 
       <div class="modal-footer">
-        <button
-          class="btn btn-secondary"
-          data-bs-target="#agendarConsulta"
-          id="regresar1"
-          data-bs-toggle="modal"
-          data-bs-dismiss="modal"
-        >
-          Regresar
-        </button>
-        <button class="btn btn-primary" onclick="NuevaPlaca()">Guardar</button>
+        <button class="btn btn-secondary" data-bs-target="#agregarUsuario" id="regresar1" data-bs-toggle="modal"
+          data-bs-dismiss="modal">Regresar</button>
+        <button class="btn btn-primary" onclick="NuevaMascota()">Guardar</button>
       </div>
     </div>
   </div>
 </div>
+
 <!-- FIN DEL MODAL -->
 <style>
   .hora-disponible {
@@ -325,6 +258,38 @@
 </style>
 <!-- FIN DE MODALES -->
 <script>
+
+
+  $("#especie").change(function () {
+    $.ajax({
+      url: "{{ url_for('sistema.traerRazas') }}",
+      type: "POST",
+      data: {
+        especie: $('#especie option:selected').val(),
+      },
+      success: function (response) {
+        console.log(response);
+        // Limpiar las opciones anteriores
+        $('#raza').empty();
+
+        // Agregar la opción por defecto
+        $('#raza').append('<option value="Seleccione una raza" disabled selected>Seleccione una raza</option>');
+
+        // Iterar sobre las mascotas recibidas y agregarlas como opciones
+        response.razas.forEach(function (razas) {
+          $('#raza').append('<option value="' + razas.num + '">' + razas.especie + '</option>');
+        });
+      },
+      error: function (error) {
+        console.error("Error en la solicitud AJAX:", error);
+      },
+    });
+  });
+
+
+
+
+
   $("#cliente").change(function () {
     $.ajax({
       url: "{{ url_for('sistema.traerMascotas') }}",
@@ -346,10 +311,10 @@
         response.mascotas.forEach(function (mascota) {
           $("#mascota").append(
             '<option value="' +
-              mascota.idMascota +
-              '">' +
-              mascota.Nombre_mascota +
-              "</option>"
+            mascota.idMascota +
+            '">' +
+            mascota.Nombre_mascota +
+            "</option>"
           );
         });
       },
@@ -363,11 +328,14 @@
     width: $(this).data("width")
       ? $(this).data("width")
       : $(this).hasClass("w-100")
-      ? "150%"
-      : "style",
+        ? "150%"
+        : "style",
     placeholder: $(this).data("placeholder"),
     closeOnSelect: false,
   });
+
+
+
 
   function HorasDisponibles() {
     $.ajax({
@@ -397,6 +365,30 @@
     });
   }
 
+  function NuevaMascota() {
+    $.ajax({
+      url: "{{ url_for('sistema.agregarMascota') }}",
+      type: "POST",
+      data: {
+        cliente: $("#cliente option:selected").val(),
+        nombre: $('#nombreMascota').val(),
+        raza: $('#raza option:selected').val(),
+        sexo: $('#sexo option:selected').val(),
+        color: $('#color').val(),
+        edad: $('#edad').val()
+      },
+      success: function (response) {
+      
+        $('#nombremascota').val($('#nombreMascota').val());
+        $('#idMascota').val(response);
+        $('#regresar1').click();
+
+      },
+      error: function (error) { // console.log(error);
+      }
+    });
+  }
+
   function guardarConsulta() {
     if (
       $("#cliente option:selected").val() == "seleccione un cliente" ||
@@ -405,7 +397,7 @@
       $("#altura").val() == "" ||
       $("#temperatura").val() == "" ||
       $("#cliente option:selected").val() == "Seleccione una hora" ||
-      $("#cliente option:selected").val() == "Tipo de atención"
+      $("#tipoAtencion1 option:selected").val() == "Tipo de atención"
     ) {
       Swal.fire({
         icon: "error",
@@ -430,7 +422,7 @@
           fecha: $("#fecha").val(),
           temperatura: $("#temperatura").val(),
           hora: $("#hora option:selected").val(),
-          atencion: $("#cliente option:selected").val(),
+          atencion: $("#tipoAtencion1 option:selected").val(),
         },
         beforeSend: function () {
           Swal.fire({

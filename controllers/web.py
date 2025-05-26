@@ -74,6 +74,13 @@ def tienda():
     return render_template('web/tienda.html')
 
 
+# INICIO DE LA CONSULTA CALENDARIO  
+@bp.route('/consulta')
+def consulta():
+    
+    return render_template('web/cliente.html',mascota = '',rol =session["rol"],nombre =session["nombre"], cons = '')
+                              
+
 # LOGIN 
 
 @bp.route('/login', methods=['POST'])
@@ -122,10 +129,12 @@ def login():
 
 # FIN LOGIN
 
+
+
 # INICIO CONSULTAS
 @bp.route('/traerCitas')
 def traerCitas():
-    
+    print('web')
     conn = conectar()
     cursor = conn.cursor()
     query = "select a.cod_atencion,c.nombres_cliente,a.fecha_atencion,e.NombreEstado from atencion as a inner join cliente as c on a.num_cliente = c.num_cliente INNER JOIN estado as e on a.id_estado = e.id_estado where e.NombreEstado = 'AGENDADO' and c.num_cliente = ?"

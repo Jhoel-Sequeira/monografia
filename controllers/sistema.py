@@ -36,6 +36,12 @@ def sistema_route():
     
     return render_template('sistema/home.html')
 
+@bp.route('/consultas')
+@login_required
+def consultas():
+    
+    return render_template('web/home.html')
+
 @bp.route('/deslog')
 def deslog():
     session.clear()
@@ -821,6 +827,17 @@ def facturar():
     pdf.set_font('Arial', 'B', 14)
     pdf.multi_cell(0, 5, 'Veterinaria El Buen Productor', 0, "C")
     pdf.ln(1)
+    pdf.set_font('Arial', 'B', 30)
+    pdf.set_text_color(0, 0, 0)
+    pdf.set_font('Arial', 'B', 10)
+    pdf.multi_cell(0, 5, 'RUC 1524135412', 0, "C")
+    pdf.ln(1)
+
+    pdf.set_font('Arial', '', 10)
+    pdf.set_text_color(0, 0, 0)
+    pdf.set_font('Arial', '', 10)
+    pdf.multi_cell(0, 5, 'Monumento la reforma, 10vrs al sur, 10vrs al oeste, contiguo a la bahia de buses Mercadoo San Carlos Masaya, Nicaragua', 0, "C")
+    pdf.ln(1)
     
     pdf.set_font('Arial', 'B', 7.5)
     pdf.cell(25, 10, 'Factura No: ')
@@ -1374,15 +1391,23 @@ def nuevaConsulta():
     return render_template('sistema/agendar_consulta.html')
 
 
-@bp.route('/traerCitas')
-def traerCitas():
-    
-    conn = conectar()
-    cursor = conn.cursor()
-    query = "select a.cod_atencion,c.nombres_cliente,a.fecha_atencion,e.NombreEstado from atencion as a inner join cliente as c on a.num_cliente = c.num_cliente INNER JOIN estado as e on a.id_estado = e.id_estado where e.NombreEstado = 'AGENDADO'"
-    cursor.execute(query)
-    agendas = cursor.fetchall()
+@bp.route('/traerCitasSistema')
+def traerCitasSistema():
+    print('ENTRO')
+    if session['rol'] != 'ADMINISTRADOR':
+        conn = conectar()
+        cursor = conn.cursor()
+        query = "select a.cod_atencion,c.nombres_cliente,a.fecha_atencion,e.NombreEstado from atencion as a inner join cliente as c on a.num_cliente = c.num_cliente INNER JOIN estado as e on a.id_estado = e.id_estado where e.NombreEstado = 'AGENDADO'"
+        cursor.execute(query)
+        agendas = cursor.fetchall()
+    else:
+        conn = conectar()
+        cursor = conn.cursor()
+        query = "select a.cod_atencion,c.nombres_cliente,a.fecha_atencion,e.NombreEstado from atencion as a inner join cliente as c on a.num_cliente = c.num_cliente INNER JOIN estado as e on a.id_estado = e.id_estado where e.NombreEstado = 'AGENDADO'"
+        cursor.execute(query)
+        agendas = cursor.fetchall()
     agenda= []
+    print(agendas)
     for fila in agendas:
         fecha_inicio = fila[2]
         fecha_fin = fecha_inicio + timedelta(minutes=30)  # Suma 30 minutos a la hora de inicio
@@ -1395,7 +1420,7 @@ def traerCitas():
             'fechafin': fecha_fin.strftime('%Y-%m-%d %H:%M:%S') 
         }
         agenda.append(agendas)
-
+    print(agenda)
     return ''+str(agenda)
 
 
@@ -1416,9 +1441,15 @@ def modalAgendar():
     cursor.execute(query)
     atencion = cursor.fetchall()
 
+    conn = conectar()
+    cursor = conn.cursor()
+    query = "select * from especie "
+    cursor.execute(query)
+    especies = cursor.fetchall()
+
     
 
-    return render_template('sistema/modales/programar_cita.html', fecha = fecha,clientes = clientes,atencion = atencion)
+    return render_template('sistema/modales/programar_cita.html', fecha = fecha,clientes = clientes,atencion = atencion,especies = especies)
 
 
 @bp.route('/modalDetalleCita', methods=['POST'])
@@ -1533,11 +1564,13 @@ def traerMascotas():
 
     return jsonify({"mascotas": mascotas_list})
 
+    
+
 @bp.route('/traerRazas', methods=['POST', 'GET'])
 @login_required
 def traerRazas():
     especie = request.form['especie']  # Fecha en formato 'YYYY-MM-DD'
-
+    print(especie)
     conn = conectar()
     cursor = conn.cursor()
     
@@ -1553,6 +1586,7 @@ def traerRazas():
 
     cursor.close()
     conn.close()
+    print(mascotas_list)
 
     return jsonify({"razas": mascotas_list})
 
@@ -1571,7 +1605,7 @@ def agendarCita():
     atencion = request.form['atencion']
     temperatura = request.form['temperatura']
 
-   
+    print(atencion)
 
     fecha_hora_str = f"{fecha} {hora}"
     fecha_hora = datetime.strptime(fecha_hora_str, "%Y-%m-%d %I:%M %p")
@@ -1582,7 +1616,7 @@ def agendarCita():
     locale.setlocale(locale.LC_TIME, 'es_MX.UTF-8')  # Español de México
     mes = fecha_obj.strftime("%B").capitalize()
 
-    print(mes)
+   
 
     conn = conectar()
     cursor = conn.cursor()
@@ -1727,7 +1761,16 @@ def agregarMascota():
     cursor.close()
     conn.close()
 
-   
+    print(mascota[0])
+
+    conn = conectar()
+    cursor = conn.cursor()
+            # Realiza la inserción
+    query = 'INSERT INTO cliente_mascota (cod_mascota,cod_cliente) VALUES (?,?)'
+    cursor.execute(query, (mascota[0],cliente ))
+    conn.commit()
+    cursor.close()
+    conn.close()
     
     return str(mascota[0])
     
@@ -2516,8 +2559,14 @@ def modalAgregarHospitalizacion():
         cursor.execute(query)
         cuarto = cursor.fetchall()
 
+        conn = conectar()
+        cursor = conn.cursor()
+        query = "select * from especie "
+        cursor.execute(query)
+        especies = cursor.fetchall()
+
         
-        return render_template('sistema/modales/modal_agregar_hospitalizacion.html', habitaciones = cuarto,mascotas = mascotas,estados = estados,clientes = cliente)
+        return render_template('sistema/modales/modal_agregar_hospitalizacion.html', habitaciones = cuarto,mascotas = mascotas,estados = estados,clientes = cliente, especies = especies)
         
     else:
         return "No"

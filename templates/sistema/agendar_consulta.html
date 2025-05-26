@@ -554,9 +554,8 @@
     });
 
     function cargareventos() {
-
         $.ajax({
-            url: "{{ url_for('sistema.traerCitas') }}",
+            url: "{{ url_for('sistema.traerCitasSistema') }}",
             type: "GET",
             data: {
 
