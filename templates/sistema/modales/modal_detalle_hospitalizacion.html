@@ -364,7 +364,7 @@
                 Swal.fire({ icon: 'success', title: 'Exito', confirmButtonText: 'Ok', text: 'Usuario Actualizado' }).then((result) => { /* Read more about isConfirmed, isDenied below */
                     if (result.isConfirmed) {
                         cargarHospitalizacion();
-                        $('#agregarHospitalizacion').click();
+                        $('#cerrarDet').click();
                         openTicket($("#id").val());
                     }
                 })

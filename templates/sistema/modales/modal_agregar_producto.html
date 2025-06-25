@@ -60,11 +60,10 @@
                         </div>
                         <div class="col">
                             <label class="form-label " for="form3Example2"
-                                style="margin-top: 20px;"><strong>Stock <i class="ti ti-login"></i></strong> <i
-                                    class="ti ti-exclamation-mark"></i></label>
+                                style="margin-top: 20px;"><strong>Stock </label>
 
 
-                            <input type="text" id="stock" class="form-control">
+                            <input type="text" id="stock_" class="form-control">
 
                         </div>
                         <div class="col" id="bas">
@@ -207,7 +206,14 @@
         $('#toggle-btn').toggleClass('pressed');
     }
     function agregarProductoN() {
-        if ($('#nombre').val() == '' || $("#categoria option:selected").val() == '' || $("#proveedor option:selected").val() == '' || $("#unidad option:selected").val() == '' || $("#precio").val() == '' || $("#stock").val() == '' || $("#stock_critico").val() == '') {
+           
+
+
+
+
+
+
+        if ($('#nombre').val() == '' || $("#categoria option:selected").val() == '' || $("#proveedor option:selected").val() == '' || $("#unidad option:selected").val() == '' || $("#precio").val() == '' || $("#stock_").val() == '' || $("#stock_critico").val() == '') {
             Swal.fire({ icon: 'error', title: 'Error', confirmButtonText: 'Ok', text: 'Debe rellenar todos los campos' }).then((result) => { /* Read more about isConfirmed, isDenied below */
                 if (result.isConfirmed) {
 
@@ -217,7 +223,7 @@
 
             var formData = new FormData();
             formData.append('nombre', $('#nombre').val());
-            formData.append('stock', $('#stock').val());
+            formData.append('stock', $('#stock_').val());
             formData.append('tienda', $('#tienda').val());
             formData.append('precio', $('#precio').val());
             formData.append('categoria', $('#categoria option:selected').val());

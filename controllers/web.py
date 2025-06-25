@@ -122,7 +122,8 @@ def login():
 
                     
             else:
-               return 'error'
+               return render_template('web/index.html')
+                             
     return 'error'
 
 

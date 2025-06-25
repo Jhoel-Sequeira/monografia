@@ -48,7 +48,7 @@
                 <button type="button" id="cerrarDetalle" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 <button type="button" onclick="GuardarEnelCarrito($('#id').val(),$('#cantidad').val())"
                     class="btn btn-primary">Agregar</button>
-                <button id="btnlogin" data-bs-target="#iniciarSesion" data-bs-toggle="modal"
+                <button id="btnlogin" class="d-none" data-bs-target="#iniciarSesion" data-bs-toggle="modal"
                     data-bs-dismiss="modal">aqui</button>
 
             </div>
@@ -70,17 +70,11 @@
                         <input type="text" name="loginUser" placeholder="ingrese su usuario" id="loginUser" class="box">
                         <input type="password" name="loginPassword" placeholder="ingrese su contraseña"
                             id="loginPassword" class="box">
-                        <div class="remember">
-                            <input type="checkbox" name="" id="remember-me">
-                            <label for="remember-me">recordarme</label>
-                        </div>
+                       
                         <input type="submit" onclick="comprar()" value="iniciar sesion" class="btn1">
-                        <div class="links">
-                            <a href="#">recuperar cuenta</a>
-                            <a href="#" id="register-btn">registrarse</a>
-                        </div>
+                        
                         <button class="btn btn-primary" data-bs-target="#exampleModal" data-bs-toggle="modal"
-                            data-bs-dismiss="modal">Back to first</button>
+                            data-bs-dismiss="modal">Regresar</button>
                     </div>
                 </div>
 

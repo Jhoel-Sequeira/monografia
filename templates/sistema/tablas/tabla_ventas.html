@@ -110,7 +110,6 @@
     $("#tabla_ventas tr").click(function () {
         // MANDAMOS A TRAER LOS DATOS
         var id = $(this).attr("id");
-        alert(id)
         $.ajax({
             url: "{{ url_for('sistema.detalleFactura') }}",
             type: "POST",
