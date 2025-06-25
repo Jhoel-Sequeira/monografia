@@ -79,7 +79,7 @@ def tienda():
 def consulta():
     
     return render_template('web/cliente.html',mascota = '',rol =session["rol"],nombre =session["nombre"], cons = '')
-                              
+                            
 
 # LOGIN 
 
