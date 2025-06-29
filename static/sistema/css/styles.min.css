@@ -20598,3 +20598,8 @@ table tr td .status.pending {
 table tr td .status.canceled {
 	background: var(--red);
 }
+
+.btn-morado {
+    background-color: blueviolet !important;
+    color: white !important;
+}

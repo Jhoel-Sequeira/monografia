@@ -144,15 +144,18 @@
                 <button type="button" id="uploadBtn" style="display:none;" onclick="uploadImage()">Subir Imagen</button>
                 <button type="button" id="desbloquear" class="btn "
                     style="background-color: rgb(47, 133, 155); color: white;">Desbloquear</button>
-                {%if producto.tienda == 'No'%}
-                <button type="button" id="toggle-btn" onclick="habilitar()" class="btn "
-                    style="background-color: blueviolet; color: white;">Habilitar en Página</button>
+                {% if producto.tienda == 'No' %}
+                    <button type="button" id="toggle-btn" onclick="habilitar()" class="btn btn-morado">
+                        Habilitar en Página
+                    </button>
                     <input type="hidden" id="tienda" value="0">
-                {%else%}
-                <button type="button" id="toggle-btn" onclick="habilitar()" class="btn pressed">Quitar en
-                    Página</button>
+                {% else %}
+                    <button type="button" id="toggle-btn" onclick="habilitar()" class="btn pressed">
+                        Quitar en Página
+                    </button>
                     <input type="hidden" id="tienda" value="1">
-                {%endif%}
+                {% endif %}
+
                 <button type="button" id="guardar" onclick="guardar()" class="btn btn-primary">Actualizar</button>
                 <!-- <button type="button" id="agregar" onclick="agregarProducto()" class="btn btn-primary">Guardar</button> -->
             </div>
@@ -314,16 +317,21 @@
             });
     }
     function habilitar() {
-        alert($('#tienda').val())
         if ($('#tienda').val() == 0) {
             $('#tienda').val(1);
-            $('#toggle-btn').text('Quitar en página')
+            $('#toggle-btn')
+                .text('Quitar en página')
+                .removeClass('btn-morado')
+                .addClass('pressed');
         } else {
             $('#tienda').val(0);
-            $('#toggle-btn').text('Habilitar en Página')
+            $('#toggle-btn')
+                .text('Habilitar en Página')
+                .removeClass('pressed')
+                .addClass('btn-morado');
         }
-        $('#toggle-btn').toggleClass('pressed');
     }
+
     function agregarProducto() {
         if ($('#nombre').val() == '' || $("#categoria option:selected").val() == '' || $("#proveedor option:selected").val() == '' || $("#unidad option:selected").val() == '' || $("#precio").val() == '' || $("#stock_").val() == '' || $("#stock_critico").val() == '') {
             Swal.fire({ icon: 'error', title: 'Error', confirmButtonText: 'Ok', text: 'Debe rellenar todos los campos' }).then((result) => { /* Read more about isConfirmed, isDenied below */

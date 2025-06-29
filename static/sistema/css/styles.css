@@ -20495,3 +20495,8 @@ color: white !important;
     display: none;
   }
 
+.btn-morado {
+    background-color: blueviolet;
+    color: white;
+}
+
