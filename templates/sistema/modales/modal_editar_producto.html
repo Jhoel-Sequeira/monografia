@@ -138,7 +138,7 @@
                     </div>
                 </div>
             </div>
-            <input type="hidden" id="tienda" value="0">
+            
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 <button type="button" id="uploadBtn" style="display:none;" onclick="uploadImage()">Subir Imagen</button>
@@ -147,9 +147,11 @@
                 {%if producto.tienda == 'No'%}
                 <button type="button" id="toggle-btn" onclick="habilitar()" class="btn "
                     style="background-color: blueviolet; color: white;">Habilitar en Página</button>
+                    <input type="hidden" id="tienda" value="0">
                 {%else%}
                 <button type="button" id="toggle-btn" onclick="habilitar()" class="btn pressed">Quitar en
                     Página</button>
+                    <input type="hidden" id="tienda" value="1">
                 {%endif%}
                 <button type="button" id="guardar" onclick="guardar()" class="btn btn-primary">Actualizar</button>
                 <!-- <button type="button" id="agregar" onclick="agregarProducto()" class="btn btn-primary">Guardar</button> -->
@@ -200,6 +202,7 @@
                 }
             });
         } else {
+            alert($('#tienda').val())
             var formData = new FormData();
             formData.append('nombre', $('#nombre').val());
             formData.append('num', $('#id').val());
@@ -311,6 +314,7 @@
             });
     }
     function habilitar() {
+        alert($('#tienda').val())
         if ($('#tienda').val() == 0) {
             $('#tienda').val(1);
             $('#toggle-btn').text('Quitar en página')
