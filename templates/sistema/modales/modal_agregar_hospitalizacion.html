@@ -68,7 +68,7 @@
                         </div>
 
                         <div class="col">
-                            <label class="form-label" for="form3Example2"><strong>Fecha Salida</strong></label>
+                            <label class="form-label" for="form3Example2"><strong>Fecha tentativa de salida</strong></label>
                             <input type="date" class="form-control" id="fechaSalida">
 
 
@@ -248,7 +248,7 @@
             </div>
 
             <div class="modal-footer">
-                <button class="btn btn-secondary" data-bs-target="#agregarUsuario" id="regresar1"
+                <button class="btn btn-secondary" data-bs-target="#agregarHospitalizacion" id="regresar1"
                     data-bs-toggle="modal" data-bs-dismiss="modal">Regresar</button>
                 <button class="btn btn-primary" onclick="NuevaMascota()">Guardar</button>
             </div>
@@ -300,8 +300,22 @@
                 edad: $('#edad').val()
             },
             success: function (response) {
-                $('#nombremascota').val($('#nombreMascota').val());
-                $('#idMascota').val(response);
+               // Suponiendo que `response` es el ID de la mascota nueva
+                const idMascota = response;
+                const nombreMascota = $('#nombreMascota').val();
+
+                // Agregar la nueva mascota al select
+                $('#mascota').append(
+                    '<option value="' + idMascota + '">' + nombreMascota + '</option>'
+                );
+
+                // Seleccionar la nueva mascota
+                $('#mascota').val(idMascota);
+
+                // Opcional: almacenar el ID si tienes un campo oculto
+                $('#idMascota').val(idMascota);
+
+                // Cerrar el modal u ocultar la sección de nueva mascota
                 $('#regresar1').click();
 
             },
@@ -309,6 +323,31 @@
             }
         });
     }
+    $("#especie").change(function () {
+    $.ajax({
+      url: "{{ url_for('sistema.traerRazas') }}",
+      type: "POST",
+      data: {
+        especie: $('#especie option:selected').val(),
+      },
+      success: function (response) {
+        console.log(response);
+        // Limpiar las opciones anteriores
+        $('#raza').empty();
+
+        // Agregar la opción por defecto
+        $('#raza').append('<option value="Seleccione una raza" disabled selected>Seleccione una raza</option>');
+
+        // Iterar sobre las mascotas recibidas y agregarlas como opciones
+        response.razas.forEach(function (razas) {
+          $('#raza').append('<option value="' + razas.num + '">' + razas.especie + '</option>');
+        });
+      },
+      error: function (error) {
+        console.error("Error en la solicitud AJAX:", error);
+      },
+    });
+  });
 
 
 

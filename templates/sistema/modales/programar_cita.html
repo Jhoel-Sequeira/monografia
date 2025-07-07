@@ -44,18 +44,18 @@
           </div>
 
           <div class="col">
-            <label class="form-label" for="form3Example2"><strong> Peso</strong></label>
+            <label class="form-label" for="form3Example2"><strong> Peso (lb)</strong></label>
 
             <input type="number" name="" class="form-control" id="peso" />
           </div>
           <div class="col">
-            <label class="form-label" for="form3Example2"><strong> Altura</strong></label>
+            <label class="form-label" for="form3Example2"><strong> Altura (cm)</strong></label>
 
             <input type="number" name="" class="form-control" id="altura" />
           </div>
 
           <div class="col">
-            <label class="form-label" for="form3Example2"><strong> Temperatura</strong></label>
+            <label class="form-label" for="form3Example2"><strong> Temperatura (C°)</strong></label>
 
             <input type="number" name="" class="form-control" id="temperatura" />
           </div>
@@ -231,7 +231,7 @@
       </div>
 
       <div class="modal-footer">
-        <button class="btn btn-secondary" data-bs-target="#agregarUsuario" id="regresar1" data-bs-toggle="modal"
+        <button class="btn btn-secondary" data-bs-target="#agendarConsulta" id="regresar1" data-bs-toggle="modal"
           data-bs-dismiss="modal">Regresar</button>
         <button class="btn btn-primary" onclick="NuevaMascota()">Guardar</button>
       </div>
@@ -366,28 +366,41 @@
   }
 
   function NuevaMascota() {
-    $.ajax({
-      url: "{{ url_for('sistema.agregarMascota') }}",
-      type: "POST",
-      data: {
-        cliente: $("#cliente option:selected").val(),
-        nombre: $('#nombreMascota').val(),
-        raza: $('#raza option:selected').val(),
-        sexo: $('#sexo option:selected').val(),
-        color: $('#color').val(),
-        edad: $('#edad').val()
-      },
-      success: function (response) {
-      
-        $('#nombremascota').val($('#nombreMascota').val());
-        $('#idMascota').val(response);
-        $('#regresar1').click();
+  $.ajax({
+    url: "{{ url_for('sistema.agregarMascota') }}",
+    type: "POST",
+    data: {
+      cliente: $("#cliente option:selected").val(),
+      nombre: $('#nombreMascota').val(),
+      raza: $('#raza option:selected').val(),
+      sexo: $('#sexo option:selected').val(),
+      color: $('#color').val(),
+      edad: $('#edad').val()
+    },
+    success: function (response) {
+      // Suponiendo que `response` es el ID de la mascota nueva
+      const idMascota = response;
+      const nombreMascota = $('#nombreMascota').val();
 
-      },
-      error: function (error) { // console.log(error);
-      }
-    });
-  }
+      // Agregar la nueva mascota al select
+      $('#mascota').append(
+        '<option value="' + idMascota + '">' + nombreMascota + '</option>'
+      );
+
+      // Seleccionar la nueva mascota
+      $('#mascota').val(idMascota);
+
+      // Opcional: almacenar el ID si tienes un campo oculto
+      $('#idMascota').val(idMascota);
+
+      // Cerrar el modal u ocultar la sección de nueva mascota
+      $('#regresar1').click();
+    },
+    error: function (error) {
+      console.error("Error al agregar mascota:", error);
+    }
+  });
+}
 
   function guardarConsulta() {
     if (
