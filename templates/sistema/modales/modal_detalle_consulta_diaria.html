@@ -6,8 +6,6 @@
         height: 1px;
         background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0));
     }
-
-
 </style>
 <div class="modal fade" id="modalDetalleConsultaDiaria" data-bs-focus="false" tabindex="-1"
     aria-labelledby="staticBackdropLabel" aria-hidden="true">
@@ -28,7 +26,7 @@
                     </div>
                     <input type="hidden" value="{{general.cod_atencion}}" id="atencion">
                     <div id="generales" style="display: none;">
-                        <div class="row mt-2">
+                        <div class="row mt-2 bloquear">
                             <div class="col" style="margin-top: 20px;">
                                 <label class="form-label " for="form3Example2"><strong>Cliente</strong></label>
                                 <input type="text" id="nombre" value="{{general.Nombre}}" class="form-control">
@@ -49,7 +47,7 @@
                             </div>
                         </div>
 
-                        <div class="row mt-2">
+                        <div class="row mt-2 bloquear">
                             <div class="col">
                                 <label class="form-label " for="form3Example2"
                                     style="margin-top: 20px;"><strong>Especie</strong></label>
@@ -79,27 +77,26 @@
                         <div class="row mt-2 ">
                             <div class="col">
                                 <label class="form-label " for="form3Example2"
-                                    style="margin-top: 20px;"><strong>Peso</strong></label>
-                                <input type="text" id="precio" value="{{general.peso}}" class="form-control">
+                                    style="margin-top: 20px;"><strong>Peso ( lb )</strong></label>
+                                <input type="text" id="peso" value="" class="form-control">
 
                             </div>
                             <div class="col">
                                 <label class="form-label " for="form3Example2"
-                                    style="margin-top: 20px;"><strong>Altura</strong>
+                                    style="margin-top: 20px;"><strong>Altura ( cm )</strong>
                                 </label>
 
 
-                                <input type="text" id="altura" value="{{general.altura}}" class="form-control">
+                                <input type="text" id="altura" value="" class="form-control">
 
                             </div>
                             <div class="col">
                                 <label class="form-label " for="form3Example2"
-                                    style="margin-top: 20px;"><strong>Temperatura</strong>
+                                    style="margin-top: 20px;"><strong>Temperatura ( C° )</strong>
                                 </label>
 
 
-                                <input type="text" id="temperatura" value="{{general.temperatura}}"
-                                    class="form-control">
+                                <input type="text" id="temperatura" value="" class="form-control">
 
                             </div>
 
@@ -120,7 +117,8 @@
 
                     <div id="solucion" class="mt-5">
                         <!-- Encabezado clickeable -->
-                        <div class="row justify-content-center encabezado" style="cursor: pointer;" onclick="ocultarDiagnostico()">
+                        <div class="row justify-content-center encabezado" style="cursor: pointer;"
+                            onclick="ocultarDiagnostico()">
                             ⓘ Diagnóstico
                             <hr class="mt-2 style-two">
                         </div>
@@ -128,17 +126,19 @@
                         <!-- Contenido plegable -->
                         <div id="contenidoDiagnostico">
                             <div class="row mt-2">
-                                <label class="form-label " for="form3Example2"><strong>Ingrese su diagnóstico</strong></label>
+                                <label class="form-label " for="form3Example2"><strong>Ingrese su
+                                        diagnóstico</strong></label>
                                 <textarea name="" class="form-control" cols="4" id="Diagnostico"></textarea>
                             </div>
                         </div>
-                        </div>
+                    </div>
 
 
 
                     <div id="solucion1" class="mt-5">
                         <!-- Encabezado clickeable -->
-                        <div class="row justify-content-center encabezado" style="cursor: pointer;" onclick="ocultarReceta()">
+                        <div class="row justify-content-center encabezado" style="cursor: pointer;"
+                            onclick="ocultarReceta()">
                             ⓘ Recetar
                             <hr class="mt-2 style-two">
                         </div>
@@ -146,30 +146,33 @@
                         <!-- Contenido plegable -->
                         <div id="contenidoReceta">
                             <div class="row mt-2">
-                            <div class="col-9" style="margin-top: 20px;">
-                                <label class="form-label" for="producto"><strong>Medicamento</strong></label>
-                                <input type="text" class="form-control" onkeyup="this.value=this.value.toUpperCase()" placeholder="Producto" id="producto">
-                                <input type="hidden" id="productoId">
-                            </div>
+                                <div class="col-9" style="margin-top: 20px;">
+                                    <label class="form-label" for="producto"><strong>Medicamento</strong></label>
+                                    <input type="text" class="form-control"
+                                        onkeyup="this.value=this.value.toUpperCase()" placeholder="Producto"
+                                        id="producto">
+                                    <input type="hidden" id="productoId">
+                                </div>
 
-                            <div class="col" style="margin-top: 20px;">
-                                <label class="form-label" for="cantidad"><strong>Cantidad</strong></label>
-                                <input type="number" id="cantidad" class="form-control">
-                            </div>
+                                <div class="col" style="margin-top: 20px;">
+                                    <label class="form-label" for="cantidad"><strong>Cantidad</strong></label>
+                                    <input type="number" id="cantidad" class="form-control">
+                                </div>
 
-                            <div class="col" style="margin-top: 50px;">
-                                <button onclick="agregar()" class="btn btn-success">+ Agregar</button>
-                            </div>
+                                <div class="col" style="margin-top: 50px;">
+                                    <button onclick="agregar()" class="btn btn-success">+ Agregar</button>
+                                </div>
                             </div>
 
                             <!-- Lista de productos agregados -->
-                            <div style="background-color:#fff; position: relative; height: auto; width: 100%;" id="productos">
-                            <div class="info" id="listaproductos"></div>
+                            <div style="background-color:#fff; position: relative; height: auto; width: 100%;"
+                                id="productos">
+                                <div class="info" id="listaproductos"></div>
                             </div>
                         </div>
                         <div class="row mt-3">
                             <div class="col" id="receta">
-                               
+
                             </div>
                         </div>
                     </div>
@@ -186,7 +189,7 @@
                 <!-- <button type="button" id="desbloquear" class="btn "
                     style="background-color: rgb(47, 133, 155); color: white;" onclick="printTicket($('#id').val())"><i
                         class="ti ti-printer"></i> Imprimir</button> -->
-                        <button type="button" id="desbloquear" class="btn "
+                <button type="button" id="desbloquear" class="btn "
                     style="background-color: rgb(47, 133, 155); color: white;" onclick="recetar()"><i
                         class="ti ti-printer"></i> Confirmar</button>
 
@@ -197,57 +200,71 @@
 {%endfor%}
 
 <script>
-    function recetar(){
+    function recetar() {
+        if (
+            $("#temperatura").val() == "" ||
+            $("#altura").val() == "" ||
+            $("#peso").val() == "" ||
+            $("#Diagnostico").val() == "" ||
+            $("#atencion").val() == ""
+        ) { }
+        else {
 
-      
-        $.ajax({
-            url: "{{ url_for('sistema.recetar') }}",
-            type: "POST",
-            data: {
-                atencion: $('#atencion').val(),
-                diagnostico: $('#Diagnostico').val()
-            },
-            beforeSend: function () {
-                Swal.fire({
-                    html: '<div class="col-lg-12" style="z-index:99999;  display:absolute; width"><img  style="height: 80px;" src="../../static/sistema/images/logos/dots.gif" alt="loading" /><br/>Enviando detalles...</div>',
-                    showCancelButton: false,
-                    showConfirmButton: false,
-                    backdrop: 'static'
+            $.ajax({
+                url: "{{ url_for('sistema.recetar') }}",
+                type: "POST",
+                data: {
+                    atencion: $('#atencion').val(),
+                    diagnostico: $('#Diagnostico').val(),
+                    peso: $("#peso").val(),
+                    altura:  $("#altura").val(),
+                    temperatura: $("#temperatura").val()
 
-                }).then((result) => {
-                    /* Read more about isConfirmed, isDenied below */
-                    if (result.isConfirmed) {
-                    }
-                });
+                },
+                beforeSend: function () {
+                    Swal.fire({
+                        html: '<div class="col-lg-12" style="z-index:99999;  display:absolute; width"><img  style="height: 80px;" src="../../static/sistema/images/logos/dots.gif" alt="loading" /><br/>Enviando detalles...</div>',
+                        showCancelButton: false,
+                        showConfirmButton: false,
+                        backdrop: 'static'
 
-            },
-            success: function (response) {
-                Swal.close();
-                Swal.fire({
-                            title: "Consulta completada!",
-                            text: "Se enviaron los detalles al correo.",
-                            icon: "success"
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                $('#cerrarDet').click();
-                                cargarComprasDiarias()  // Recargar el inventario
+                    }).then((result) => {
+                        /* Read more about isConfirmed, isDenied below */
+                        if (result.isConfirmed) {
+                        }
+                    });
 
-                            }
-                        });
+                },
+                success: function (response) {
+                    Swal.close();
+                    Swal.fire({
+                        title: "Consulta completada!",
+                        text: "Se enviaron los detalles al correo.",
+                        icon: "success"
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            $('#cerrarDet').click();
+                            cargarComprasDiarias()  // Recargar el inventario
 
-            },
-            error: function (error) {
-                // console.log(error);
-            },
-        });
+                        }
+                    });
 
-        
+                },
+                error: function (error) {
+                    // console.log(error);
+                },
+            });
+        }
+
+
+
+
     }
 
 
 
     cargarReceta();
-    function cargarReceta(){
+    function cargarReceta() {
         $.ajax({
             url: "{{ url_for('sistema.tablaConsultasProductos') }}",
             type: "POST",
@@ -265,18 +282,18 @@
         });
     }
 
-function agregar(){
-    if($('#cantidad').val()<= 0 || $('#cantidad').val() == '' || $('#producto').val() == '' ){
-        Swal.fire({
-            title: "Error",
-            text: "Datos no válidos",
-            icon: "warning",
-            showCancelButton: false,
-            confirmButtonColor: "#3085d6",
-            confirmButtonText: "Continuar"
-        }).then((result) => {})
-    }else{
-        $.ajax({
+    function agregar() {
+        if ($('#cantidad').val() <= 0 || $('#cantidad').val() == '' || $('#producto').val() == '') {
+            Swal.fire({
+                title: "Error",
+                text: "Datos no válidos",
+                icon: "warning",
+                showCancelButton: false,
+                confirmButtonColor: "#3085d6",
+                confirmButtonText: "Continuar"
+            }).then((result) => { })
+        } else {
+            $.ajax({
                 url: "{{ url_for('sistema.agregarProductosAtencion') }}",
                 type: "POST",
                 data: {
@@ -294,11 +311,11 @@ function agregar(){
                     // console.log(error);
                 },
             });
-    }
-   
-}
+        }
 
-var buscarProducto = function () {
+    }
+
+    var buscarProducto = function () {
         if ($("#producto").val() != "") {
 
             $.ajax({
@@ -315,7 +332,7 @@ var buscarProducto = function () {
                         $("#producto").val($(this).text());
                         $("#productoId").val($(this).attr("value"));
                         $("#listaproductos").hide();
-                        
+
                     });
                 },
                 error: function (error) {
@@ -342,12 +359,12 @@ var buscarProducto = function () {
         }
     }
     function ocultarDiagnostico() {
-    const contenido = document.getElementById('contenidoDiagnostico');
-    contenido.style.display = (contenido.style.display === 'none') ? 'block' : 'none';
+        const contenido = document.getElementById('contenidoDiagnostico');
+        contenido.style.display = (contenido.style.display === 'none') ? 'block' : 'none';
     }
     function ocultarReceta() {
-    const contenido = document.getElementById('contenidoReceta');
-    contenido.style.display = (contenido.style.display === 'none') ? 'block' : 'none';
+        const contenido = document.getElementById('contenidoReceta');
+        contenido.style.display = (contenido.style.display === 'none') ? 'block' : 'none';
     }
 
 
@@ -426,7 +443,7 @@ var buscarProducto = function () {
 
 
 
-    document.querySelectorAll('.cuerpo-modal #generales input, .cuerpo-modal select, .cuerpo-modal file').forEach(element => {
+    document.querySelectorAll('.cuerpo-modal #generales .bloquear input, .cuerpo-modal select, .cuerpo-modal file').forEach(element => {
         element.disabled = true;
     });
     var isDisabled = false; // Iniciamos con los elementos desactivados
@@ -436,7 +453,7 @@ var buscarProducto = function () {
         var isDisabled = false; // Iniciamos con los elementos desactivados
     }
 
-    document.querySelectorAll('.cuerpo-modal #generales input, .cuerpo-modal select, .cuerpo-modal file').forEach(element => {
+    document.querySelectorAll('.cuerpo-modal #generales .bloquear input, .cuerpo-modal select, .cuerpo-modal file').forEach(element => {
         element.disabled = true;
     });
 

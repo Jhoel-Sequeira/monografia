@@ -43,7 +43,7 @@
             </select>
           </div>
 
-          <div class="col">
+          <!-- <div class="col">
             <label class="form-label" for="form3Example2"><strong> Peso (lb)</strong></label>
 
             <input type="number" name="" class="form-control" id="peso" />
@@ -58,7 +58,7 @@
             <label class="form-label" for="form3Example2"><strong> Temperatura (C°)</strong></label>
 
             <input type="number" name="" class="form-control" id="temperatura" />
-          </div>
+          </div> -->
         </div>
 
         <div class="row mt-2">
@@ -406,9 +406,6 @@
     if (
       $("#cliente option:selected").val() == "seleccione un cliente" ||
       $("#mascota option:selected").val() == "Seleccione una mascota" ||
-      $("#peso").val() == "" ||
-      $("#altura").val() == "" ||
-      $("#temperatura").val() == "" ||
       $("#cliente option:selected").val() == "Seleccione una hora" ||
       $("#tipoAtencion1 option:selected").val() == "Tipo de atención"
     ) {
@@ -429,11 +426,11 @@
         data: {
           cliente: $("#cliente option:selected").val(),
           mascota: $("#mascota option:selected").val(),
-          peso: $("#peso").val(),
-          altura: $("#altura").val(),
+          peso: 0,
+          altura: 0,
           observacion: $("#observacion").val(),
           fecha: $("#fecha").val(),
-          temperatura: $("#temperatura").val(),
+          temperatura: 0,
           hora: $("#hora option:selected").val(),
           atencion: $("#tipoAtencion1 option:selected").val(),
         },

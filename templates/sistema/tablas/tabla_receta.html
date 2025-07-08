@@ -1,12 +1,9 @@
 <style>
-    .modal-backdrop {
+  .modal-backdrop {
     display: none;
   }
 </style>
-<table
-  class="table text-nowrap mb-0 align-middle table-hover"
-  id="tabla_consultas_diarias"
->
+<table class="table text-nowrap mb-0 align-middle table-hover" id="tabla_consultas_diarias">
   <thead class="text-dark fs-4">
     <tr>
       <th class="border-bottom-0">
@@ -40,32 +37,17 @@
       </td>
 
       <td class="border-bottom-0" style="text-align: end">
-        <span class="fw-normal"
-          ><button
-            value="{{venta.cod_detalle}}"
-            name="comment"
-            class="btn btn-light"
-          >
-            <i class="ti ti-message"></i></button
-          ><button
-            value="{{venta.cod_detalle}}"
-            name="delete"
-            class="btn btn-light"
-          >
-            <i class="ti ti-eraser"></i></button
-        ></span>
+        <span class="fw-normal"><button value="{{venta.cod_detalle}}" name="comment" class="btn btn-light">
+            <i class="ti ti-message"></i></button><button value="{{venta.cod_detalle}}" name="delete"
+            class="btn btn-light">
+            <i class="ti ti-eraser"></i></button></span>
       </td>
     </tr>
     {%endfor%}
   </tbody>
 </table>
 <div id="modal-detalle-consulta-diaria"></div>
-<input
-  id="detalleConsultaDiaria"
-  type="hidden"
-  data-bs-toggle="modal"
-  data-bs-target="#modalDetalleConsultaDiaria"
-/>
+<input id="detalleConsultaDiaria" type="hidden" data-bs-toggle="modal" data-bs-target="#modalDetalleConsultaDiaria" />
 <script>
   $("#tabla_consultas_diarias button[name=comment]").click(function () {
     idDet = $(this).val();
@@ -73,7 +55,7 @@
       title: "Agregar Orientaciones!",
       text: "Ingrese los datos de la tara",
       html: '<textarea class="form-control" id="orientacion" rows="4"></textarea>',
-      
+
       preConfirm: (value) => {
         if ($("#orientacion").val() == "") {
           Swal.showValidationMessage("Debe ingresar datos válidos.");
@@ -82,23 +64,26 @@
 
       showCancelButton: true,
     }).then((result) => {
-      valor = $("#orientacion").val();
-      
+      if (result.isConfirmed) {
+        valor = $("#orientacion").val();
 
-      $.ajax({
-        url: "{{ url_for('sistema.orientaciones') }}",
-        type: "POST",
-        data: {
-          detalle: idDet,
-          orientacion: valor,
-        },
-        success: function (response) {
-          cargarReceta();
-        },
-        error: function (error) {
-          // console.log(error);
-        },
-      });
+
+        $.ajax({
+          url: "{{ url_for('sistema.orientaciones') }}",
+          type: "POST",
+          data: {
+            detalle: idDet,
+            orientacion: valor,
+          },
+          success: function (response) {
+            cargarReceta();
+          },
+          error: function (error) {
+            // console.log(error);
+          },
+        });
+      }
+
     });
   });
 

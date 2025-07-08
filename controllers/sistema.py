@@ -1994,11 +1994,15 @@ def recetar():
         detalle = request.form['atencion']
         diagnostico = request.form['diagnostico']
 
+        peso = request.form['peso']
+        altura = request.form['altura']
+        temperatura = request.form['temperatura']
+
 
         conn = conectar()
         cursor = conn.cursor()
-        query = 'UPDATE atencion set id_estado = 14, diagnostico = ? where cod_atencion = ?'
-        cursor.execute(query, (diagnostico,detalle))
+        query = 'UPDATE atencion set id_estado = 14, diagnostico = ?,peso = ?,altura = ?, temperatura = ? where cod_atencion = ?'
+        cursor.execute(query, (diagnostico,peso,altura,temperatura,detalle))
         conn.commit()
         cursor.close()
         conn.close()
