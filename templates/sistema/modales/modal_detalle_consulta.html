@@ -1,55 +1,27 @@
 {%for general in detalle%}
-<div
-  class="modal fade"
-  id="modalDetalleConsulta"
-  data-bs-backdrop="static"
-  tabindex="-1"
-  aria-labelledby="staticBackdropLabel"
-  aria-hidden="true"
->
+<div class="modal fade" id="modalDetalleConsulta" data-bs-backdrop="static" tabindex="-1"
+  aria-labelledby="staticBackdropLabel" aria-hidden="true">
   <div class="modal-dialog modal-xl">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="staticBackdropLabel">Detalle Consulta</h5>
-        <button
-          type="button"
-          class="btn-close"
-          id="cerrarDet"
-          data-bs-dismiss="modal"
-          aria-label="Close"
-        ></button>
+        <button type="button" class="btn-close" id="cerrarDet" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
         <input type="hidden" name="" value="{{general.cod_atencion}}" id="id" />
         <div class="cuerpo-modal" style="background-color: white">
           <div class="row mt-2">
             <div class="col" style="margin-top: 20px">
-              <label class="form-label" for="form3Example2"
-                ><strong>Cliente</strong></label
-              >
-              <input
-                type="text"
-                id="nombre"
-                value="{{general.Nombre}}"
-                class="form-control"
-              />
+              <label class="form-label" for="form3Example2"><strong>Cliente</strong></label>
+              <input type="text" id="nombre" value="{{general.Nombre}}" class="form-control" />
             </div>
             <div class="col" id="bas">
               <div class="row">
                 <div class="col">
-                  <label
-                    class="form-label"
-                    for="form3Example2"
-                    style="margin-top: 20px"
-                    ><strong>Mascota</strong>
+                  <label class="form-label" for="form3Example2" style="margin-top: 20px"><strong>Mascota</strong>
                   </label>
 
-                  <input
-                    type="text"
-                    id="stock_critico"
-                    value="{{general.Nombre_mascota}}"
-                    class="form-control"
-                  />
+                  <input type="text" id="stock_critico" value="{{general.Nombre_mascota}}" class="form-control" />
                 </div>
               </div>
             </div>
@@ -57,127 +29,59 @@
 
           <div class="row mt-2">
             <div class="col">
-              <label
-                class="form-label"
-                for="form3Example2"
-                style="margin-top: 20px"
-                ><strong>Especie</strong></label
-              >
-              <input
-                type="text"
-                id="precio"
-                value="{{general.nom_especie}}"
-                class="form-control"
-              />
+              <label class="form-label" for="form3Example2" style="margin-top: 20px"><strong>Especie</strong></label>
+              <input type="text" id="precio" value="{{general.nom_especie}}" class="form-control" />
             </div>
             <div class="col">
-              <label
-                class="form-label"
-                for="form3Example2"
-                style="margin-top: 20px"
-                ><strong>Tipo</strong>
+              <label class="form-label" for="form3Example2" style="margin-top: 20px"><strong>Tipo</strong>
               </label>
 
-              <input
-                type="text"
-                id="stock"
-                value="{{general.tipo}}"
-                class="form-control"
-              />
+              <input type="text" id="stock" value="{{general.tipo}}" class="form-control" />
             </div>
             <div class="col">
-              <label
-                class="form-label"
-                for="form3Example2"
-                style="margin-top: 20px"
-                ><strong>Estado</strong>
+              <label class="form-label" for="form3Example2" style="margin-top: 20px"><strong>Estado</strong>
               </label>
 
-              <input
-                type="text"
-                id="stock"
-                value="{{general.NombreEstado}}"
-                class="form-control"
-              />
+              <input type="text" id="stock" value="{{general.NombreEstado}}" class="form-control" />
             </div>
           </div>
           <div class="row mt-2">
             <div class="col">
-              <label
-                class="form-label"
-                for="form3Example2"
-                style="margin-top: 20px"
-                ><strong>Peso</strong></label
-              >
-              <input
-                type="text"
-                id="precio"
-                value="{{general.peso}}"
-                class="form-control"
-              />
+              <label class="form-label" for="form3Example2" style="margin-top: 20px"><strong>Peso</strong></label>
+              <input type="text" id="precio" value="{{general.peso}}" class="form-control" />
             </div>
             <div class="col">
-              <label
-                class="form-label"
-                for="form3Example2"
-                style="margin-top: 20px"
-                ><strong>Altura</strong>
+              <label class="form-label" for="form3Example2" style="margin-top: 20px"><strong>Altura</strong>
               </label>
 
-              <input
-                type="text"
-                id="altura"
-                value="{{general.altura}}"
-                class="form-control"
-              />
+              <input type="text" id="altura" value="{{general.altura}}" class="form-control" />
             </div>
             <div class="col">
-              <label
-                class="form-label"
-                for="form3Example2"
-                style="margin-top: 20px"
-                ><strong>Temperatura</strong>
+              <label class="form-label" for="form3Example2" style="margin-top: 20px"><strong>Temperatura</strong>
               </label>
 
-              <input
-                type="text"
-                id="temperatura"
-                value="{{general.temperatura}}"
-                class="form-control"
-              />
+              <input type="text" id="temperatura" value="{{general.temperatura}}" class="form-control" />
             </div>
           </div>
           <div class="row mt-3">
             <div class="col">
-              <label
-                class="form-label"
-                for="form3Example2"
-                style="margin-top: 20px"
-                ><strong>Observación</strong>
+              <label class="form-label" for="form3Example2" style="margin-top: 20px"><strong>Observación</strong>
               </label>
 
               <textarea name="" disabled class="form-control" id="">
-{{general.descripcion}}</textarea
-              >
+{{general.descripcion}}</textarea>
             </div>
           </div>
           <div class="row mt-3">
             <div class="col">
               <div class="d-flex justify-content-center">
-                <label
-                  class="form-label"
-                  for="form3Example2"
-                  style="margin-top: 20px"
-                  ><strong>Medicamentos</strong>
+                <label class="form-label" for="form3Example2" style="margin-top: 20px"><strong>Medicamentos</strong>
                 </label>
                 <hr />
               </div>
 
               <div id="tabla_receta">
-                <table
-                  class="table text-nowrap mb-0 align-middle table-hover"
-                  id="tabla_consultas_diarias"
-                >
+                <table class="table text-nowrap mb-0 align-middle table-hover" id="tabla_consultas_diarias">
                   <thead class="text-dark fs-4">
                     <tr>
                       <th class="border-bottom-0">
@@ -208,8 +112,7 @@
                       <td class="border-bottom-0">
                         <span class="fw-normal">
                           {%if
-                          venta.orientacion%}{{venta.orientacion}}{%else%}-{%endif%}</span
-                        >
+                          venta.orientacion%}{{venta.orientacion}}{%else%}-{%endif%}</span>
                       </td>
 
                       <td class="border-bottom-0" style="text-align: end">
@@ -225,18 +128,13 @@
           <div class="row mt-3">
             <div class="col">
               <div class="d-flex justify-content-center">
-                <label
-                  class="form-label"
-                  for="form3Example2"
-                  style="margin-top: 20px"
-                  ><strong>Diagnóstico</strong>
+                <label class="form-label" for="form3Example2" style="margin-top: 20px"><strong>Diagnóstico</strong>
                 </label>
                 <hr />
               </div>
 
               <textarea name="" disabled class="form-control" id="">
-{{general.diagnostico}}</textarea
-              >
+{{general.diagnostico}}</textarea>
             </div>
           </div>
         </div>
@@ -246,33 +144,18 @@
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
           Close
         </button>
-        <button
-          type="button"
-          id="uploadBtn"
-          class="btn"
-          style="background-color: rgb(178, 13, 13); color: white"
-          onclick="cancelar()"
-        >
+        <button type="button" id="uploadBtn" class="btn" style="background-color: rgb(178, 13, 13); color: white"
+          onclick="cancelar()">
           <i class="ti ti-x"></i> Cancelar
         </button>
 
-        <button
-          type="button"
-          id="desbloquear"
-          class="btn"
-          style="background-color: rgb(47, 49, 155); color: white"
-          onclick="enviar_correo()"
-        >
+        <button type="button" id="desbloquear" class="btn" style="background-color: rgb(47, 49, 155); color: white"
+          onclick="enviar_correo()">
           <i class="ti ti-mail"></i> Enviar Correo
         </button>
 
-        <button
-          type="button"
-          id="desbloquear"
-          class="btn"
-          style="background-color: rgb(47, 133, 155); color: white"
-          onclick="printTicket($('#id').val())"
-        >
+        <button type="button" id="desbloquear" class="btn" style="background-color: rgb(47, 133, 155); color: white"
+          onclick="printTicket($('#id').val())">
           <i class="ti ti-printer"></i> Imprimir
         </button>
       </div>
@@ -352,23 +235,37 @@
     }).then((result) => {
       if (result.isConfirmed) {
         $.ajax({
-          url: "{{ url_for('sistema.cancelarFactura') }}",
+          url: "{{ url_for('sistema.cancelarConsulta') }}",
           type: "POST",
           data: {
             id: $("#id").val(),
           },
 
           success: function (response) {
-            Swal.fire({
-              title: "Anulada!",
-              text: "Se ha anulado la factura.",
-              icon: "success",
-            }).then((result) => {
-              if (result.isConfirmed) {
-                $("#cerrarDet").click();
-                cargarCompras(); // Recargar el inventario
-              }
-            });
+            if (response == 'Hecho') {
+              Swal.fire({
+                title: "Anulada!",
+                text: "Se ha anulado la consulta.",
+                icon: "success",
+              }).then((result) => {
+                if (result.isConfirmed) {
+                  $("#cerrarDet").click();
+                  cargarCompras(); // Recargar el inventario
+                }
+              });
+            } else {
+              Swal.fire({
+                title: "Error!",
+                text: "No se puede anular la consulta finalizada.",
+                icon: "warning",
+              }).then((result) => {
+                if (result.isConfirmed) {
+                  $("#cerrarDet").click();
+                  cargarCompras(); // Recargar el inventario
+                }
+              });
+            }
+
           },
           error: function (error) {
             console.log(error);

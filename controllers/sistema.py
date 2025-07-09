@@ -506,6 +506,43 @@ def cancelarFactura():
     conn.close()
 
     return 'Hecho'
+
+
+
+@bp.route('/cancelarConsulta', methods=['POST'])
+@login_required
+def cancelarConsulta():
+
+    num = request.form['id']
+
+    conn = conectar()
+    cursor = conn.cursor()
+    query = "select e.NombreEstado from atencion as a inner join estado as e ON a.id_estado = e.id_estado where cod_atencion = ?"
+    cursor.execute(query,(num))
+    estado = cursor.fetchone()
+
+    print(estado[0])
+    if estado[0] != 'FINALIZADO':
+        conn = conectar()
+        cursor = conn.cursor()
+                        # Query de actualización del producto
+        query = '''
+                UPDATE atencion
+                SET id_estado = 9
+                WHERE cod_atencion = ?
+        '''
+                        
+                        # Ejecutar la consulta SQL
+        cursor.execute(query, (num))
+        conn.commit()
+
+                        # Cerrar la conexión
+        cursor.close()
+        conn.close()
+
+        return 'Hecho'
+    else:
+        return 'finalizado'
     
     
 @bp.route('/buscarProductoCaja', methods=['POST'])
