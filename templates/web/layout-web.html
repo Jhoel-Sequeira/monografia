@@ -68,13 +68,13 @@
         {%if session.rol == "CLIENTE"%}
         <div class="icons1">
             {%if session%}
-            
-            <a   href="/carrito"  class="fas fa-shopping-cart" ></a>
-                <span  id="cart-count" class="cart-count">0</span>
+
+            <a href="/carrito" class="fas fa-shopping-cart"></a>
+            <span id="cart-count" class="cart-count">0</span>
             </a>
             {%else%}
-            <a   onclick="log()" class="fas fa-shopping-cart" ></a>
-                <span  id="cart-count" class="cart-count">0</span>
+            <a onclick="log()" class="fas fa-shopping-cart"></a>
+            <span id="cart-count" class="cart-count">0</span>
             </a>
             {%endif%}
             <div class="fas fa-bars" id="menu-btn1"></div>
@@ -84,14 +84,14 @@
         <div class="icons1">
             <div class="fas fa-bars" id="menu-btn1"></div>
             <!-- onclick="carritoUsuario()" -->
-             {%if session%}
-            
-            <a   href="/carrito"  class="fas fa-shopping-cart" ></a>
-                <span  id="cart-count" class="cart-count">0</span>
+            {%if session%}
+
+            <a href="/carrito" class="fas fa-shopping-cart"></a>
+            <span id="cart-count" class="cart-count">0</span>
             </a>
             {%else%}
-            <a   onclick="log()" class="fas fa-shopping-cart" ></a>
-                <span  id="cart-count" class="cart-count">0</span>
+            <a onclick="log()" class="fas fa-shopping-cart"></a>
+            <span id="cart-count" class="cart-count">0</span>
             </a>
             {%endif%}
             <div class="fas fa-user" onclick="log()" id="login-btn"></div>
@@ -99,11 +99,10 @@
         <!-- inicio de login de usuario -->
         <form action="/login" method="POST" id="login" class="login-form">
             <h3>Inicia Sesion</h3>
-            <input type="text" name="usuario" placeholder="ingrese su usuario" id="" class="box">
+            <input type="text" name="usuario" placeholder="ingrese su usuario" id="us" class="box">
             <input type="password" name="pass" placeholder="ingrese su contraseña" id="" class="box">
             <div class="remember">
-                <input type="checkbox" name="" id="remember-me">
-                <label for="remember-me">recordarme</label>
+                <a onclick="recuperar()"><label for="remember-me">recuperar</label></a>
             </div>
             <input type="submit" value="iniciar sesion" class="btn1">
             <div class="links">
@@ -160,7 +159,7 @@
         <!-- inicio de la burbuja del chatbot -->
         <div class="chat-bubble">
             <span>
-                <h1><i class="fas fa-comment-dots" style="font-size: 25px; color: white; margin-top: 10px;" ></i></h1>
+                <h1><i class="fas fa-comment-dots" style="font-size: 25px; color: white; margin-top: 10px;"></i></h1>
             </span>
             <div class="" id="chatbot">
                 <div class="chat-tray">
@@ -170,18 +169,22 @@
                         <div class="chat-bubble1">
                             <div class="row">
                                 <div class="cols" style="width: 10px; height: 10px;"><i class="fas fa-robot"></i></div>
-                                <div class="col m-4 mt-5"><span><div class="burbuja" style="text-decoration: none;">Hola, soy tu asistente virtual. ¿En qué puedo ayudarte?</div></span></div>
+                                <div class="col m-4 mt-5"><span>
+                                        <div class="burbuja" style="text-decoration: none;">Hola, soy tu asistente
+                                            virtual. ¿En qué puedo ayudarte?</div>
+                                    </span></div>
                             </div>
-                            
+
                         </div>
 
-                       
+
 
                         <!-- Aquí van los mensajes del chat -->
                     </div>
                     <div class="chat-form">
                         <input type="text" id="mensaje" placeholder="Escribe tu mensaje...">
-                        <button class="botonenviar" type="button" onclick="MandarMensaje()"><i class="fas fa-paper-plane" style="font-size: 25px; margin: 10px;"></i></button>
+                        <button class="botonenviar" type="button" onclick="MandarMensaje()"><i
+                                class="fas fa-paper-plane" style="font-size: 25px; margin: 10px;"></i></button>
                     </div>
                 </div>
 
@@ -228,6 +231,44 @@
     integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
     crossorigin="anonymous"></script>
 <script>
+    function recuperar() {
+        alert('entro')
+        if ($('#us').val() == '') {
+            Swal.fire({ icon: 'error', title: 'Error', confirmButtonText: 'Ok', text: 'Debe de ingresar al menos el usuario o su correo' }).then((result) => { /* Read more about isConfirmed, isDenied below */
+                if (result.isConfirmed) {
+
+                }
+            })
+        } else {
+            $.ajax({
+                url: "/recuperar",
+                type: "POST",
+                data: {
+                    datos: $('#us').val(),
+                },
+                success: function (response) {
+                    if (response == 'No') {
+                        Swal.fire({ icon: 'error', title: 'Usuario no encontrado', confirmButtonText: 'Ok', text: 'No se encontró su usuario' }).then((result) => { /* Read more about isConfirmed, isDenied below */
+                            if (result.isConfirmed) {
+
+                            }
+                        })
+                    } else {
+                        Swal.fire({ icon: 'success', title: 'Usuario Restablecido', confirmButtonText: 'Ok', text: 'Se enviaron las credenciales a su correo' }).then((result) => { /* Read more about isConfirmed, isDenied below */
+                            if (result.isConfirmed) {
+
+                            }
+                        })
+                    }
+
+
+                },
+                error: function (error) {
+                    //console.log(error);
+                },
+            });
+        }
+    }
     function updateCartCount() {
         // Supongamos que el número de productos está almacenado en la sesión o se obtiene de una llamada a la base de datos.
         let cartItems = sessionStorage.getItem('cartItems') || 0; // O puedes usar otra fuente de datos
@@ -286,7 +327,7 @@
     $(document).ready(function () {
         // cargarChatbot();    
     });
-    
+
     function cargarChatbot() {
         $.ajax({
             url: "/cargarChatBot",
@@ -313,9 +354,9 @@
 
 
         var chatBubble = document.createElement("div");
-                chatBubble.className = "chat-bubble1 ";
-                var icono = '<i class="fas fa-user"></i>'
-                chatBubble.innerHTML = `
+        chatBubble.className = "chat-bubble1 ";
+        var icono = '<i class="fas fa-user"></i>'
+        chatBubble.innerHTML = `
                     <div class="row">
                         
                         <div class="col-10 m-3 mt-5">
@@ -330,15 +371,15 @@
                         </div>
                     </div>
                 `;
-                
-                chatDisplay.appendChild(chatBubble);
-                
+
+        chatDisplay.appendChild(chatBubble);
 
 
-        
 
 
-        
+
+
+
 
         $.ajax({
             url: "/recibirMensaje",
@@ -365,7 +406,7 @@
                         </div>
                     </div>
                 `;
-                
+
                 chatDisplay.appendChild(chatBubbleBot);
 
                 // Hacer scroll hacia abajo para mostrar la última respuesta.
@@ -438,24 +479,24 @@
 
 
 
-    function traerCarrito(){
+    function traerCarrito() {
         $.ajax({
-        url: "{{ url_for('web.cargarCarrito') }}",
-        type: "POST",
-        data: {
-            
+            url: "{{ url_for('web.cargarCarrito') }}",
+            type: "POST",
+            data: {
 
-        },
-        success: function (response) {
-            $('#cart-count').text(response);
 
-        },
-        error: function (error) {
-            // console.log(error);
-        },
-    });
+            },
+            success: function (response) {
+                $('#cart-count').text(response);
+
+            },
+            error: function (error) {
+                // console.log(error);
+            },
+        });
     }
-    
+
 </script>
 
 {%endif%}

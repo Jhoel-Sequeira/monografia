@@ -1,6 +1,8 @@
 # controllers/web.py
 import os
 from flask import Blueprint
+import random
+import string
 
 from datetime import datetime, date, timedelta
 import json
@@ -30,7 +32,7 @@ from openpyxl import Workbook
 from openpyxl.drawing.image import Image
 from openpyxl.styles import Alignment,Font,Border,Side
 
-from controllers.correo import enviar_usuario,enviar_correo_orden
+from controllers.correo import enviar_usuario,enviar_correo_orden,enviar_correo_registro
 
 bp = Blueprint('web', __name__)
 
@@ -46,6 +48,29 @@ stop_words_personalizado = set(STOP_WORDS) - set(palabras_excluidas)
         # Asignar el nuevo conjunto stop_words personalizado al modelo de SpaCy
 nlp.Defaults.stop_words = stop_words_personalizado
 
+def generar_contrasena(longitud=8):
+    if longitud < 4:
+        raise ValueError("La longitud mínima recomendada es 4 caracteres.")
+
+    letras = string.ascii_lowercase
+    numeros = string.digits
+    mayusculas = string.ascii_uppercase
+
+    # Garantizamos al menos una letra minúscula, una mayúscula y un número
+    contrasena = [
+        random.choice(letras),
+        random.choice(mayusculas),
+        random.choice(numeros),
+    ]
+
+    # Rellenamos el resto de la contraseña con letras y números
+    todos = letras + mayusculas + numeros
+    contrasena += random.choices(todos, k=longitud - 3)
+
+    # Mezclamos los caracteres
+    random.shuffle(contrasena)
+
+    return ''.join(contrasena)
 
 def capturarHora():
     hi = datetime.now()
@@ -80,7 +105,41 @@ def consulta():
     
     return render_template('web/cliente.html',mascota = '',rol =session["rol"],nombre =session["nombre"], cons = '')
                             
+# INICIO DE LA CONSULTA CALENDARIO  
+@bp.route('/recuperar', methods=['POST'])
+def recuperar():
+    datos = request.form['datos']
 
+    print(datos)
+    conn = conectar()
+            
+    cursor = conn.cursor()
+    query = 'select c.correo_cliente,cred.id_credencial,cred.usuario from credenciales as cred inner join cliente as c on cred.id_credencial = c.id_credencial inner join roles as r on cred.rol = r.cod_rol where (cred.usuario = ? or c.correo_cliente = ?) AND c.id_estado = 1'
+    cursor.execute(query, (datos,datos))
+    correo = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    if correo:
+
+        contra = generar_contrasena(8)
+        usuario = correo[0][2]
+
+        conn = conectar()
+        cursor = conn.cursor()
+        query = 'UPDATE credenciales set contrasena = ? where id_credencial = ?'
+        cursor.execute(query,(generate_password_hash(contra),correo[0][1]))
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+
+
+        enviar_correo_registro(current_app,"Usuario Actualizado!!!",correo[0][0],'registro',usuario,contra)
+
+        return 'Hecho'
+    else:
+        return 'No'
+         
 # LOGIN 
 
 @bp.route('/login', methods=['POST'])
@@ -124,7 +183,7 @@ def login():
             else:
                return render_template('web/index.html')
                              
-    return 'error'
+    return render_template('web/index.html')
 
 
 
