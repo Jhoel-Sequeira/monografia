@@ -30,6 +30,9 @@
                                 <h6 class="fw-semibold mb-0">Tipo Atención</h6>
                             </th>
                             <th class="border-bottom-0">
+                                <h6 class="fw-semibold mb-0">Veterinario</h6>
+                            </th>
+                            <th class="border-bottom-0">
                                 <h6 class="fw-semibold mb-0">Estado</h6>
                             </th>
                         </tr>
@@ -53,9 +56,13 @@
                             <td class="border-bottom-0">
                                 <span class="fw-normal">{{venta.nom_especie}}</span>
                             </td>
+                            
                             <td class="border-bottom-0">
 
                                 <span class="fw-normal">{{venta.tipo}}</span>
+                            </td>
+                            <td class="border-bottom-0">
+                                <span class="fw-normal">{{venta.veterinario}}</span>
                             </td>
 
                             {%if venta.NombreEstado == 'AGENDADO'%}
