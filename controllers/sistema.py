@@ -804,25 +804,41 @@ def facturar():
         # Consulta SQL para obtener los datos del ticket
         query = """
             	SELECT 
-                    v.cod_venta, 
-                    v.fecha_venta,
-                    
-                    vendedor.nombres_cliente + ' ' + vendedor.apellidos_cliente AS vendedor,
-                    SUM(dv.cantidad * p.precio - dv.precio_venta) AS total_venta
-                FROM 
-                    venta AS v 
-                INNER JOIN 
-                    cliente AS vendedor ON vendedor.num_cliente = v.vendedor 
-                INNER JOIN 
-                    Det_venta AS dv ON v.cod_venta = dv.cod_venta_1
-                INNER JOIN 
-                    producto AS p ON dv.cod_producto_1 = p.cod_producto
-                where v.cod_venta = ?
-                GROUP BY 
-                    v.cod_venta, 
-                    v.fecha_venta, 
-                    vendedor.nombres_cliente, 
-                    vendedor.apellidos_cliente
+                v.cod_venta, 
+                v.fecha_venta,
+                vendedor.nombres_cliente + ' ' + vendedor.apellidos_cliente AS vendedor,
+
+                SUM(
+                    CASE 
+                        WHEN dv.cantidad = 0 THEN 
+                            CASE 
+                                WHEN dv.precio_venta < 1 THEN -(p.precio * dv.precio_venta)  -- Descuento porcentual sobre precio base
+                                ELSE -dv.precio_venta  -- Descuento fijo
+                            END
+                        ELSE 
+                            CASE 
+                                WHEN dv.precio_venta < 1 THEN dv.cantidad * (p.precio * (1 - dv.precio_venta))  -- Descuento porcentual
+                                ELSE dv.cantidad * (p.precio - dv.precio_venta)  -- Descuento fijo
+                            END
+                    END
+                ) AS total_venta
+
+            FROM 
+                venta AS v 
+            INNER JOIN 
+                cliente AS vendedor ON vendedor.num_cliente = v.vendedor 
+            INNER JOIN 
+                Det_venta AS dv ON v.cod_venta = dv.cod_venta_1
+            INNER JOIN 
+                producto AS p ON dv.cod_producto_1 = p.cod_producto
+            WHERE 
+                v.cod_venta = ?
+            GROUP BY 
+                v.cod_venta, 
+                v.fecha_venta, 
+                vendedor.nombres_cliente, 
+                vendedor.apellidos_cliente;
+
 
         
         """
@@ -839,7 +855,7 @@ def facturar():
 
     print(detalle)
 
-
+    print('aaaaaaaaaaaaaaaaaa')
     print(ticket)
 
     fecha_factura = ticket[1].strftime("%Y-%m-%d") if isinstance(ticket[1], datetime) else str(ticket[1])
@@ -923,12 +939,12 @@ def facturar():
 
     # Iterar sobre los resultados y calcular el descuento
     for fila in detalle:
-
+        
         nom_producto = str(fila[0]).upper()  # Nombre del producto en mayúsculas
         cantidad = float(fila[1])  # Cantidad comprada
         precio = float(fila[2])  # Precio unitario
         descuento_raw = float(fila[5])  # Descuento aplicado en porcentaje o monto
-
+        print('descuento: ',descuento_raw)
         conn = conectar()
         cursor = conn.cursor()
 
@@ -959,7 +975,10 @@ def facturar():
    
 
         # Calcular el descuento
-        subtotal = cantidad * precio
+        if cantidad:
+            subtotal = cantidad * precio
+        else:
+            subtotal = precio
         if descuento_raw == 0.0:
             descuento_aplicado = 0
         elif descuento_raw < 1:
@@ -977,12 +996,22 @@ def facturar():
         # Fila de datos
         pdf.cell(30, 10, nom_producto, 1, 0)  # Borde para la celda de producto
         pdf.cell(15, 10, str(cantidad), 1, 0, 'C')  # Cantidad centrada con borde fino
-        if descuento_aplicado == 0:
+        if cantidad:
+            if descuento_aplicado == 0:
 
-            pdf.cell(15, 10, "", 1, 0, 'C')  # Precio centrado con borde fino
+                pdf.cell(15, 10, "", 1, 0, 'C')  # Precio centrado con borde fino
+            else:
+                pdf.cell(15, 10, f"C$ {descuento_aplicado:.2f}", 1, 0, 'C')  # Precio centrado con borde fino
+            pdf.cell(30, 10, f"C$ {total:.2f}", 1, 0, 'C')  # Descuento centrado con borde y nueva línea
         else:
-            pdf.cell(15, 10, f"C$ {descuento_aplicado:.2f}", 1, 0, 'C')  # Precio centrado con borde fino
-        pdf.cell(30, 10, f"C$ {total:.2f}", 1, 0, 'C')  # Descuento centrado con borde y nueva línea
+            if descuento_aplicado == 0:
+
+                pdf.cell(15, 10, "", 1, 0, 'C')  # Precio centrado con borde fino
+            elif descuento_raw < 1 :
+                pdf.cell(15, 10, f"{descuento_raw * 100} %", 1, 0, 'C')  # Precio centrado con borde fino
+            else:
+                pdf.cell(15, 10, f"C$ {descuento_raw:.2f}", 1, 0, 'C') 
+            pdf.cell(30, 10, f"C$ {descuento_aplicado:.2f}", 1, 0, 'C')  # Descuento centrado con borde y nueva línea
 
         pdf.ln(10)  # Aumenta el espacio entre filas a 6 unidades
 
@@ -1059,6 +1088,8 @@ def ingresarMedicamento():
         cursor.execute(query,(venta,medicamento,descuento))
         existe = cursor.fetchone()
 
+        print(existe)
+
         if existe:
 
             conn = conectar()
@@ -1100,7 +1131,26 @@ def totalCaja():
     print(num)
     conn = conectar()
     cursor = conn.cursor()
-    query = "SELECT SUM(dv.cantidad * (p.precio - dv.precio_venta)) AS total_venta FROM Det_venta AS dv INNER JOIN producto AS p ON dv.cod_producto_1 = p.cod_producto where dv.cod_venta_1 = ?"
+    query = """
+            SELECT SUM(
+            CASE
+                WHEN dv.cantidad = 0 THEN
+                    CASE
+                        WHEN dv.precio_venta < 1 THEN -(p.precio * dv.precio_venta) -- porcentaje descuento en devolución
+                        ELSE -dv.precio_venta -- descuento fijo en devolución
+                    END
+                ELSE -- cantidad > 0
+                    CASE
+                        WHEN dv.precio_venta < 1 THEN dv.cantidad * (p.precio * (1 - dv.precio_venta)) -- porcentaje descuento
+                        ELSE dv.cantidad * (p.precio - dv.precio_venta) -- descuento fijo
+                    END
+            END
+        ) AS total_venta
+        FROM Det_venta AS dv
+        INNER JOIN producto AS p ON dv.cod_producto_1 = p.cod_producto
+        WHERE dv.cod_venta_1 = ?;
+
+    """
     cursor.execute(query,(num))
     total = cursor.fetchone()
     print(total)

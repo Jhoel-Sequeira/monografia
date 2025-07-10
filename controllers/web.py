@@ -149,7 +149,8 @@ def login():
         contraseña = request.form['pass']
 
         if usuario == "" or contraseña == "":
-            return render_template('login.html', errorlogin=1)
+            return render_template('web/index.html')
+
         else:
             conn = conectar()
             cursor = conn.cursor()
@@ -161,7 +162,7 @@ def login():
             print(rows)
             if rows:
                 if len(rows) == 0 or not check_password_hash(rows[5], contraseña):
-                    return 'error'
+                    return render_template('web/index.html')
                 else:
                     session['id'] = rows[0]
                     session['nombre'] = rows[1]
@@ -182,7 +183,7 @@ def login():
                     
             else:
                return render_template('web/index.html')
-                             
+        print('fuera')                     
     return render_template('web/index.html')
 
 

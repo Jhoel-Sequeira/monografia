@@ -31,13 +31,39 @@
           {% endif %}
         </td>
         <td>
-          {% set subtotal = medicamento.precio * medicamento.cantidad %} {% if
-          medicamento.descuento == 0.0 %} {% set descuento_aplicado = 0 %} {%
-          elif medicamento.descuento < 1 %} {% set descuento_aplicado=subtotal *
-          medicamento.descuento %} {% else %} {% set
-          descuento_aplicado=medicamento.descuento %} {% endif %} {% set
-          total=subtotal - descuento_aplicado %} C$ {{ total }}
+          {% if medicamento.cantidad == 0 %}
+            {# Mostrar solo el valor del descuento como negativo #}
+            {% if medicamento.descuento == 0.0 %}
+              <!-- No mostrar nada -->
+            {% elif medicamento.descuento < 1 %}
+              -C$ {{ (medicamento.precio * medicamento.descuento) | round(2) }}
+            {% else %}
+              -C$ {{ medicamento.descuento | round(2) }}
+            {% endif %}
+          {% else %}
+            {# Calcular subtotal #}
+            {% set subtotal = medicamento.precio * medicamento.cantidad %}
+
+            {# Calcular descuento aplicado #}
+            {% if medicamento.descuento == 0.0 %}
+              {% set descuento_aplicado = 0 %}
+            {% elif medicamento.descuento < 1 %}
+              {% set descuento_aplicado = subtotal * medicamento.descuento %}
+            {% else %}
+              {% set descuento_aplicado = medicamento.descuento %}
+            {% endif %}
+
+            {# Calcular total y mostrar #}
+            {% set total = subtotal - descuento_aplicado %}
+            C$ {{ total | round(2) }}
+          {% endif %}
         </td>
+
+
+
+
+
+
         <td
           style="
             display: flex;

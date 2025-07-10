@@ -16,52 +16,28 @@
       <div class="" style="overflow: scroll">
         <div class="row">
           <div class="col">
-            <label class="form-label" for="form3Example2"
-              ><strong>Cod Factura</strong></label
-            >
+            <label class="form-label" for="form3Example2"><strong>Cod Factura</strong></label>
 
-            <input
-              type="text"
-              id="facturaId"
-              disabled
-              class="form-control"
-              placeholder=""
-            />
+            <input type="text" id="facturaId" disabled class="form-control" placeholder="" />
           </div>
           <div class="col">
             <label class="form-label"><strong>Ya es cliente?</strong></label>
             <div class="d-flex align-items-center justify-content-start">
-              <label class="form-check-label" for="flexSwitchCheckDefault"
-                >No</label
-              >
+              <label class="form-check-label" for="flexSwitchCheckDefault">No</label>
               <div class="form-check form-switch" style="margin: 0 10px 0 35px">
-                <input
-                  class="form-check-input"
-                  type="checkbox"
-                  id="clienteExistente"
-                />
+                <input class="form-check-input" type="checkbox" id="clienteExistente" />
               </div>
-              <label class="form-check-label" for="flexSwitchCheckDefault"
-                >Si</label
-              >
+              <label class="form-check-label" for="flexSwitchCheckDefault">Si</label>
             </div>
           </div>
         </div>
 
         <div class="row mt-3 clienteViejo">
           <div class="col d-flex">
-            <label class="form-label" for="form3Example2"
-              ><strong>Cliente</strong></label
-            >
-            <i
-              id="btnGuardarNuevoConductor"
-              class="fas fa-plus-circle mt-1"
-              aria-hidden="true"
-              title="Agregar Nuevo Conductor"
-              data-bs-toggle="modal"
-              data-bs-target="#exampleModal"
-              style="margin-right: 5px; cursor: pointer; color: red"
-            ></i>
+            <label class="form-label" for="form3Example2"><strong>Cliente</strong></label>
+            <i id="btnGuardarNuevoConductor" class="fas fa-plus-circle mt-1" aria-hidden="true"
+              title="Agregar Nuevo Conductor" data-bs-toggle="modal" data-bs-target="#exampleModal"
+              style="margin-right: 5px; cursor: pointer; color: red"></i>
             <!-- <input type="text" id="NombreCliente" class="form-control" placeholder="Nombre...">
                 <input type="hidden" id="Idcliente"> -->
           </div>
@@ -82,66 +58,31 @@
         </div>
         <div class="row mt-3">
           <div class="col">
-            <label class="form-label" for="form3Example2"
-              ><strong>Fecha</strong></label
-            >
+            <label class="form-label" for="form3Example2"><strong>Fecha</strong></label>
 
-            <input
-              type="text"
-              id="fecha"
-              class="form-control"
-              placeholder="07/01/2024"
-              disabled
-            />
+            <input type="text" id="fecha" class="form-control" placeholder="07/01/2024" disabled />
           </div>
           <div class="col">
-            <label class="form-label" for="form3Example2"
-              ><strong>Hora</strong></label
-            >
+            <label class="form-label" for="form3Example2"><strong>Hora</strong></label>
 
-            <input
-              type="text"
-              id="hora"
-              class="form-control"
-              placeholder="04:15 pm"
-              disabled
-            />
+            <input type="text" id="hora" class="form-control" placeholder="04:15 pm" disabled />
           </div>
         </div>
         <div class="row mt-3">
           <div class="col-8">
-            <label class="form-label" for="form3Example2"
-              ><strong>Codigo</strong></label
-            >
+            <label class="form-label" for="form3Example2"><strong>Codigo</strong></label>
 
-            <input
-              type="text"
-              id="receta"
-              class="form-control"
-              placeholder=""
-            />
-            <label
-              id="resultadoReceta"
-              class="control-label col-md-12 text-danger"
-              style="display: none"
-              >Las constraseñas no coinciden</label
-            >
+            <input type="text" id="receta" class="form-control" placeholder="" />
+            <label id="resultadoReceta" class="control-label col-md-12 text-danger" style="display: none">Las
+              constraseñas no coinciden</label>
           </div>
           <div class="col d-none" id="recetas" style="margin-top: 30px">
-            <button
-              id="agregarReceta"
-              class="btn btn-success"
-              onclick="agregarReceta()"
-            >
+            <button id="agregarReceta" class="btn btn-success" onclick="agregarReceta()">
               <i class="ti ti-clipboard-search"></i> Cargar
             </button>
           </div>
           <div class="col d-none" id="ordenes" style="margin-top: 30px">
-            <button
-              id="agregarOrden"
-              class="btn btn-success"
-              onclick="agregarOrden()"
-            >
+            <button id="agregarOrden" class="btn btn-success" onclick="agregarOrden()">
               <i class="ti ti-clipboard-search"></i> Cargar
             </button>
           </div>
@@ -157,9 +98,7 @@
           <input type="hidden" id="barcode" name="barcode" required />
           <div class="row" id="Materiales">
             <div class="col-7">
-              <label class="form-label" for="form3Example2"
-                ><strong>Producto</strong></label
-              >
+              <label class="form-label" for="form3Example2"><strong>Producto</strong></label>
 
               <div class="input-group mb-3">
                 <div class="input-group-prepend">
@@ -167,57 +106,28 @@
                     <i class="fas fa-search"></i>
                   </button>
                 </div>
-                <input
-                  type="text"
-                  class="form-control"
-                  placeholder="buscar..."
-                  aria-label="Username"
-                  aria-describedby="basic-addon1"
-                  id="producto"
-                  autofocus
-                />
-                <input
-                  type="hidden"
-                  class="form-control"
-                  placeholder="Codigo receta"
-                  aria-label="Username"
-                  aria-describedby="basic-addon1"
-                  id="Idproducto"
-                />
+                <input type="text" class="form-control" placeholder="buscar..." aria-label="Username"
+                  aria-describedby="basic-addon1" id="producto" autofocus />
+                <input type="hidden" class="form-control" placeholder="Codigo receta" aria-label="Username"
+                  aria-describedby="basic-addon1" id="Idproducto" />
               </div>
-              <div
-                class=""
-                style="
+              <div class="" style="
                   background-color: #fff;
                   position: relative;
                   height: 15%;
                   width: 100%;
                   margin-left: 0px;
-                "
-                id="totalmedicamentos"
-              >
+                " id="totalmedicamentos">
                 <div class="info" id="listaMedicamentos"></div>
               </div>
             </div>
             <div class="col-2">
-              <label class="form-label" for="form3Example2"
-                ><strong>Cantidad</strong></label
-              >
+              <label class="form-label" for="form3Example2"><strong>Cantidad</strong></label>
 
-              <input
-                type="text"
-                class="form-control"
-                id="cantidad"
-                value="1"
-                placeholder="10"
-              />
+              <input type="text" class="form-control" id="cantidad" value="1" placeholder="10" />
             </div>
             <div class="col" style="margin-top: 30px">
-              <button
-                id="agregar"
-                class="btn btn-success"
-                onclick="ingresarMedicamento()"
-              >
+              <button id="agregar" class="btn btn-success" onclick="ingresarMedicamento()">
                 <i class="ti ti-shopping-cart"></i> Añadir
               </button>
             </div>
@@ -234,22 +144,12 @@
         <hr />
         <div class="row mt-3">
           <div class="col-6">
-            <label class="form-label" for="form3Example2"
-              ><strong>Descuento</strong></label
-            >
+            <label class="form-label" for="form3Example2"><strong>Descuento</strong></label>
 
-            <input
-              type="number"
-              class="form-control"
-              id="descuento"
-              value="0"
-              placeholder="10"
-            />
+            <input type="number" class="form-control" id="descuento" value="0" placeholder="10" />
           </div>
           <div class="col-6">
-            <label class="form-label" for="form3Example2"
-              ><strong>Tipo</strong></label
-            >
+            <label class="form-label" for="form3Example2"><strong>Tipo</strong></label>
 
             <select name="" class="form-select" id="tipo_descuento">
               <option value="1">%</option>
@@ -259,18 +159,12 @@
         </div>
         <div class="row">
           <div class="col" style="margin-top: 30px">
-            <button
-              class="btn btn-success boton-crear-factura w-100"
-              onclick="Facturar()"
-            >
+            <button class="btn btn-success boton-crear-factura w-100" onclick="Facturar()">
               Facturar
             </button>
           </div>
           <div class="col" style="margin-top: 30px">
-            <button
-              class="btn btn-secundary boton-crear-factura w-100"
-              onclick="Limpiar()"
-            >
+            <button class="btn btn-secundary boton-crear-factura w-100" onclick="Limpiar()">
               Limpiar
             </button>
           </div>
@@ -290,11 +184,7 @@
                   <span class="text-secondary"><strong>Total:</strong></span>
                   <span style="font-size: 50px" id="total">C$ -</span>
                 </div>
-                <div
-                  data-orientation="horizontal"
-                  role="none"
-                  class="shrink-0 bg-border h-[1px] w-full"
-                ></div>
+                <div data-orientation="horizontal" role="none" class="shrink-0 bg-border h-[1px] w-full"></div>
                 <div class="flex justify-between mt-2"></div>
               </div>
             </div>
@@ -304,38 +194,19 @@
     </div>
   </div>
 
-  <div
-    class="modal fade"
-    id="exampleModal"
-    tabindex="-1"
-    aria-labelledby="exampleModalLabel"
-    aria-hidden="true"
-  >
+  <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="exampleModalLabel">Cliente Nuevo</h5>
-          <button
-            type="button"
-            id="cerrar"
-            class="btn-close"
-            data-bs-dismiss="modal"
-            aria-label="Close"
-          ></button>
+          <button type="button" id="cerrar" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
           <div class="row">
             <div class="col">
-              <label class="form-label" for="form3Example2"
-                ><strong>Nombre Cliente</strong></label
-              >
+              <label class="form-label" for="form3Example2"><strong>Nombre Cliente</strong></label>
 
-              <input
-                type="text"
-                class="form-control"
-                id="nombre"
-                placeholder="Nombre..."
-              />
+              <input type="text" class="form-control" id="nombre" placeholder="Nombre..." />
             </div>
             <!-- <div class="col">
             <label class="form-label " for="form3Example2"><strong>Conductor</strong></label>
@@ -345,60 +216,31 @@
           </div>
           <div class="row">
             <div class="col">
-              <label class="form-label" for="form3Example2"
-                ><strong>Telefono</strong></label
-              >
+              <label class="form-label" for="form3Example2"><strong>Telefono</strong></label>
 
-              <input
-                type="text"
-                class="form-control"
-                id="telefono"
-                placeholder="Ex: 12345678"
-              />
+              <input type="text" class="form-control" id="telefono" placeholder="Ex: 12345678" />
             </div>
             <div class="col">
-              <label class="form-label" for="form3Example2"
-                ><strong>Correo</strong></label
-              >
+              <label class="form-label" for="form3Example2"><strong>Correo</strong></label>
 
-              <input
-                type="text"
-                class="form-control"
-                id="correo"
-                placeholder="Ex: persona@gmail.com"
-              />
+              <input type="text" class="form-control" id="correo" placeholder="Ex: persona@gmail.com" />
             </div>
           </div>
 
           <div class="row">
             <div class="col">
-              <label class="form-label" for="form3Example2"
-                ><strong>Dirección</strong></label
-              >
+              <label class="form-label" for="form3Example2"><strong>Dirección</strong></label>
 
-              <textarea
-                class="form-control"
-                rows="3"
-                id="direccion"
-                style="text-transform: uppercase"
-                value=""
-              ></textarea>
+              <textarea class="form-control" rows="3" id="direccion" style="text-transform: uppercase"
+                value=""></textarea>
             </div>
           </div>
         </div>
         <div class="modal-footer">
-          <button
-            type="button"
-            class="btn btn-secondary"
-            data-bs-dismiss="modal"
-          >
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
             Cerrar
           </button>
-          <button
-            type="button"
-            class="btn btn-primary"
-            onclick="RegistrarNuevo()"
-          >
+          <button type="button" class="btn btn-primary" onclick="RegistrarNuevo()">
             Registrar
           </button>
         </div>
@@ -407,12 +249,12 @@
   </div>
 
   <script>
-    function agregarOrden(){
+    function agregarOrden() {
 
       ordenAFactura();
 
 
-      
+
     }
     function cargarCodigo() {
       crearFacturaReceta("");
@@ -461,7 +303,7 @@
       //
     }
     function recetaAFactura() {
-      
+
 
       $.ajax({
         url: "{{ url_for('sistema.agregarReceta') }}",
@@ -482,7 +324,7 @@
       });
     }
     function ordenAFactura() {
-      
+
 
       $.ajax({
         url: "{{ url_for('sistema.agregarOrden') }}",
@@ -509,8 +351,8 @@
       width: $(this).data("width")
         ? $(this).data("width")
         : $(this).hasClass("w-100")
-        ? "100%"
-        : "style",
+          ? "100%"
+          : "style",
       placeholder: $(this).data("placeholder"),
       closeOnSelect: false,
     });
@@ -556,29 +398,30 @@
         },
         success: function (response) {
           if (response == "si") {
-            $.ajax({
-              url: "/ingresarMedicamento",
-              type: "POST",
-              data: {
-                venta: $("#facturaId").val(),
-                cantidad: $("#cantidad").val(),
-                medicamento: producto,
-                descuento: descuento,
-              },
-              success: function (response) {
-                alert('ingreso')
-                $("#producto").val("");
-                $("#Idproducto").val("");
-                $("#cantidad").val(1);
+            
+              $.ajax({
+                url: "/ingresarMedicamento",
+                type: "POST",
+                data: {
+                  venta: $("#facturaId").val(),
+                  cantidad: $("#cantidad").val(),
+                  medicamento: producto,
+                  descuento: descuento,
+                },
+                success: function (response) {
+                  $("#producto").val("");
+                  $("#Idproducto").val("");
+                  $("#cantidad").val(1);
 
-                cargarCaja();
+                  cargarCaja();
 
-                total();
-              },
-              error: function (error) {
-                // console.log(error);
-              },
-            });
+                  total();
+                },
+                error: function (error) {
+                  // console.log(error);
+                },
+              });
+
           } else {
             Toastify({
               text: "Lo sentimos no tenemos ese stock disponible.",
@@ -725,7 +568,7 @@
           cliente: cliente,
           num: $("#facturaId").val(),
         },
-        success: function (response) {},
+        success: function (response) { },
         error: function (error) {
           // console.log(error);
         },
@@ -756,6 +599,7 @@
           num: $("#facturaId").val(),
         },
         success: function (response) {
+
           callback(response);
         },
         error: function (error) {
@@ -855,12 +699,12 @@
             $("#receta").prop("disabled", false);
             printTicket($("#facturaId").val());
             var socket = io.connect('http://' + document.domain + ':' + location.port);
-            
-              socket.emit('dato_nuevo', 0);
+
+            socket.emit('dato_nuevo', 0);
             // Esperar 1 segundo (1000 milisegundos) antes de ejecutar refrescar
             setTimeout(function () {
               refrescar();
-              
+
             }, 1000);
           } else {
             Swal.fire({
@@ -962,7 +806,7 @@
             receta: $("#receta").val(),
           },
           success: function (response) {
-            if (response === "receta" ) {
+            if (response === "receta") {
               $("#resultadoReceta").attr(
                 "class",
                 "control-label col-md-12 text-success"
@@ -975,7 +819,7 @@
                 "d-none"
               );
               $('#recetas').removeClass("d-none");
-            }else if (response === "orden") {
+            } else if (response === "orden") {
               $("#resultadoReceta").attr(
                 "class",
                 "control-label col-md-12 text-success"
@@ -988,8 +832,8 @@
               );
               $('#ordenes').removeClass("d-none");
 
-            } 
-             else {
+            }
+            else {
               $("#resultadoReceta").attr(
                 "class",
                 "control-label col-md-12 text-danger"
