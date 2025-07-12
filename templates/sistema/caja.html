@@ -337,7 +337,7 @@
           $("#tabla-caja").html(response);
           $("#tabla-caja").append(response.htmlresponse);
           // cargarCaja();
-          total();
+          totalOrden();
         },
         error: function (error) {
           // console.log(error);
@@ -398,29 +398,29 @@
         },
         success: function (response) {
           if (response == "si") {
-            
-              $.ajax({
-                url: "/ingresarMedicamento",
-                type: "POST",
-                data: {
-                  venta: $("#facturaId").val(),
-                  cantidad: $("#cantidad").val(),
-                  medicamento: producto,
-                  descuento: descuento,
-                },
-                success: function (response) {
-                  $("#producto").val("");
-                  $("#Idproducto").val("");
-                  $("#cantidad").val(1);
 
-                  cargarCaja();
+            $.ajax({
+              url: "/ingresarMedicamento",
+              type: "POST",
+              data: {
+                venta: $("#facturaId").val(),
+                cantidad: $("#cantidad").val(),
+                medicamento: producto,
+                descuento: descuento,
+              },
+              success: function (response) {
+                $("#producto").val("");
+                $("#Idproducto").val("");
+                $("#cantidad").val(1);
 
-                  total();
-                },
-                error: function (error) {
-                  // console.log(error);
-                },
-              });
+                cargarCaja();
+
+                total();
+              },
+              error: function (error) {
+                // console.log(error);
+              },
+            });
 
           } else {
             Toastify({
@@ -560,6 +560,22 @@
       });
     }
 
+    function totalOrden() {
+      $.ajax({
+        url: "{{ url_for('sistema.totalOrden') }}",
+        type: "POST",
+        data: {
+          num: $("#receta").val(),
+        },
+        success: function (response) {
+          $("#total").text("C$ " + response);
+        },
+        error: function (error) {
+          // console.log(error);
+        },
+      });
+    }
+
     function crearFactura(cliente) {
       $.ajax({
         url: "{{ url_for('sistema.crearFactura') }}",
@@ -688,41 +704,80 @@
     });
 
     function Facturar() {
-      $.ajax({
-        url: "/validarProductos",
-        type: "POST",
-        data: {
-          num: $("#facturaId").val(),
-        },
-        success: function (response) {
-          if (response == "si") {
-            $("#receta").prop("disabled", false);
-            printTicket($("#facturaId").val());
-            var socket = io.connect('http://' + document.domain + ':' + location.port);
+      if ($('#receta').val() != '') {
+        $.ajax({
+          url: "/validarProductosOrden",
+          type: "POST",
+          data: {
+            num: $("#receta").val(),
+          },
+          success: function (response) {
+            if (response == "si") {
+              $("#receta").prop("disabled", false);
+              printTicketOrden($("#receta").val());
+              var socket = io.connect('http://' + document.domain + ':' + location.port);
 
-            socket.emit('dato_nuevo', 0);
-            // Esperar 1 segundo (1000 milisegundos) antes de ejecutar refrescar
-            setTimeout(function () {
-              refrescar();
+              socket.emit('dato_nuevo', 0);
+              // Esperar 1 segundo (1000 milisegundos) antes de ejecutar refrescar
+              setTimeout(function () {
+                refrescar();
 
-            }, 1000);
-          } else {
-            Swal.fire({
-              icon: "warning",
-              title: "Error",
-              confirmButtonText: "Ok",
-              text: "Debe agregar al menos un producto para facturar",
-            }).then((result) => {
-              /* Read more about isConfirmed, isDenied below */
-              if (result.isConfirmed) {
-              }
-            });
-          }
-        },
-        error: function (error) {
-          // console.log(error);
-        },
-      });
+              }, 1000);
+            } else {
+              Swal.fire({
+                icon: "warning",
+                title: "Error",
+                confirmButtonText: "Ok",
+                text: "Debe agregar al menos un producto para facturar",
+              }).then((result) => {
+                /* Read more about isConfirmed, isDenied below */
+                if (result.isConfirmed) {
+                }
+              });
+            }
+          },
+          error: function (error) {
+            // console.log(error);
+          },
+        });
+      } else {
+        $.ajax({
+          url: "/validarProductos",
+          type: "POST",
+          data: {
+            num: $("#facturaId").val(),
+          },
+          success: function (response) {
+            if (response == "si") {
+              $("#receta").prop("disabled", false);
+              printTicket($("#facturaId").val());
+              var socket = io.connect('http://' + document.domain + ':' + location.port);
+
+              socket.emit('dato_nuevo', 0);
+              // Esperar 1 segundo (1000 milisegundos) antes de ejecutar refrescar
+              setTimeout(function () {
+                refrescar();
+
+              }, 1000);
+            } else {
+              Swal.fire({
+                icon: "warning",
+                title: "Error",
+                confirmButtonText: "Ok",
+                text: "Debe agregar al menos un producto para facturar",
+              }).then((result) => {
+                /* Read more about isConfirmed, isDenied below */
+                if (result.isConfirmed) {
+                }
+              });
+            }
+          },
+          error: function (error) {
+            // console.log(error);
+          },
+        });
+      }
+
     }
     function refrescar() {
       traerId();
@@ -746,6 +801,26 @@
     function printTicket(id) {
       // Construye la URL con el ID
       var url = "/facturar?id=" + id;
+      // Abre una nueva ventana sin barras de herramientas
+      var newWindow = window.open(
+        url,
+        "_blank",
+        "toolbar=no,scrollbars=yes,resizable=yes,location=no"
+      );
+      if (newWindow) {
+        // Si se pudo abrir la nueva ventana, enfócala
+        newWindow.focus();
+      } else {
+        // Si no se pudo abrir la nueva ventana (debido a un bloqueador de ventanas emergentes), muestra un mensaje
+        alert(
+          "No se pudo abrir la nueva ventana. Asegúrate de desactivar el bloqueador de ventanas emergentes."
+        );
+      }
+    }
+
+    function printTicketOrden(id) {
+      // Construye la URL con el ID
+      var url = "/facturarOrden?id=" + id;
       // Abre una nueva ventana sin barras de herramientas
       var newWindow = window.open(
         url,

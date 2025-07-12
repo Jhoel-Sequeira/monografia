@@ -753,7 +753,7 @@ def guardarCarrito():
                     print()
                     conn = conectar()
                     cursor = conn.cursor()
-                    query = 'INSERT INTO detalle_carrito (cod_producto,cantidad,cod_carrito) VALUES (?,?,?)'
+                    query = 'INSERT INTO detalle_carrito (cod_producto,cantidad,cod_carrito,precio_venta) VALUES (?,?,?,0)'
                     cursor.execute(query,(producto,cantidad,carrito[0]))
                     conn.commit()
                     cursor.close()

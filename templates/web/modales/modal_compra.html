@@ -113,36 +113,41 @@
     };
     $('#cantidad').on('keyup', validarCantidad)
     // Guardar Producto en el carrito
-
-    function GuardarEnelCarrito(producto, cantidad) {
-
+function GuardarEnelCarrito(producto, cantidad) {
+    return new Promise(function(resolve, reject) {
         $.ajax({
             url: "{{ url_for('web.guardarCarrito') }}",
             type: "POST",
             data: {
                 producto: producto,
                 cantidad: cantidad,
-
             },
             success: function (response) {
                 if (response == 'HECHO') {
-                    Swal.fire({ icon: 'success', title: 'Producto añadido', confirmButtonText: 'Ok', text: 'Se actualizó su carrito de compras' }).then((result) => { /* Read more about isConfirmed, isDenied below */
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Producto añadido',
+                        confirmButtonText: 'Ok',
+                        text: 'Se actualizó su carrito de compras'
+                    }).then((result) => {
                         if (result.isConfirmed) {
                             $('#cerrarDetalle').click();
                             traerCarrito();
+                            resolve(); // ✅ Se resuelve aquí
                         }
-                    })
+                    });
                 } else if (response == 'Sin Sesion') {
                     $('#btnlogin').click();
-
+                    reject("Sin sesión");
                 }
-
             },
             error: function (error) {
-                // console.log(error);
+                reject(error);
             },
         });
-    }
+    });
+}
+
 
 
     //INICIAR SESION PARA COMPRAR AL CARRITO
@@ -157,8 +162,13 @@
             },
             success: function (response) {
                 if (response == 'exito') {
-                    GuardarEnelCarrito($('#id').val(), $('#cantidad').val());
-                    
+                    GuardarEnelCarrito($('#id').val(), $('#cantidad').val())
+                        .then(() => {
+                            location.reload(); // 🔄 Se recarga solo después de que se cierre el SweetAlert
+                        })
+                        .catch((error) => {
+                            console.error("Error al guardar en el carrito:", error);
+                        });
                     
                 } else if (response == 'error') {
 
