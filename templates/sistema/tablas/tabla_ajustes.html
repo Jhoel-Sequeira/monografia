@@ -1,0 +1,506 @@
+<div class="col-lg d-flex align-items-stretch">
+    <div class="card w-100">
+        <div class="card-body p-4">
+            <div class="d-sm-flex d-block align-items-center justify-content-between mb-9">
+                <h5 class="card-title fw-semibold mb-4">Ajustes Inventario</h5>
+                <button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#filtromodal">
+                    <i class="ti ti-adjustments-horizontal"></i>
+                </button>
+                <button class="btn btn-primary" id="agregar" onclick="agregarProducto()">
+                    Agregar
+                </button>
+            </div>
+
+
+            <div class="table-responsive">
+                <table class="table text-nowrap mb-0 align-middle table-hover" id="tabla_inventario">
+                    <thead class="text-dark fs-4">
+                        <tr>
+                            <th class="border-bottom-0">
+                                <h6 class="fw-semibold mb-0">cod</h6>
+                            </th>
+                            <th class="border-bottom-0">
+                                <h6 class="fw-semibold mb-0">Producto</h6>
+                            </th>
+                            <th class="border-bottom-0">
+                                <h6 class="fw-semibold mb-0">Fecha</h6>
+                            </th>
+                            <th class="border-bottom-0">
+                                <h6 class="fw-semibold mb-0">Cantidad</h6>
+                            </th>
+                            <th class="border-bottom-0">
+                                <h6 class="fw-semibold mb-0">Tipo Ajuste</h6>
+                            </th>
+                            
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {%for producto in productos%}
+                        <tr id="{{producto.cod_producto}}">
+                            <td class="border-bottom-0">
+                                <span class="fw-normal">{{producto.num_ajuste}}</span>
+                                <!-- <h6 class="fw-semibold mb-0">{{producto.cod_producto}}</h6> -->
+                            </td>
+                            <td class="border-bottom-0">
+                                <span class="fw-normal">{{producto.nom_producto}}</span>
+                                <!-- <h6 class="fw-semibold mb-1">{{producto.nom_producto}}</h6> -->
+                            </td>
+                            <td class="border-bottom-0">
+                                <span class="fw-normal">{{producto.fecha_hora}}</span>
+                                <!-- <h6 class="fw-semibold mb-1">{{producto.stock}}</h6> -->
+                            </td>
+                            <td class="border-bottom-0">
+                                <span class="fw-normal">{{producto.cantidad}}</span>
+                                <!-- <h6 class="fw-semibold mb-1">{{producto.stock_critico}}</h6> -->
+                            </td>
+                            
+                            
+                            
+                            {%if producto.tipo_ajuste == 'ALTA'%}
+                            <td class="border-bottom-0">
+                                <span class="status finished">Entrada</span>
+                                <!-- <h6 class="fw-semibold mb-0 fs-4">{{producto.precio}}</h6> -->
+                            </td>
+                            {%else%}
+                            
+                            <td class="border-bottom-0">
+                                <span class="status canceled">Salida</span>
+                                <!-- <h6 class="fw-semibold mb-0 fs-4">{{producto.precio}}</h6> -->
+                            </td>
+                            {%endif%}
+                        </tr>
+                        {%endfor%}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade " id="filtromodal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Filtros</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="container mt-3" id="filtro">
+                    <div class="row">
+                        <div class="col-12">
+                            <select multiple name="filtro" id="filtroOpc" class="filter-multi-select">
+
+                                <option value="1">Proveedor</option>
+                                <option value="2">Stock</option>
+                                <option value="3">Estado</option>
+                                <option value="4">Categoría</option>
+
+                                <!-- <option value="4">Digitador</option>
+                                <option value="5">Verificador</option> -->
+                            </select>
+
+                        </div>
+
+                    </div>
+                    <div class="row mt-3 justify-content-start" id="filtrosInputs">
+                        <div class="col-6" id="proveedor_filtro">
+                            <div class="form-outline">
+                                <label class="form-label" for="proveedor">Nombre proveedor</label>
+                                <input type="text" id="cod_proveedor" value="" style="text-transform:uppercase;"
+                                    onkeyup="this.value=this.value.toUpperCase()" style="text-transform:uppercase;"
+                                    name="cod_proveedor" placeholder="Ingrese el nombre..." required="required"
+                                    class="form-control" value="" />
+
+                            </div>
+                            <div style="background-color:#fff;position: relative; height: 20%; width: 100%; margin-left: 0px;"
+                                id="totalprov">
+                                <div class="info" id="listaproveedor">
+                                </div>
+                            </div>
+                            <input type="hidden" name="" id="provedor_id">
+
+
+                        </div>
+
+                        <div class="col-6" id="stock">
+                            <div class="form-outline">
+                                <label class="form-label"  for="proveedor">Stock</label>
+                                <!-- <input type="text" class="mt-2" id="sampleSlider" /> -->
+
+                                <input type="number" min="1" max="100"  class="" name="1"/> <input type="number" min="1" max="100" class="" name="2" id="2" />
+                                    
+                                
+                                
+                            </div>
+                        </div>
+                        <div class="col-6" id="estado_filtro">
+                            <div class="form-outline">
+                                <label class="form-label" for="proveedor">Estado</label>
+
+                                <select class="form-control" name="id_estado" id="id_estado">
+                                    <!-- <option value="3">Pendiente</option> -->
+                                    <option value="4">Disponibles</option>
+                                    <option value="5">Sin Stock</option>
+                                    <option value="6">Bajo Stock</option>
+                                    <!-- <option value="7">Desbloqueados</option> -->
+                                </select>
+
+                            </div>
+
+                        </div>
+
+                        <div class="col-6" id="categoria_filtro">
+                            <div class="form-outline">
+                                <label class="form-label" for="proveedor">Categoría</label>
+
+                                <select class="form-control" name="tipo_producto" id="tipo_producto">
+                                    <!-- <option value="3">Pendiente</option> -->
+                                    {%for tipo in categoria%}
+                                    <option value="{{tipo.cod_tipo}}">{{tipo.tipos}}</option>
+                                    {%endfor%}
+                                    <!-- <option value="7">Desbloqueados</option> -->
+                                </select>
+
+                                </select>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <!-- x -->
+                <button type="button" onclick="filtrar()" class="btn btn-primary">Buscar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+
+
+
+    $(document).ready(function () {
+        setTimeout(function () {
+            var mySlider = new rSlider({
+                target: '#sampleSlider',
+                values: [1, 2, 3, 4, 5, 6, 7, 8,9,10,20,30,50,60,80,100],
+                range: true,
+                tooltip: true,
+                scale: true,
+                labels: true,
+                set: [1, 100],
+                onChange: function (vals) {
+                    // vals es un array con dos valores [min, max]
+                    document.getElementById('val1').value = vals[0];
+                    document.getElementById('val2').value = vals[2];
+                }
+
+            });
+            document.getElementById('val1').value = mySlider.getValue()[0];
+            document.getElementById('val2').value = mySlider.getValue()[3];
+        }, 3500);
+    });
+</script>
+
+<script>
+
+    var fecha = new Date();
+    hoyf = formatearFecha(fecha);
+
+    function formatearFecha(fecha) {
+        var formatted_date = (fecha.getMonth() + 1) + "/" + fecha.getDate() + "/" + fecha.getFullYear()
+        return formatted_date;
+    }
+    moment.locale('es');
+    $("#Fecha").daterangepicker(
+        {
+            "locale": {
+
+                "format": "YYYY-MM-DD",
+                "separator": " a ",
+                "applyLabel": "Aplicar",
+                "cancelLabel": "Cancelar",
+                "fromLabel": "Desde",
+                "toLabel": "hasta",
+                "customRangeLabel": "Custom",
+            }
+        },
+        function (start, end, label) {
+
+            $("#1").val(start.format("YYYY-MM-DD"));
+            $("#2").val(end.format("YYYY-MM-DD"));
+
+        }
+    );
+</script>
+
+<script>
+
+    $(document).on("change", "#filtroOpc", function (event) {
+        var selected = $('#filtroOpc').val();
+        $.ajax({
+            url: "/valorTablaAdminInv",
+            type: "POST",
+            data: {
+                valor: selected,
+                po: $('#buscarAdmin').val()
+
+            },
+            success: function (response) {
+                $('#tabla-adm').html(response);
+                $('#tabla-adm').append(response.htmlresponse);
+            },
+            error: function (error) { // console.log(error);
+            }
+        });
+
+    });
+    function vacioVer() {
+        opc = "po"
+        $.ajax({
+            url: "/valorTablaAdminInv",
+            type: "POST",
+            data: {
+                valor: opc,
+                po: ""
+
+            },
+            success: function (response) {
+                $('#tabla-adm').html(response);
+                $('#tabla-adm').append(response.htmlresponse);
+            },
+            error: function (error) { // console.log(error);
+            }
+        });
+    }
+    $(document).ready(function () {
+
+
+    });
+    var opc = "po";
+    var buscar = function () {
+        var proveedor = $('#buscarAdmin').val();
+        if (proveedor != "") {
+            $.ajax({
+                url: "/valorTablaAdminInv",
+                type: "POST",
+                data: {
+                    valor: opc,
+                    po: $('#buscarAdmin').val()
+
+                },
+                success: function (response) {
+                    $('#tabla-adm').html(response);
+                    $('#tabla-adm').append(response.htmlresponse);
+                },
+                error: function (error) { // console.log(error);
+                }
+            });
+        } else {
+            vacioVer();
+
+            $('#contenerLista').hide();
+        }
+
+
+    }
+    $("#buscarAdmin").on('keyup', buscar);
+
+</script>
+<style>
+    .viewbar .placeholder {
+        background-color: transparent;
+    }
+</style>
+
+<script>
+    var table = $("#tabla_inventario").DataTable({
+        language: {
+            url: "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Spanish.json",
+            emptyTable: "Sin Datos",
+            zeroRecords: "No se encontraron registros coincidentes",
+        },
+        lengthChange: false,
+        searching: true,
+        info: false,
+        ordering: false,
+    });
+    $("#tabla_inventario tr").click(function () {
+        // MANDAMOS A TRAER LOS DATOS
+        var id = $(this).attr("id");
+
+        $.ajax({
+            url: "{{ url_for('sistema.mostrarDetalleProducto') }}",
+            type: "POST",
+            data: {
+                num: id,
+            },
+            success: function (response) {
+                $("#modal-detalle").html(response);
+                $("#modal-detalle").append(response.htmlresponse);
+                $("#launchDetalle").click();
+            },
+            error: function (error) {
+                // console.log(error);
+            },
+        });
+    });
+
+    function buscarDash() {
+        var searchTerm = $("#Buscador").val();
+
+        // Aplica el término de búsqueda a DataTables
+        $("#tabla_inventario").DataTable().search(searchTerm).draw();
+    }
+    $("#Buscador").on("keyup", buscarDash);
+
+
+
+
+    // OCULTAMOS TODOS LOS FILTROS DE LOS TEXTOS
+    $('#proveedor_filtro').hide();
+    $('#stock').hide();
+    $('#estado_filtro').hide();
+    $('#categoria_filtro').hide();
+
+
+    $('#filtroOpc').filterMultiSelect({
+        selectAllText: 'Todo',
+        placeholderText: 'filtrar por..',
+        filterText: 'buscar',
+        caseSensitive: true,
+    });
+    $('#filtroOpc').on("optionselected", function (e) {
+
+        var filtro = e.detail.label
+        var b = true;
+        var filtroJson = JSON.stringify(getJson(b), null, "  ");
+        $('#filtrosInput').text(filtroJson);
+        //    MANDAMOS A ESCRIBIR LOS FILTROS QUE HA SELECCIONADO EL USUARIO
+        if (filtro == 'Proveedor') {
+            $('#proveedor_filtro').show();
+
+        } else if (filtro == 'Stock') {
+            $('#stock').show();
+
+        } else if (filtro == 'Estado') {
+            $('#estado_filtro').show();
+
+        } else if (filtro == 'Categoría') {
+            $('#categoria_filtro').show();
+
+        }
+
+    });
+
+    // BUSCAR PROVEEDOR
+
+    var buscarProveedor = function () {
+        if ($("#IdProveedor").val() != "") {
+
+            $.ajax({
+                url: "/buscarProveedorApi",
+                type: "POST",
+                data: {
+                    proveedor: $("#IdProveedor").val(),
+                },
+                success: function (response) {
+                    $("#listaproveedor").html(response);
+                    $("#listaproveedor").append(response.htmlresponse);
+                    $("#listaproveedor").show();
+                    $("#totalprov").show();
+                    $("#busqueda button[name=det]").click(function () {
+                        $('#provedor_id').val($(this).val())
+                        $("#IdProveedor").val($(this).text());
+                        $("#listaproveedor").hide();
+                        $("#totalprov").hide();
+                    });
+                },
+                error: function (error) {
+                    // console.log(error);
+                },
+            });
+        } else {
+            $("#listaproveedor").hide();
+            $("#totalprov").hide();
+        }
+
+
+
+
+    }
+    $("#IdProveedor").on('keyup', buscarProveedor);
+
+    // =========================
+
+
+
+
+
+
+
+
+    $('#filtroOpc').on("optiondeselected", function (e) {
+
+        var filtros = e.detail.label;
+        var b = true;
+        var filtroJson = JSON.stringify(getJson(b), null, "  ");
+
+
+
+        if (filtros == 'Proveedor') {
+            $('#proveedor_filtro').hide();
+
+        } else if (filtros == 'Stock') {
+            $('#stock').hide();
+
+        } else if (filtros == 'Estado') {
+            $('#estado_filtro').hide();
+
+        } else if (filtros == 'Categoría') {
+            $('#categoria_filtro').hide();
+
+        }
+    });
+
+    var getJson = function (b) {
+        var result = $.fn.filterMultiSelect.applied
+            .map((e) => JSON.parse(e.getSelectedOptionsAsJson(b)))
+            .reduce((prev, curr) => {
+                prev = {
+                    ...prev,
+                    ...curr,
+                };
+                return prev;
+            });
+        return result;
+    }
+    // new MultiSelectTag('filtroOpc')  // id
+    function filtrar() {
+
+        var inputs = $('#filtrosInputs :input:visible');
+        var values = {};
+
+        inputs.each(function () {
+            values[this.name] = $(this).val();
+        });
+
+        console.log(values);
+        var JSon = JSON.stringify(values);
+        alert(JSon)
+        $.ajax({
+            url: "/addFiltroInv",
+            type: "POST",
+            data: {
+                filtro: JSon,
+
+            },
+            success: function (response) {
+                $('#tabla-adm').html(response);
+                $('#tabla-adm').append(response.htmlresponse);
+            },
+            error: function (error) { // console.log(error);
+            }
+        });
+    }
+
+</script>

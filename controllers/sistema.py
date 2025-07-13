@@ -48,6 +48,11 @@ def deslog():
     return redirect(url_for('web.home'))
 
 # MODULO: INVENTARIO
+# INICIO DEL MODULO DE Movimientos Inventario
+@bp.route('/movimientosInventario')
+@login_required
+def movimientosInventario():
+    return render_template('sistema/movimientoInventario.html')
 
 
 
@@ -78,6 +83,25 @@ def tablaProductos():
 
 
         return render_template('sistema/tablas/tabla_inventario.html', productos=productos, categoria = categoria)
+        
+    else:
+        return "No"
+
+@bp.route('/tablaMovimientos', methods=['POST'])
+def tablaMovimientos():
+
+    if request.method == "POST":
+
+        conn = conectar()
+        cursor = conn.cursor()
+        query = 'select a.num_ajuste, p.nom_producto,a.fecha_hora,a.cantidad,a.tipo_ajuste from ajuste_inventario as a inner join producto as p on a.cod_producto = p.cod_producto order by a.num_ajuste desc'
+        cursor.execute(query)
+        productos = cursor.fetchall()
+
+        print(productos)
+
+
+        return render_template('sistema/tablas/tabla_ajustes.html', productos=productos)
         
     else:
         return "No"
@@ -211,6 +235,26 @@ def modalAgregarProducto():
     else:
         return "No"
 
+
+@bp.route('/modalAgregarAjuste', methods=['POST'])
+def modalAgregarAjuste():
+
+    if request.method == "POST":
+
+        conn = conectar()
+        cursor = conn.cursor()
+        query = 'select * from producto where id_estado = 1'
+        cursor.execute(query)
+        proveedores = cursor.fetchall()
+
+        
+
+        
+        return render_template('sistema/modales/modal_agregar_ajuste.html', proveedores = proveedores)
+        
+    else:
+        return "No"
+
 # FIN DE LA CARGA DE PRODUCTOS 
 @bp.route('/guardarProducto', methods=['POST'])
 def guardarProducto():
@@ -261,6 +305,58 @@ def guardarProducto():
 
 
     return 'Hecho'
+
+
+@bp.route('/guardarAjuste', methods=['POST'])
+def guardarAjuste():
+
+    nombre = request.form['producto']
+    cantidad = request.form['cantidad']
+    tipo = request.form['tipo']
+    FechaActual = capturarHora()
+
+    print(nombre)
+    print(cantidad)
+    print(tipo)
+    print(FechaActual)
+    
+    conn = conectar()
+    cursor = conn.cursor()
+            # Realiza la inserción
+    query = 'INSERT INTO ajuste_inventario (fecha_hora,tipo_ajuste,cod_producto,cantidad) VALUES (?,?,?,?)'
+    cursor.execute(query, (FechaActual, tipo,nombre,cantidad))
+    conn.commit()
+
+    if tipo == 'ALTA':
+        conn = conectar()
+        cursor = conn.cursor()
+        query = '''
+        UPDATE producto
+        SET stock += ?
+        WHERE cod_producto = ?
+        '''
+        cursor.execute(query, (cantidad,nombre))
+        conn.commit()
+        cursor.close()
+        conn.close()
+    else:
+        conn = conectar()
+        cursor = conn.cursor()
+        query = '''
+        UPDATE producto
+        SET stock = CASE 
+                    WHEN stock - ? < 0 THEN 0 
+                    ELSE stock - ? 
+                    END
+        WHERE cod_producto = ?;
+
+        '''
+        cursor.execute(query, (cantidad,nombre))
+        conn.commit()
+        cursor.close()
+        conn.close()
+    return 'Hecho'
+
 
 # DETALLE DE LOS PRODUCTOS SELECCIONADOS
 @bp.route('/mostrarDetalleProducto', methods=['POST'])
