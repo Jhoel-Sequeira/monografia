@@ -1,275 +1,340 @@
-{% extends "sistema/layout.html" %}
-
-
-{% block contenido %}
+{% extends "sistema/layout.html" %} {% block contenido %}
 <!-- inicio de sección de home  -->
 <!--  Header End -->
 <div class="container-fluid">
     <!--  Row 1 -->
     <div class="row">
-      <div class="col-lg-8 d-flex align-items-strech">
-        <div class="card w-100">
-          <div class="card-body">
-            <div class="d-sm-flex d-block align-items-center justify-content-between mb-9">
-              <div class="mb-3 mb-sm-0">
-                <h5 class="card-title fw-semibold">Ventas</h5>
-              </div>
-              <div>
-                <select class="form-select">
-                  <option value="1">March 2023</option>
-                  <option value="2">April 2023</option>
-                  <option value="3">May 2023</option>
-                  <option value="4">June 2023</option>
-                </select>
-              </div>
-            </div>
-            <div id="chart"></div>
-          </div>
-        </div>
-      </div>
-      <div class="col-lg-4">
-        <div class="row">
-          <div class="col-lg-12">
-            <!-- Yearly Breakup -->
-            <div class="card overflow-hidden">
-              <div class="card-body p-4">
-                <h5 class="card-title mb-9 fw-semibold">Meta Anual</h5>
-                <div class="row align-items-center">
-                  <div class="col-8">
-                    <h4 class="fw-semibold mb-3">$36,358</h4>
-                    <div class="d-flex align-items-center mb-3">
-                      <span
-                        class="me-1 rounded-circle bg-light-success round-20 d-flex align-items-center justify-content-center">
-                        <i class="ti ti-arrow-up-left text-success"></i>
-                      </span>
-                      <p class="text-dark me-1 fs-3 mb-0">+9%</p>
-                      <p class="fs-3 mb-0">last year</p>
+        <div class="col-lg-8 d-flex align-items-strech">
+            <div class="card w-100">
+                <div class="card-body">
+                    <div class="d-sm-flex d-block align-items-center justify-content-between mb-9">
+                        <div class="mb-3 mb-sm-0">
+                            <h5 class="card-title fw-semibold">Ventas</h5>
+                        </div>
+                        <div>
+                            <select class="form-select"></select>
+                        </div>
                     </div>
-                    <div class="d-flex align-items-center">
-                      <div class="me-4">
-                        <span class="round-8 bg-primary rounded-circle me-2 d-inline-block"></span>
-                        <span class="fs-2">2023</span>
-                      </div>
-                      <div>
-                        <span class="round-8 bg-light-primary rounded-circle me-2 d-inline-block"></span>
-                        <span class="fs-2">2023</span>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="col-4">
-                    <div class="d-flex justify-content-center">
-                      <div id="breakup"></div>
-                    </div>
-                  </div>
+                    <div id="barras"></div>
                 </div>
-              </div>
             </div>
-          </div>
-          <div class="col-lg-12">
-            <!-- Monthly Earnings -->
-            <div class="card">
-              <div class="card-body">
-                <div class="row alig n-items-start">
-                  <div class="col-8">
-                    <h5 class="card-title mb-9 fw-semibold"> Monthly Earnings </h5>
-                    <h4 class="fw-semibold mb-3">$6,820</h4>
-                    <div class="d-flex align-items-center pb-1">
-                      <span
-                        class="me-2 rounded-circle bg-light-danger round-20 d-flex align-items-center justify-content-center">
-                        <i class="ti ti-arrow-down-right text-danger"></i>
-                      </span>
-                      <p class="text-dark me-1 fs-3 mb-0">+9%</p>
-                      <p class="fs-3 mb-0">last year</p>
-                    </div>
-                  </div>
-                  <div class="col-4">
-                    <div class="d-flex justify-content-end">
-                      <div
-                        class="text-white bg-secondary rounded-circle p-6 d-flex align-items-center justify-content-center">
-                        <i class="ti ti-currency-dollar fs-6"></i>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div id="earning"></div>
-            </div>
-          </div>
         </div>
-      </div>
+        <div class="col-lg-4">
+            <div class="row">
+                <div class="col-lg-12">
+                    <!-- Yearly Breakup -->
+                    <div class="card overflow-hidden">
+                        <div class="card-body p-4">
+                            <h5 class="card-title mb-9 fw-semibold">Meta Anual</h5>
+                            <div class="row align-items-center">
+                                <div class="col-8">
+                                    <h4 id="meta-anual" class="fw-semibold mb-3">$0</h4>
+                                    <!-- meta anual dinámica -->
+
+                                    <div class="d-flex align-items-center mb-3">
+                                        <span class="me-1 rounded-circle bg-light-success round-20 d-flex align-items-center justify-content-center">
+                                            <i id="icon-crecimiento" class="ti ti-arrow-up-left text-success"></i>
+                                            <!-- icono crecimiento -->
+                                        </span>
+                                        <p id="porcentaje-crecimiento" class="text-dark me-1 fs-3 mb-0">
+                                            +0%
+                                        </p>
+                                        <!-- % crecimiento dinámico -->
+                                        <p class="fs-3 mb-0">Año Pasado</p>
+                                    </div>
+
+                                    <div class="d-flex align-items-center">
+                                        <div class="me-4">
+                                            <span class="round-8 bg-primary rounded-circle me-2 d-inline-block"></span>
+                                            <span id="anio-anterior" class="fs-2">2023</span>
+                                            <!-- año anterior dinámico -->
+                                        </div>
+                                        <div>
+                                            <span class="round-8 bg-light-primary rounded-circle me-2 d-inline-block"></span>
+                                            <span id="anio-actual" class="fs-2">2024</span>
+                                            <!-- año actual dinámico -->
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-4">
+                                    <div class="d-flex justify-content-center">
+                                        <div id="breakup"></div>
+                                        <!-- gráfico breakup dinámico -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-12">
+                    <!-- Monthly Earnings -->
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="row align-items-start">
+                                <div class="col-8">
+                                    <h5 class="card-title mb-9 fw-semibold">Ganancias Mensuales</h5>
+                                    <h4 id="monthlyEarningsValue" class="fw-semibold mb-3"></h4>
+                                    <div class="d-flex align-items-center pb-1">
+                                        <span class="me-2 rounded-circle bg-light-danger round-20 d-flex align-items-center justify-content-center">
+          
+          </span>
+
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="d-flex justify-content-end">
+                                        <div class="text-white bg-secondary rounded-circle p-6 d-flex align-items-center justify-content-center">
+                                            <i class="ti ti-currency-dollar fs-6"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="monthlyEarningsChart"></div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
     </div>
-    <div class="row">
-      <div class="col-lg-4 d-flex align-items-stretch">
-        <div class="card w-100">
-          <div class="card-body p-4">
-            <div class="mb-4">
-              <h5 class="card-title fw-semibold">Recent Transactions</h5>
-            </div>
-            <ul class="timeline-widget mb-0 position-relative mb-n5">
-              <li class="timeline-item d-flex position-relative overflow-hidden">
-                <div class="timeline-time text-dark flex-shrink-0 text-end">09:30</div>
-                <div class="timeline-badge-wrap d-flex flex-column align-items-center">
-                  <span class="timeline-badge border-2 border border-primary flex-shrink-0 my-8"></span>
-                  <span class="timeline-badge-border d-block flex-shrink-0"></span>
-                </div>
-                <div class="timeline-desc fs-3 text-dark mt-n1">Payment received from John Doe of $385.90</div>
-              </li>
-              <li class="timeline-item d-flex position-relative overflow-hidden">
-                <div class="timeline-time text-dark flex-shrink-0 text-end">10:00 am</div>
-                <div class="timeline-badge-wrap d-flex flex-column align-items-center">
-                  <span class="timeline-badge border-2 border border-info flex-shrink-0 my-8"></span>
-                  <span class="timeline-badge-border d-block flex-shrink-0"></span>
-                </div>
-                <div class="timeline-desc fs-3 text-dark mt-n1 fw-semibold">New sale recorded <a
-                    href="javascript:void(0)" class="text-primary d-block fw-normal">#ML-3467</a>
-                </div>
-              </li>
-              <li class="timeline-item d-flex position-relative overflow-hidden">
-                <div class="timeline-time text-dark flex-shrink-0 text-end">12:00 am</div>
-                <div class="timeline-badge-wrap d-flex flex-column align-items-center">
-                  <span class="timeline-badge border-2 border border-success flex-shrink-0 my-8"></span>
-                  <span class="timeline-badge-border d-block flex-shrink-0"></span>
-                </div>
-                <div class="timeline-desc fs-3 text-dark mt-n1">Payment was made of $64.95 to Michael</div>
-              </li>
-              <li class="timeline-item d-flex position-relative overflow-hidden">
-                <div class="timeline-time text-dark flex-shrink-0 text-end">09:30 am</div>
-                <div class="timeline-badge-wrap d-flex flex-column align-items-center">
-                  <span class="timeline-badge border-2 border border-warning flex-shrink-0 my-8"></span>
-                  <span class="timeline-badge-border d-block flex-shrink-0"></span>
-                </div>
-                <div class="timeline-desc fs-3 text-dark mt-n1 fw-semibold">New sale recorded <a
-                    href="javascript:void(0)" class="text-primary d-block fw-normal">#ML-3467</a>
-                </div>
-              </li>
-              <li class="timeline-item d-flex position-relative overflow-hidden">
-                <div class="timeline-time text-dark flex-shrink-0 text-end">09:30 am</div>
-                <div class="timeline-badge-wrap d-flex flex-column align-items-center">
-                  <span class="timeline-badge border-2 border border-danger flex-shrink-0 my-8"></span>
-                  <span class="timeline-badge-border d-block flex-shrink-0"></span>
-                </div>
-                <div class="timeline-desc fs-3 text-dark mt-n1 fw-semibold">New arrival recorded 
-                </div>
-              </li>
-              <li class="timeline-item d-flex position-relative overflow-hidden">
-                <div class="timeline-time text-dark flex-shrink-0 text-end">12:00 am</div>
-                <div class="timeline-badge-wrap d-flex flex-column align-items-center">
-                  <span class="timeline-badge border-2 border border-success flex-shrink-0 my-8"></span>
-                </div>
-                <div class="timeline-desc fs-3 text-dark mt-n1">Payment Done</div>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
-      <div class="col-lg-8 d-flex align-items-stretch">
-        <div class="card w-100">
-          <div class="card-body p-4">
-            <h5 class="card-title fw-semibold mb-4">Recent Transactions</h5>
-            <div class="table-responsive">
-              <table class="table text-nowrap mb-0 align-middle">
-                <thead class="text-dark fs-4">
-                  <tr>
-                    <th class="border-bottom-0">
-                      <h6 class="fw-semibold mb-0">Id</h6>
-                    </th>
-                    <th class="border-bottom-0">
-                      <h6 class="fw-semibold mb-0">Assigned</h6>
-                    </th>
-                    <th class="border-bottom-0">
-                      <h6 class="fw-semibold mb-0">Name</h6>
-                    </th>
-                    <th class="border-bottom-0">
-                      <h6 class="fw-semibold mb-0">Priority</h6>
-                    </th>
-                    <th class="border-bottom-0">
-                      <h6 class="fw-semibold mb-0">Budget</h6>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td class="border-bottom-0"><h6 class="fw-semibold mb-0">1</h6></td>
-                    <td class="border-bottom-0">
-                        <h6 class="fw-semibold mb-1">Sunil Joshi</h6>
-                        <span class="fw-normal">Web Designer</span>                          
-                    </td>
-                    <td class="border-bottom-0">
-                      <p class="mb-0 fw-normal">Elite Admin</p>
-                    </td>
-                    <td class="border-bottom-0">
-                      <div class="d-flex align-items-center gap-2">
-                        <span class="badge bg-primary rounded-3 fw-semibold">Low</span>
-                      </div>
-                    </td>
-                    <td class="border-bottom-0">
-                      <h6 class="fw-semibold mb-0 fs-4">$3.9</h6>
-                    </td>
-                  </tr> 
-                  <tr>
-                    <td class="border-bottom-0"><h6 class="fw-semibold mb-0">2</h6></td>
-                    <td class="border-bottom-0">
-                        <h6 class="fw-semibold mb-1">Andrew McDownland</h6>
-                        <span class="fw-normal">Project Manager</span>                          
-                    </td>
-                    <td class="border-bottom-0">
-                      <p class="mb-0 fw-normal">Real Homes WP Theme</p>
-                    </td>
-                    <td class="border-bottom-0">
-                      <div class="d-flex align-items-center gap-2">
-                        <span class="badge bg-secondary rounded-3 fw-semibold">Medium</span>
-                      </div>
-                    </td>
-                    <td class="border-bottom-0">
-                      <h6 class="fw-semibold mb-0 fs-4">$24.5k</h6>
-                    </td>
-                  </tr> 
-                  <tr>
-                    <td class="border-bottom-0"><h6 class="fw-semibold mb-0">3</h6></td>
-                    <td class="border-bottom-0">
-                        <h6 class="fw-semibold mb-1">Christopher Jamil</h6>
-                        <span class="fw-normal">Project Manager</span>                          
-                    </td>
-                    <td class="border-bottom-0">
-                      <p class="mb-0 fw-normal">MedicalPro WP Theme</p>
-                    </td>
-                    <td class="border-bottom-0">
-                      <div class="d-flex align-items-center gap-2">
-                        <span class="badge bg-danger rounded-3 fw-semibold">High</span>
-                      </div>
-                    </td>
-                    <td class="border-bottom-0">
-                      <h6 class="fw-semibold mb-0 fs-4">$12.8k</h6>
-                    </td>
-                  </tr>      
-                  <tr>
-                    <td class="border-bottom-0"><h6 class="fw-semibold mb-0">4</h6></td>
-                    <td class="border-bottom-0">
-                        <h6 class="fw-semibold mb-1">Nirav Joshi</h6>
-                        <span class="fw-normal">Frontend Engineer</span>                          
-                    </td>
-                    <td class="border-bottom-0">
-                      <p class="mb-0 fw-normal">Hosting Press HTML</p>
-                    </td>
-                    <td class="border-bottom-0">
-                      <div class="d-flex align-items-center gap-2">
-                        <span class="badge bg-success rounded-3 fw-semibold">Critical</span>
-                      </div>
-                    </td>
-                    <td class="border-bottom-0">
-                      <h6 class="fw-semibold mb-0 fs-4">$2.4k</h6>
-                    </td>
-                  </tr>                       
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
+    <div class="row" id="mostrar_ventas">
     </div>
-   
+
     <div class="py-6 px-6 text-center">
-      <p class="mb-0 fs-4">Design and Developed by <a href="https://adminmart.com/" target="_blank" class="pe-1 text-primary text-decoration-underline">AdminMart.com</a> Distributed by <a href="https://themewagon.com">ThemeWagon</a></p>
+        <p class="mb-0 fs-4">
+            Veterinaria El Buen Productor 2025
+
+        </p>
     </div>
-  </div>
+</div>
+<script>
+    function cargarCompras() {
+        $.ajax({
+            url: "{{ url_for('sistema.tablaCompras') }}",
+            type: "POST",
+            data: {},
+            success: function(response) {
+                $("#mostrar_ventas").html(response);
+                $("#mostrar_ventas").append(response.htmlresponse);
+
+            },
+            error: function(error) {
+                // console.log(error);
+            },
+        });
+    }
+    $(document).ready(function() {
+        let chart;
+        let ventas = [];
+        let años = [];
+
+        function renderSelect(años) {
+            const select = $(".form-select");
+            select.empty();
+            años.forEach((anio, idx) => {
+                select.append(`<option value="${anio}">${anio}</option>`);
+            });
+        }
+
+        function renderChart(añoSeleccionado) {
+            // Filtrar ventas para el año seleccionado
+            const ventasFiltradas = ventas.filter((v) => v.anio == añoSeleccionado);
+
+            // Ordenar por mes_num por si acaso
+            ventasFiltradas.sort((a, b) => a.mes_num - b.mes_num);
+
+            // Preparar arrays para ApexCharts
+            const categorias = ventasFiltradas.map(
+                (v) => `${v.mes_nombre} ${v.anio}`
+            );
+            const datos = ventasFiltradas.map((v) => v.total_ventas);
+
+            const options = {
+                chart: {
+                    type: "bar",
+                    height: 350,
+                },
+                series: [{
+                    name: "Ventas",
+                    data: datos,
+                }, ],
+                xaxis: {
+                    categories: categorias,
+                },
+                colors: ["#3b82f6"],
+                plotOptions: {
+                    bar: {
+                        columnWidth: "50%",
+                        borderRadius: 6,
+                    },
+                },
+                title: {
+                    text: `Ventas Mensuales ${añoSeleccionado}`,
+                    align: "center",
+                    style: {
+                        fontSize: "16px",
+                    },
+                },
+                dataLabels: {
+                    enabled: true,
+                    formatter: function(val) {
+                        return "C$ " + val.toLocaleString("es-NI"); // separadores de miles para Nicaragua
+                    },
+                },
+                tooltip: {
+                    y: {
+                        formatter: function(val) {
+                            return "C$ " + val.toLocaleString("es-NI");
+                        },
+                    },
+                },
+            };
+
+            if (chart) {
+                chart.destroy();
+            }
+            chart = new ApexCharts(document.querySelector("#barras"), options);
+            chart.render();
+        }
+
+        // Traer datos
+        $.ajax({
+            url: "/api/ventas",
+            method: "GET",
+            success: function(data) {
+                ventas = data.ventas;
+                años = data.años;
+                renderSelect(años);
+                renderChart(años[0]); // Mostrar primer año por defecto
+            },
+            error: function() {
+                alert("Error al cargar los datos");
+            },
+        });
+
+        // Evento cambio de select
+        $(".form-select").on("change", function() {
+            const añoSeleccionado = parseInt($(this).val());
+            renderChart(añoSeleccionado);
+        });
+
+        metaAnual();
+        cargarCompras();
+        cargarMonthlyEarnings();
+    });
+
+    function metaAnual() {
+        $.ajax({
+            url: "/api/meta_anual",
+            method: "GET",
+            success: function(data) {
+
+                // Actualizar el valor de la meta anual con formato moneda y separador de miles
+                $("#meta-anual").text("C$ " + data.meta.toLocaleString("es-NI"));
+
+                // Actualizar el porcentaje de crecimiento, agregando + si es positivo
+                const signo = data.crecimiento >= 0 ? "+" : "";
+                $("#porcentaje-crecimiento").text(signo + data.crecimiento + "%");
+
+                // Texto fijo "last year" (puede quedar estático en HTML)
+                // $("#texto-last-year").text("last year"); // si lo quieres dinámico
+
+                // Actualizar años (ojo que en tu HTML anio_actual es el año mayor, y anio_anterior el menor)
+                $("#anio-anterior").text(data.anio_anterior);
+                $("#anio-actual").text(data.anio_actual);
+
+                // Renderizar gráfico breakup con ApexCharts tipo donut
+                const options = {
+                    chart: {
+                        type: "donut",
+                        height: 150,
+                    },
+                    series: data.breakup,
+                    labels: [data.anio_actual.toString(), data.anio_anterior.toString()],
+                    colors: ["#0d6efd", "#dbe5ff"],
+                    legend: {
+                        show: false,
+                    },
+                };
+
+                if (window.breakupChart) {
+                    window.breakupChart.updateOptions({
+                        series: data.breakup,
+                        labels: [
+                            data.anio_actual.toString(),
+                            data.anio_anterior.toString(),
+                        ],
+                    });
+                } else {
+                    window.breakupChart = new ApexCharts(
+                        document.querySelector("#breakup"),
+                        options
+                    );
+                    window.breakupChart.render();
+                }
+            },
+            error: function() {
+                alert("Error al cargar los datos de meta anual");
+            },
+        });
+    }
+
+    function cargarMonthlyEarnings() {
+        $.ajax({
+            url: '/api/monthly_earnings',
+            method: 'GET',
+            success: function(data) {
+                const ventas = data.ventas_mensuales;
+
+                if (!ventas || ventas.length === 0) {
+                    $('#monthlyEarningsValue').text('C$ 0');
+                    $('#monthlyGrowthPercent').text('0%');
+                    $('#monthlyEarningsIcon').removeClass().addClass('ti ti-minus text-secondary');
+                    return;
+                }
+
+                // Obtener el último mes (el más reciente)
+                const ultimoMes = ventas[ventas.length - 1];
+                const totalActual = ultimoMes.total_ventas;
+
+                // Buscar el mismo mes del año anterior (opcional, si lo tuvieras)
+                // Aquí solo simulamos que es un 20% menos, por ejemplo
+                const totalAnterior = totalActual * 0.8; // Simulación
+
+                const crecimiento = totalAnterior === 0 ? 100 : ((totalActual - totalAnterior) / totalAnterior) * 100;
+
+                // Formatear y mostrar
+                $('#monthlyEarningsValue').text('C$ ' + totalActual.toLocaleString('es-NI', {
+                    minimumFractionDigits: 2
+                }));
+                $('#monthlyGrowthPercent').text((crecimiento > 0 ? '+' : '') + crecimiento.toFixed(2) + '%');
+
+                // Icono y color según crecimiento
+                if (crecimiento > 0) {
+                    $('#monthlyEarningsIcon')
+                        .removeClass()
+                        .addClass('ti ti-arrow-up-left text-success');
+                } else if (crecimiento < 0) {
+                    $('#monthlyEarningsIcon')
+                        .removeClass()
+                        .addClass('ti ti-arrow-down-right text-danger');
+                } else {
+                    $('#monthlyEarningsIcon')
+                        .removeClass()
+                        .addClass('ti ti-minus text-secondary');
+                }
+
+                // Etiqueta "last year"
+                $('#monthlyLastYearLabel').text('last year');
+            },
+            error: function() {
+                alert('Error al cargar los datos de Monthly Earnings');
+            }
+        });
+    }
+</script>
+
 {% endblock %}

@@ -1834,7 +1834,7 @@ def tablaCompras():
 
         conn = conectar()
         cursor = conn.cursor()
-        query = "SELECT v.cod_venta, CONVERT(DATE, v.fecha_venta) AS fecha,FORMAT(v.fecha_venta, 'HH:mm') AS hora, cred.usuario AS vendedor, SUM(dv.cantidad * p.precio - dv.precio_venta) AS total_venta, e.NombreEstado AS estado FROM venta AS v INNER JOIN cliente AS vendedor ON vendedor.num_cliente = v.vendedor INNER JOIN Det_venta AS dv ON v.cod_venta = dv.cod_venta_1 INNER JOIN producto AS p ON dv.cod_producto_1 = p.cod_producto INNER JOIN estado AS e ON v.cod_estado = e.id_estado INNER JOIN credenciales as cred on vendedor.id_credencial = cred.id_credencial GROUP BY v.cod_venta, CONVERT(DATE, v.fecha_venta), FORMAT(v.fecha_venta, 'HH:mm'), vendedor.nombres_cliente, vendedor.apellidos_cliente, e.NombreEstado, cred.usuario;"
+        query = "SELECT v.cod_venta, CONVERT(DATE, v.fecha_venta) AS fecha,FORMAT(v.fecha_venta, 'HH:mm') AS hora, cred.usuario AS vendedor, SUM(dv.cantidad * p.precio - dv.precio_venta) AS total_venta, e.NombreEstado AS estado FROM venta AS v INNER JOIN cliente AS vendedor ON vendedor.num_cliente = v.vendedor INNER JOIN Det_venta AS dv ON v.cod_venta = dv.cod_venta_1 INNER JOIN producto AS p ON dv.cod_producto_1 = p.cod_producto INNER JOIN estado AS e ON v.cod_estado = e.id_estado INNER JOIN credenciales as cred on vendedor.id_credencial = cred.id_credencial GROUP BY v.cod_venta, CONVERT(DATE, v.fecha_venta), FORMAT(v.fecha_venta, 'HH:mm'), vendedor.nombres_cliente, vendedor.apellidos_cliente, e.NombreEstado, cred.usuario order by v.cod_venta desc;"
         cursor.execute(query)
         ventas = cursor.fetchall()
 
@@ -3365,6 +3365,158 @@ def hospFact():
 
 
 #FIN DEL MODULO DE HOSPITALIZACION
+
+
+@bp.route('/api/ventas')
+def api_ventas():
+    conn = conectar()
+    cursor = conn.cursor()
+
+    # Ejecutar SET LANGUAGE primero
+    cursor.execute("SET LANGUAGE Spanish;")
+
+    # Ahora ejecutar la consulta
+    query = """
+        SELECT 
+            YEAR(v.fecha_venta) AS anio,
+            MONTH(v.fecha_venta) AS mes_num,
+            FORMAT(v.fecha_venta, 'MMMM') AS mes_nombre,
+            SUM(dv.cantidad * dv.precio_venta) AS total_ventas
+        FROM venta v
+        INNER JOIN Det_venta dv ON v.cod_venta = dv.cod_venta_1
+        GROUP BY YEAR(v.fecha_venta), MONTH(v.fecha_venta), FORMAT(v.fecha_venta, 'MMMM')
+        ORDER BY anio, mes_num;
+    """
+    cursor.execute(query)
+    rows = cursor.fetchall()
+    # Construir respuesta
+    ventas = []
+    años = set()
+    for r in rows:
+        anio, mes_num, mes_nombre, total_ventas = r
+        ventas.append({
+            'anio': anio,
+            'mes_num': mes_num,
+            'mes_nombre': mes_nombre,
+            'total_ventas': total_ventas
+        })
+        años.add(anio)
+
+    return jsonify({
+        'ventas': ventas,
+        'años': sorted(list(años))
+    })
+
+@bp.route('/api/meta_anual')
+def meta_anual():
+    conn = conectar()
+    cursor = conn.cursor()
+
+   
+
+    # Obtener año actual y año anterior
+    cursor.execute("SELECT YEAR(GETDATE())")
+    anio_actual = cursor.fetchone()[0]
+    anio_anterior = anio_actual - 1
+
+    print(anio_actual)
+    print(anio_anterior)
+    # Consulta para obtener la suma total ventas año actual
+    query_actual = """
+        SELECT SUM(dv.cantidad * dv.precio_venta)
+        FROM venta v
+        INNER JOIN Det_venta dv ON v.cod_venta = dv.cod_venta_1
+        WHERE YEAR(v.fecha_venta) = ?
+    """
+    cursor.execute(query_actual, (anio_actual,))
+    meta = cursor.fetchone()[0] or 0
+
+    # Consulta para obtener suma total ventas año anterior
+    cursor.execute(query_actual, (anio_anterior,))
+    ventas_anterior = cursor.fetchone()[0] or 0
+
+    # Calcular crecimiento porcentual (cuidado división por cero)
+    if ventas_anterior == 0:
+        crecimiento = 100 if meta > 0 else 0
+    else:
+        crecimiento = round(((meta - ventas_anterior) / ventas_anterior) * 100, 2)
+
+    # Ejemplo breakup: % ventas primer semestre vs segundo semestre del año actual
+    query_breakup = """
+        SELECT 
+            SUM(CASE WHEN MONTH(v.fecha_venta) BETWEEN 1 AND 6 THEN dv.cantidad * dv.precio_venta ELSE 0 END) AS primer_semestre,
+            SUM(CASE WHEN MONTH(v.fecha_venta) BETWEEN 7 AND 12 THEN dv.cantidad * dv.precio_venta ELSE 0 END) AS segundo_semestre
+        FROM venta v
+        INNER JOIN Det_venta dv ON v.cod_venta = dv.cod_venta_1
+        WHERE YEAR(v.fecha_venta) = ?
+    """
+    cursor.execute(query_breakup, (anio_actual,))
+    primer_sem, segundo_sem = cursor.fetchone()
+    total_sem = (primer_sem or 0) + (segundo_sem or 0)
+    if total_sem == 0:
+        breakup = [0, 0]
+    else:
+        breakup = [
+            round((primer_sem or 0) / total_sem * 100, 2),
+            round((segundo_sem or 0) / total_sem * 100, 2)
+        ]
+
+    cursor.close()
+    conn.close()
+
+    data = {
+        "meta": round(meta, 2),
+        "crecimiento": crecimiento,
+        "anio_actual": anio_actual,
+        "anio_anterior": anio_anterior,
+        "breakup": breakup
+    }
+
+    return jsonify(data)
+
+@bp.route('/api/monthly_earnings')
+def monthly_earnings():
+    conn = conectar()
+    cursor = conn.cursor()
+
+    # Obtener año actual para filtrar ventas de este año
+    cursor.execute("SELECT YEAR(GETDATE())")
+    anio_actual = cursor.fetchone()[0]
+
+    # Consulta para obtener suma de ventas por mes del año actual
+    query = """
+        SELECT 
+            MONTH(v.fecha_venta) AS mes_num,
+            FORMAT(v.fecha_venta, 'MMMM') AS mes_nombre,
+            SUM(dv.cantidad * dv.precio_venta) AS total_ventas
+        FROM venta v
+        INNER JOIN Det_venta dv ON v.cod_venta = dv.cod_venta_1
+        WHERE YEAR(v.fecha_venta) = ?
+        GROUP BY MONTH(v.fecha_venta), FORMAT(v.fecha_venta, 'MMMM')
+        ORDER BY mes_num
+    """
+    cursor.execute(query, (anio_actual,))
+    resultados = cursor.fetchall()
+
+    # Construir respuesta en formato JSON
+    data = []
+    for row in resultados:
+        mes_num, mes_nombre, total_ventas = row
+        data.append({
+            "mes_num": mes_num,
+            "mes_nombre": mes_nombre.capitalize(),  # Primer letra mayúscula
+            "total_ventas": round(total_ventas or 0, 2)
+        })
+
+    cursor.close()
+    conn.close()
+
+    return jsonify({
+        "anio": anio_actual,
+        "ventas_mensuales": data
+    })
+
+
 
 # WEBSOCKET
 # SOCKET EMIT
