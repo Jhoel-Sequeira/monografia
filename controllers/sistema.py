@@ -351,7 +351,7 @@ def guardarAjuste():
         WHERE cod_producto = ?;
 
         '''
-        cursor.execute(query, (cantidad,nombre))
+        cursor.execute(query, (cantidad,cantidad,nombre))
         conn.commit()
         cursor.close()
         conn.close()
