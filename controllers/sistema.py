@@ -548,6 +548,11 @@ def descargarPLantilla():
 def ventas():
     return render_template('sistema/ventas.html')
 
+@bp.route('/compras')
+@login_required
+def compras():
+    return render_template('sistema/compras.html')
+
 @bp.route('/caja')
 @login_required
 def caja():
@@ -560,6 +565,20 @@ def caja():
 
 
     return render_template('sistema/caja.html',clientes = clientes)
+
+
+@bp.route('/cajaCompra')
+@login_required
+def cajaCompra():
+
+    conn = conectar()
+    cursor = conn.cursor()
+    query = "select cod_proveedor,nom_proveedor from proveedor"
+    cursor.execute(query)
+    clientes = cursor.fetchall()
+
+
+    return render_template('sistema/cajaCompra.html',clientes = clientes)
 
 @bp.route('/traerId', methods=['POST'])
 @login_required
@@ -576,7 +595,21 @@ def traerId():
     else:
         return str(1)
     
+@bp.route('/traerIdCompra', methods=['POST'])
+@login_required
+def traerIdCompra():
 
+    conn = conectar()
+    cursor = conn.cursor()
+    query = "select top 1 cod_compra from compras where cod_estado != 8 order by cod_compra desc "
+    cursor.execute(query)
+    ultimaventa = cursor.fetchone()
+    if ultimaventa:
+        print('ultimaventa : ',ultimaventa)
+        return str(ultimaventa[0]+1)
+    else:
+        return str(1)
+    
 
 @bp.route('/cancelarFactura', methods=['POST'])
 @login_required
@@ -697,6 +730,40 @@ def crearFactura():
        
 
     return 'hecho'
+
+@bp.route('/crearFacturaCompra', methods=['POST'])
+def crearFacturaCompra():
+    if request.method == "POST":
+        FechaActual = capturarHora()
+        cliente1 = request.form['cliente']
+        num = request.form['num']
+
+        conn = conectar()
+        cursor = conn.cursor()
+        query = "select * from compras where cod_compra = ? "
+        cursor.execute(query,(num))
+        existe = cursor.fetchone()
+
+        if existe:
+            return 'ya'
+        
+        print(cliente1)
+        if cliente1:
+            conn = conectar()
+            cursor = conn.cursor()
+            query = 'INSERT INTO compras (fechaCompra,cod_proveedor,cod_estado) VALUES (?,?,8)'
+            cursor.execute(query, (FechaActual,cliente1))
+            conn.commit()
+            cursor.close()
+            conn.close()
+        
+        
+        
+       
+       
+
+    return 'hecho'
+
 # SE INGRESA EL MEDICAMENTO A LA FACTURA CREADA
 @bp.route('/comprobarStock', methods=['POST', 'GET'])
 def comprobarStock():
@@ -1172,6 +1239,256 @@ def facturar():
     return response
 
 
+@bp.route('/facturarCompra', methods=['POST', 'GET'])
+def facturarCompra():
+    num = request.args.get('id')
+
+    conn = conectar()
+    cursor = conn.cursor()
+
+    # Consulta SQL para obtener los datos del ticket
+    query = """
+    	select v.cod_compra,v.fechaCompra,c.nom_proveedor as cliente,SUM(dv.cantidad * p.precio - dv.precio_venta) AS total_venta  
+        from compras as v inner join proveedor as c on v.cod_proveedor = c.cod_proveedor 
+            INNER JOIN 
+                            detalle_compra AS dv ON v.cod_compra = dv.cod_compra
+                        INNER JOIN 
+                            producto AS p ON dv.cod_producto = p.cod_producto
+                        where v.cod_compra = ?
+                        GROUP BY 
+                            v.cod_compra, 
+                            v.fechaCompra, 
+                            c.nom_proveedor
+    """
+
+    cursor.execute(query, (num))
+    ticket = cursor.fetchone()
+    no_tiene = 1
+    
+
+    conn = conectar()
+    cursor = conn.cursor()
+    query = "select p.nom_producto,dv.cantidad,p.precio,p.stock,p.stock_critico,dv.precio_venta as descuento,p.cod_producto from detalle_compra as dv inner join producto as p on dv.cod_producto = p.cod_producto INNER JOIN compras AS v on dv.cod_compra = v.cod_compra where v.cod_compra = ?"
+    cursor.execute(query,(num))
+    detalle = cursor.fetchall()
+
+    print(detalle)
+
+    print('aaaaaaaaaaaaaaaaaa')
+    print(ticket)
+
+    fecha_factura = ticket[1].strftime("%Y-%m-%d") if isinstance(ticket[1], datetime) else str(ticket[1])
+    hora_factura = ticket[1].strftime("%I:%M %p") if isinstance(ticket[1], datetime) else str(ticket[1])
+    
+
+    pdf = FPDF('P', 'mm',  (101.6, 175))
+    pdf.set_margins(5.5, 5.5, 5.5)
+    pdf.set_display_mode(zoom=100, layout='continuous')
+    pdf.add_page()
+    
+    x = 35
+    y = 0
+    width = 30
+    height = 0 
+    imagePath = 'static/sistema/images/logos/logo.png'
+
+    pdf.image(imagePath, x, y, width, height)
+    pdf.ln(20)
+    pdf.set_font('Arial', 'B', 30)
+    pdf.set_text_color(0, 0, 0)
+    pdf.set_font('Arial', 'B', 14)
+    pdf.multi_cell(0, 5, 'Veterinaria El Buen Productor', 0, "C")
+    pdf.ln(1)
+    pdf.set_font('Arial', 'B', 30)
+    pdf.set_text_color(0, 0, 0)
+    pdf.set_font('Arial', 'B', 10)
+    pdf.multi_cell(0, 5, 'RUC 1524135412', 0, "C")
+    pdf.ln(1)
+
+    pdf.set_font('Arial', '', 10)
+    pdf.set_text_color(0, 0, 0)
+    pdf.set_font('Arial', '', 10)
+    pdf.multi_cell(0, 5, 'Monumento la reforma, 10vrs al sur, 10vrs al oeste, contiguo a la bahia de buses Mercadoo San Carlos Masaya, Nicaragua', 0, "C")
+    pdf.ln(1)
+    
+    pdf.set_font('Arial', 'B', 7.5)
+    pdf.cell(25, 10, 'Factura No: ')
+    pdf.set_font('Arial', '', 7.5)
+    pdf.cell(30, 10, str(ticket[0]))
+    pdf.ln(6)
+    
+    pdf.set_font('Arial', 'B', 7.5)
+    pdf.cell(25, 10, 'Fecha: ')
+    pdf.set_font('Arial', '', 7.5)  # Cambia a fuente normal si lo prefieres
+    pdf.cell(30, 10, fecha_factura)  # Espacio suficiente para la fecha
+    pdf.ln(6)
+
+    pdf.set_font('Arial', 'B', 7.5)
+    pdf.cell(25, 10, 'Hora: ')
+    pdf.set_font('Arial', '', 7.5)
+    pdf.cell(30, 10, hora_factura)  # Espacio suficiente para la hora
+
+    pdf.ln(5)  
+    
+    if no_tiene ==1:
+
+        pdf.set_font('Arial', 'B', 7.5)
+        pdf.cell(25, 10, 'Proveedor: ')
+        pdf.set_font('Arial', 'B', 7.5)
+        pdf.cell(20, 10, ticket[2])
+        pdf.ln(6)
+    
+        
+    pdf.ln(5)
+
+    pdf.set_line_width(0.2) 
+    pdf.set_font('Arial', 'B', 7.5)
+
+    # Encabezados de la tabla
+
+    # Iterar sobre los resultados y calcular el descuento
+    for fila in detalle:
+        nom_producto = str(fila[0]).upper()  # Nombre del producto en mayúsculas
+        cantidad = float(fila[1])  # Cantidad comprada
+        precio = float(fila[2])  # Precio unitario
+        descuento_raw = float(fila[5])  # Descuento aplicado
+        cod_producto = fila[6]
+
+    # Actualizar stock
+    conn = conectar()
+    cursor = conn.cursor()
+    cursor.execute('UPDATE producto SET stock = stock + ? WHERE cod_producto = ?', (cantidad, cod_producto))
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+    # Calcular subtotal y descuento
+    subtotal = cantidad * precio if cantidad else precio
+
+    if descuento_raw == 0.0:
+        descuento_aplicado = 0
+    elif descuento_raw < 1:
+        descuento_aplicado = subtotal * descuento_raw  # Descuento en %
+    else:
+        descuento_aplicado = descuento_raw  # Descuento directo
+
+    total = subtotal - descuento_aplicado
+
+    pdf.set_line_width(0.0)
+    pdf.set_font('Arial', '', 7.5)
+
+    # Coordenadas actuales
+    pdf.set_line_width(0.2) 
+    pdf.set_font('Arial', 'B', 7.5)
+
+    # Encabezados de la tabla
+    pdf.cell(30, 10, 'Producto', 1)
+    pdf.cell(15, 10, 'Cantidad', 1)
+    pdf.cell(15, 10, 'Descuento', 1)
+    pdf.cell(30, 10, 'Subtotal', 1)
+    pdf.ln(10)  # Salto de línea
+
+    for fila in detalle:
+        nom_producto = str(fila[0]).upper()
+        cantidad = float(fila[1])
+        precio = float(fila[2])
+        descuento_raw = float(fila[5])
+        cod_producto = fila[6]
+
+        conn = conectar()
+        cursor = conn.cursor()
+        cursor.execute('UPDATE producto SET stock = stock + ? WHERE cod_producto = ?', (cantidad, cod_producto))
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+        subtotal = cantidad * precio if cantidad else precio
+
+        if descuento_raw == 0.0:
+            descuento_aplicado = 0
+        elif descuento_raw < 1:
+            descuento_aplicado = subtotal * descuento_raw
+        else:
+            descuento_aplicado = descuento_raw
+
+        total = subtotal - descuento_aplicado
+
+        pdf.set_line_width(0.0)
+        pdf.set_font('Arial', '', 7.5)
+
+        x = pdf.get_x()
+        y = pdf.get_y()
+
+        pdf.multi_cell(30, 4, nom_producto, border=1)
+        altura_fila = pdf.get_y() - y
+
+        pdf.set_xy(x + 30, y)
+        pdf.cell(15, altura_fila, str(cantidad), 1, 0, 'C')
+
+        if cantidad:
+            if descuento_aplicado == 0:
+                descuento_str = ""
+            else:
+                descuento_str = f"C$ {descuento_aplicado:.2f}"
+        else:
+            if descuento_aplicado == 0:
+                descuento_str = ""
+            elif descuento_raw < 1:
+                descuento_str = f"{descuento_raw * 100:.0f} %"
+            else:
+                descuento_str = f"C$ {descuento_raw:.2f}"
+
+        pdf.cell(15, altura_fila, descuento_str, 1, 0, 'C')
+        pdf.cell(30, altura_fila, f"C$ {total:.2f}", 1, 0, 'C')
+        pdf.ln(altura_fila)
+
+
+
+    if no_tiene ==1:
+        pdf.set_font('Arial', 'B', 7.5)  # Título "Total"
+        pdf.cell(25, 30, 'Total: ')
+        pdf.set_font('Arial', '', 30)  # Aumentar el tamaño de la fuente para el valor
+        pdf.cell(65, 30, 'C$ '+str(ticket[3]), 0, 1, 'R')  # Alinear a la derecha
+        pdf.ln(9)  # Salto de línea
+    else:
+        pdf.set_font('Arial', 'B', 7.5)  # Título "Total"
+        pdf.cell(25, 30, 'Total: ')
+        pdf.set_font('Arial', '', 30)  # Aumentar el tamaño de la fuente para el valor
+        pdf.cell(65, 30, 'C$ '+str(ticket[3]), 0, 1, 'R')  # Alinear a la derecha
+        pdf.ln(9)  # Salto de línea 
+
+        
+    pdf_output = pdf.output(dest='S').encode('latin1') 
+
+    response = make_response(pdf_output)
+    response.headers['Content-Type'] = 'application/pdf'
+    response.headers['Content-Disposition'] = 'inline; filename=ticket.pdf'
+
+
+    conn = conectar()
+    cursor = conn.cursor()
+
+                    
+                    # Query de actualización del producto
+    query = '''
+            UPDATE compras
+            SET cod_estado = 7
+            WHERE cod_compra = ?
+    '''
+                    
+                    # Ejecutar la consulta SQL
+    cursor.execute(query, (num))
+    conn.commit()
+
+                    # Cerrar la conexión
+    cursor.close()
+    conn.close()
+
+    
+
+    return response
+
+
 @bp.route('/facturarOrden', methods=['POST', 'GET'])
 def facturarOrden():
     num = request.args.get('id')
@@ -1516,6 +1833,63 @@ def ingresarMedicamento():
        
 
     return 'hecho'
+
+
+@bp.route('/ingresarMedicamentoCompra', methods=['POST'])
+def ingresarMedicamentoCompra():
+    if request.method == "POST":
+        venta = request.form['venta']
+        medicamento = request.form['medicamento']
+        cantidad = request.form['cantidad']
+        descuento = request.form['descuento']
+
+        print('aquiii')
+        print(descuento)
+        print(venta)
+        print(medicamento)
+        print(cantidad)
+
+        # BUSCAMOS EL MEDICAMENTO ESTA EN LA FACTURA
+
+        conn = conectar()
+        cursor = conn.cursor()
+        query = "select * from detalle_compra where cod_compra = ? and cod_producto = ? and precio_venta = ?"
+        cursor.execute(query,(venta,medicamento,descuento))
+        existe = cursor.fetchone()
+
+        print(existe)
+
+        if existe:
+
+            conn = conectar()
+            cursor = conn.cursor()
+            query = 'UPDATE detalle_compra set cantidad += ? where cod_detalleCompra = ?'
+            cursor.execute(query, (cantidad,existe[0]))
+            conn.commit()
+            cursor.close()
+            conn.close()
+        else:
+
+            conn = conectar()
+            cursor = conn.cursor()
+            query = 'INSERT INTO detalle_compra (cod_producto,cod_compra,cantidad,precio_venta) VALUES (?,?,?,?)'
+            cursor.execute(query, (medicamento,venta,cantidad,descuento))
+            conn.commit()
+            cursor.close()
+            conn.close()
+        
+
+        print('cantidad: ', cantidad)
+        conn = conectar()
+        cursor = conn.cursor()
+        query = 'update producto set stock = stock-? where cod_producto = ?'
+        cursor.execute(query, (cantidad,medicamento))
+        conn.commit()
+        cursor.close()
+        conn.close()
+       
+
+    return 'hecho'
 # FIN DE LA INSERCION DE MEDICAMENTOS EN LA FACTURA
 
 @bp.route('/totalCaja', methods=['POST'])
@@ -1544,6 +1918,42 @@ def totalCaja():
         FROM Det_venta AS dv
         INNER JOIN producto AS p ON dv.cod_producto_1 = p.cod_producto
         WHERE dv.cod_venta_1 = ?;
+
+    """
+    cursor.execute(query,(num))
+    total = cursor.fetchone()
+    print(total)
+    if total[0]:
+        return str(total[0])
+    else:
+        return '0'
+
+@bp.route('/totalCajaCompra', methods=['POST'])
+def totalCajaCompra():
+
+    num = request.form['num']
+
+    print(num)
+    conn = conectar()
+    cursor = conn.cursor()
+    query = """
+            SELECT SUM(
+            CASE
+                WHEN dv.cantidad = 0 THEN
+                    CASE
+                        WHEN dv.precio_venta < 1 THEN -(p.precio * dv.precio_venta) -- porcentaje descuento en devolución
+                        ELSE -dv.precio_venta -- descuento fijo en devolución
+                    END
+                ELSE -- cantidad > 0
+                    CASE
+                        WHEN dv.precio_venta < 1 THEN dv.cantidad * (p.precio * (1 - dv.precio_venta)) -- porcentaje descuento
+                        ELSE dv.cantidad * (p.precio - dv.precio_venta) -- descuento fijo
+                    END
+            END
+        ) AS total_venta
+        FROM detalle_compra AS dv
+        INNER JOIN producto AS p ON dv.cod_producto = p.cod_producto
+        WHERE dv.cod_compra = ?;
 
     """
     cursor.execute(query,(num))
@@ -1601,6 +2011,23 @@ def listadoProductosCaja():
     conn = conectar()
     cursor = conn.cursor()
     query = "select dv.cod_detalle,p.nom_producto,dv.cantidad,p.precio,p.stock,p.stock_critico,dv.precio_venta as descuento from Det_venta as dv inner join producto as p on dv.cod_producto_1 = p.cod_producto where dv.cod_venta_1 = ?"
+    cursor.execute(query,(num))
+    medicamentos = cursor.fetchall()
+    
+
+    return render_template('sistema/tablas/tabla-caja.html',medicamentos = medicamentos)
+
+
+@bp.route('/listadoProductosCajaCompra', methods=['POST'])
+def listadoProductosCajaCompra():
+
+    num = request.form['num']
+    print(num)
+
+
+    conn = conectar()
+    cursor = conn.cursor()
+    query = "select dv.cod_detalleCompra,p.nom_producto,dv.cantidad,p.precio,p.stock,p.stock_critico,dv.precio_venta as descuento from detalle_compra as dv inner join producto as p on dv.cod_producto = p.cod_producto where dv.cod_compra = ?"
     cursor.execute(query,(num))
     medicamentos = cursor.fetchall()
     
@@ -1793,6 +2220,23 @@ def validarFactura():
             return 'si'
         else:
             return 'no'
+
+@bp.route('/validarFacturaCompra', methods=['POST'])
+def validarFacturaCompra():
+    if request.method == "POST":
+        num = request.form['num']
+    
+        conn = conectar()
+        cursor = conn.cursor()
+        query = "select *  from compras where cod_compra = ? and cod_estado = 8"
+        cursor.execute(query,(num))
+        tiene = cursor.fetchone()
+        
+        if tiene:
+            return 'si'
+        else:
+            return 'no'
+        
         
 @bp.route('/validarProductos', methods=['POST'])
 def validarProductos():
@@ -1802,6 +2246,22 @@ def validarProductos():
         conn = conectar()
         cursor = conn.cursor()
         query = "select dv.cod_detalle,p.nom_producto,dv.cantidad,p.precio,p.stock,p.stock_critico,dv.precio_venta as descuento from Det_venta as dv inner join producto as p on dv.cod_producto_1 = p.cod_producto where dv.cod_venta_1 = ?"
+        cursor.execute(query,(num))
+        tiene = cursor.fetchone()
+        
+        if tiene:
+            return 'si'
+        else:
+            return 'no'
+
+@bp.route('/validarProductosCompra', methods=['POST'])
+def validarProductosCompra():
+    if request.method == "POST":
+        num = request.form['num']
+    
+        conn = conectar()
+        cursor = conn.cursor()
+        query = "select dv.cod_detalleCompra,p.nom_producto,dv.cantidad,p.precio,p.stock,p.stock_critico,dv.precio_venta as descuento from detalle_compra as dv inner join producto as p on dv.cod_producto = p.cod_producto where dv.cod_compra = ?"
         cursor.execute(query,(num))
         tiene = cursor.fetchone()
         
@@ -1834,11 +2294,11 @@ def tablaCompras():
 
         conn = conectar()
         cursor = conn.cursor()
-        query = "SELECT v.cod_venta, CONVERT(DATE, v.fecha_venta) AS fecha,FORMAT(v.fecha_venta, 'HH:mm') AS hora, cred.usuario AS vendedor, SUM(dv.cantidad * p.precio - dv.precio_venta) AS total_venta, e.NombreEstado AS estado FROM venta AS v INNER JOIN cliente AS vendedor ON vendedor.num_cliente = v.vendedor INNER JOIN Det_venta AS dv ON v.cod_venta = dv.cod_venta_1 INNER JOIN producto AS p ON dv.cod_producto_1 = p.cod_producto INNER JOIN estado AS e ON v.cod_estado = e.id_estado INNER JOIN credenciales as cred on vendedor.id_credencial = cred.id_credencial GROUP BY v.cod_venta, CONVERT(DATE, v.fecha_venta), FORMAT(v.fecha_venta, 'HH:mm'), vendedor.nombres_cliente, vendedor.apellidos_cliente, e.NombreEstado, cred.usuario order by v.cod_venta desc;"
+        query = "SELECT v.cod_compra,vendedor.nom_proveedor, CONVERT(DATE, v.fechaCompra) AS fecha,FORMAT(v.fechaCompra, 'HH:mm') AS hora, SUM(dv.cantidad * p.precio - dv.precio_venta) AS total_venta, e.NombreEstado AS estado FROM compras AS v INNER JOIN proveedor AS vendedor ON vendedor.cod_proveedor = v.cod_proveedor INNER JOIN detalle_compra AS dv ON v.cod_compra = dv.cod_compra INNER JOIN producto AS p ON dv.cod_producto = p.cod_producto INNER JOIN estado AS e ON v.cod_estado = e.id_estado GROUP BY v.cod_compra, CONVERT(DATE, v.fechaCompra), FORMAT(v.fechaCompra, 'HH:mm'), vendedor.nom_proveedor, e.NombreEstado order by v.cod_compra desc;"
         cursor.execute(query)
         ventas = cursor.fetchall()
 
-        return render_template('sistema/tablas/tabla_ventas.html', ventas=ventas)
+        return render_template('sistema/tablas/tabla_compra.html', ventas=ventas)
         
     else:
         return "No"
@@ -3033,6 +3493,32 @@ def nuevoUsuario():
     
 
     return 'HECHO'
+
+
+
+@bp.route('/nuevoProveedor',methods = ['GET','POST'])
+def nuevoProveedor():
+    nombre = request.form['nombre']
+    info = request.form['info']
+    direccion = request.form['direccion']
+    correo = request.form['correo']
+
+
+    conn = conectar()
+    cursor = conn.cursor()
+    query = 'INSERT INTO proveedor (nom_proveedor,info_proveedor,dir_proveedor,correo_proveedor,id_estado) VALUES (?,?,?,?,1)'
+    cursor.execute(query, (nombre,info,direccion,correo))
+    conn.commit()
+    cursor.close()
+    conn.close()
+    conn = conectar()
+    cursor = conn.cursor()
+
+
+    
+    
+    return 'HECHO'
+
 
 
 # FIN MODULO DE ADMINISTRACIÓN

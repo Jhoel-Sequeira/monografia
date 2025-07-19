@@ -183,6 +183,41 @@
                 </li>
               </ul>
             </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="#" id="toggle-submenu-compra" aria-expanded="false">
+                <span>
+                  <i class="ti ti-trolley"></i>
+                </span>
+                <span class="hide-menu">Compras</span>
+              </a>
+              <ul id="submenu-compra" class="submenu" style="display: none; padding-left: 20px;">
+                <li class="sidebar-item">
+                  <a href="/compras" class="sidebar-link">
+                    <span class="hide-menu">Historial de Compras</span>
+                  </a>
+                </li>
+                <li class="sidebar-item">
+                  <a href="/cajaCompra" class="sidebar-link">
+                    <span class="hide-menu">Nueva Compra</span>
+                  </a>
+                </li>
+              </ul>
+            </li>
+            <script>
+              function toggleSubmenu(submenuId) {
+                const submenu = document.getElementById(submenuId);
+                if (submenu.style.display === 'none' || submenu.style.display === '') {
+                  submenu.style.display = 'block';
+                } else {
+                  submenu.style.display = 'none';
+                }
+              }
+              // Otros menús con submenú similar al de inventario
+              document.getElementById('toggle-submenu-compra').addEventListener('click', function (e) {
+                e.preventDefault();
+                toggleSubmenu('submenu-compra');
+              });
+            </script>
             <script>
               function toggleSubmenu(submenuId) {
                 const submenu = document.getElementById(submenuId);

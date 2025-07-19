@@ -1,0 +1,63 @@
+{% extends "sistema/layout.html" %}
+
+
+{% block contenido %}
+<div class="container-fluid ">
+    <!--  Row 1 -->
+    <div class="row">
+    </div>
+    <div class="row" id="mostrar_ventas">
+    </div>
+</div>
+<!-- MODALES -->
+<input id="launchModal" type="hidden" data-bs-toggle="modal" data-bs-target="#modalAgregarVenta">
+<div id="modal-producto"></div>
+
+<!-- MODAL DE DETALLE DE PRODUCTOS -->
+<input id="launchDetalle" type="hidden" data-bs-toggle="modal" data-bs-target="#modalDetalleProducto">
+<div id="modal-detalle"></div>
+<!-- FIN DEL MODAL -->
+<!-- FIN DE MODALES -->
+<script>
+    $(document).ready(function () {
+
+        cargarCompras();
+
+    });
+   
+    function cargarCompras() {
+        $.ajax({
+            url: "{{ url_for('sistema.tablaCompras') }}",
+            type: "POST",
+            data: {
+            },
+            success: function (response) {
+                $("#mostrar_ventas").html(response);
+                $("#mostrar_ventas").append(response.htmlresponse);
+
+            },
+            error: function (error) {
+                // console.log(error);
+            },
+        });
+    }
+    function agregarVenta() {
+        $.ajax({
+            url: "{{ url_for('sistema.modalAgregarVenta') }}",
+            type: "POST",
+            data: {
+            },
+            success: function (response) {
+                $("#modal-producto").html(response);
+                $("#modal-producto").append(response.htmlresponse);
+                $('#launchModal').click();
+
+            },
+            error: function (error) {
+                // console.log(error);
+            },
+        });
+    }
+</script>
+
+{% endblock %}
