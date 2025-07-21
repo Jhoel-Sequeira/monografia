@@ -130,6 +130,7 @@
                 <button type="button" id="uploadBtn" style="display:none;" onclick="uploadImage()">Subir Imagen</button>
                 <button type="button" id="toggle-btn" onclick="habilitar()" class="btn "
                     style="background-color: blueviolet; color: white;">Habilitar en Página</button>
+                    <button type="button" onclick="agregarProductoOtro()" class="btn btn-secondary">Guardar & Nuevo</button>
                 <button type="button" onclick="agregarProductoN()" class="btn btn-primary">Guardar</button>
             </div>
         </div>
@@ -257,4 +258,75 @@
 
         }
     }
+
+    function agregarProductoOtro() {
+    if (
+        $('#nombre').val() == '' ||
+        $("#categoria option:selected").val() == '' ||
+        $("#proveedor option:selected").val() == '' ||
+        $("#unidad option:selected").val() == '' ||
+        $("#precio").val() == '' ||
+        $("#stock_").val() == '' ||
+        $("#stock_critico").val() == ''
+    ) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            confirmButtonText: 'Ok',
+            text: 'Debe rellenar todos los campos'
+        });
+    } else {
+        var formData = new FormData();
+        formData.append('nombre', $('#nombre').val());
+        formData.append('stock', $('#stock_').val());
+        formData.append('tienda', $('#tienda').val());
+        formData.append('precio', $('#precio').val());
+        formData.append('categoria', $('#categoria option:selected').val());
+        formData.append('unidad', $('#unidad option:selected').val());
+        formData.append('proveedor', $("#proveedor option:selected").val());
+        formData.append('critico', $("#stock_critico").val());
+
+        var fileInput = $('#formFile')[0];
+        if (fileInput.files.length > 0) {
+            formData.append('imagen', $('#formFile')[0].files[0]);
+        } else {
+            formData.append('imagen', '-');
+        }
+
+        $.ajax({
+            url: "{{ url_for('sistema.guardarProducto') }}",
+            type: "POST",
+            data: formData,
+            contentType: false,
+            processData: false,
+
+            success: function (response) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Éxito',
+                    confirmButtonText: 'Ok',
+                    text: 'Producto guardado correctamente'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        cargarInventario();
+
+                        // No cerrar el modal
+                        // $('#cerrar').click();
+
+                        // Limpia solo algunos campos si lo deseas
+                        $('#nombre').val('');
+                        $('#stock_').val('');
+                        $('#precio').val('');
+                        $('#stock_critico').val('');
+                        $('#formFile').val('');
+                    }
+                });
+            },
+            error: function (error) {
+                console.log("Error al guardar el producto:", error);
+            }
+        });
+    }
+}
+
 </script>

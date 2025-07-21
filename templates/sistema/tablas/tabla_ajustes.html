@@ -29,6 +29,9 @@
                                 <h6 class="fw-semibold mb-0">Cantidad</h6>
                             </th>
                             <th class="border-bottom-0">
+                                <h6 class="fw-semibold mb-0">Comentario</h6>
+                            </th>
+                            <th class="border-bottom-0">
                                 <h6 class="fw-semibold mb-0">Tipo Ajuste</h6>
                             </th>
                             
@@ -51,6 +54,10 @@
                             </td>
                             <td class="border-bottom-0">
                                 <span class="fw-normal">{{producto.cantidad}}</span>
+                                <!-- <h6 class="fw-semibold mb-1">{{producto.stock_critico}}</h6> -->
+                            </td>
+                            <td class="border-bottom-0">
+                                <span class="fw-normal">{{producto.comentario}}</span>
                                 <!-- <h6 class="fw-semibold mb-1">{{producto.stock_critico}}</h6> -->
                             </td>
                             
@@ -326,23 +333,7 @@
     });
     $("#tabla_inventario tr").click(function () {
         // MANDAMOS A TRAER LOS DATOS
-        var id = $(this).attr("id");
-
-        $.ajax({
-            url: "{{ url_for('sistema.mostrarDetalleProducto') }}",
-            type: "POST",
-            data: {
-                num: id,
-            },
-            success: function (response) {
-                $("#modal-detalle").html(response);
-                $("#modal-detalle").append(response.htmlresponse);
-                $("#launchDetalle").click();
-            },
-            error: function (error) {
-                // console.log(error);
-            },
-        });
+        
     });
 
     function buscarDash() {

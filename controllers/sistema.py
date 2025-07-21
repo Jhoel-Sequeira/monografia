@@ -94,7 +94,7 @@ def tablaMovimientos():
 
         conn = conectar()
         cursor = conn.cursor()
-        query = 'select a.num_ajuste, p.nom_producto,a.fecha_hora,a.cantidad,a.tipo_ajuste from ajuste_inventario as a inner join producto as p on a.cod_producto = p.cod_producto order by a.num_ajuste desc'
+        query = 'select a.num_ajuste, p.nom_producto,a.fecha_hora,a.cantidad,a.tipo_ajuste,a.comentario from ajuste_inventario as a inner join producto as p on a.cod_producto = p.cod_producto order by a.num_ajuste desc'
         cursor.execute(query)
         productos = cursor.fetchall()
 
@@ -267,7 +267,8 @@ def guardarProducto():
     categoria = request.form['categoria']
     proveedor = request.form['proveedor']
     critico = request.form['critico']
-    imagen = request.files['imagen']
+    imagen = request.files.get('imagen')
+
 
     if tienda == 1:
         Tienda = 'Si'
@@ -313,6 +314,7 @@ def guardarAjuste():
     nombre = request.form['producto']
     cantidad = request.form['cantidad']
     tipo = request.form['tipo']
+    comentario = request.form['comentario']
     FechaActual = capturarHora()
 
     print(nombre)
@@ -323,8 +325,8 @@ def guardarAjuste():
     conn = conectar()
     cursor = conn.cursor()
             # Realiza la inserción
-    query = 'INSERT INTO ajuste_inventario (fecha_hora,tipo_ajuste,cod_producto,cantidad) VALUES (?,?,?,?)'
-    cursor.execute(query, (FechaActual, tipo,nombre,cantidad))
+    query = 'INSERT INTO ajuste_inventario (fecha_hora,tipo_ajuste,cod_producto,cantidad,comentario) VALUES (?,?,?,?,?)'
+    cursor.execute(query, (FechaActual, tipo,nombre,cantidad,comentario))
     conn.commit()
 
     if tipo == 'ALTA':
@@ -392,6 +394,44 @@ def mostrarDetalleProducto():
 
 
     return render_template('sistema/modales/modal_editar_producto.html', proveedores = proveedores,unidades = unidades,categorias = categoria,producto = producto)
+
+@bp.route('/mostrarDetalleAjuste', methods=['POST'])
+def mostrarDetalleAjuste():
+
+    num = request.form['num']
+
+    conn = conectar()
+    cursor = conn.cursor()
+    query = 'select * from proveedor where id_estado = 1'
+    cursor.execute(query)
+    proveedores = cursor.fetchall()
+
+    conn = conectar()
+    cursor = conn.cursor()
+    query = 'select * from unidades '
+    cursor.execute(query)
+    unidades = cursor.fetchall()
+
+    conn = conectar()
+    cursor = conn.cursor()
+    query = 'select * from tipo '
+    cursor.execute(query)
+    categoria = cursor.fetchall()
+
+    
+
+    conn = conectar()
+    cursor = conn.cursor()
+    query = 'select p.cod_producto,p.nom_producto,p.precio,p.stock,p.stock_critico,prov.nom_proveedor,t.tipos,u.nombre as unidad,e.NombreEstado as estado,p.Imagen,p.tienda from producto as p inner join proveedor as prov on p.cod_proveedor = prov.cod_proveedor inner join tipo as t on p.tipo_producto = t.cod_tipo inner join unidades as u on p.unidad = u.cod_unidad inner join estado as e on p.id_estado = e.id_estado where p.cod_producto = ?'
+    cursor.execute(query,(num))
+    producto = cursor.fetchall()
+
+
+    return render_template('sistema/modales/modal_editar_producto.html', proveedores = proveedores,unidades = unidades,categorias = categoria,producto = producto)
+
+
+
+
 
 # EDITAR PRODUCTOS
 @bp.route('/actualizarProducto', methods=['POST'])
@@ -2450,6 +2490,47 @@ def modalAgendar():
     
 
     return render_template('sistema/modales/programar_cita.html', fecha = fecha,clientes = clientes,atencion = atencion,especies = especies)
+
+
+@bp.route('/modalAgendarValoracion', methods=['POST'])
+@login_required
+def modalAgendarValoracion():
+    fecha = request.form['fecha']
+    id = request.form['id']
+
+
+    conn = conectar()
+    cursor = conn.cursor()
+    query = "select c.num_cliente,c.nombres_cliente + ' ' + apellidos_cliente as Nombre from hospitalizacion as h inner join mascota as m on h.idMascota = m.idMascota INNER JOIN cliente as c on m.num_cliente = c.num_cliente where h.id_hosp = ? "
+    cursor.execute(query,(id))
+    clientes = cursor.fetchall()
+
+    conn = conectar()
+    cursor = conn.cursor()
+    query = "select m.idMascota,m.Nombre_mascota from hospitalizacion as h inner join mascota as m on h.idMascota = m.idMascota INNER JOIN cliente as c on m.num_cliente = c.num_cliente where h.id_hosp = ? "
+    cursor.execute(query,(id))
+    mascota = cursor.fetchall()
+
+ 
+    conn = conectar()
+    cursor = conn.cursor()
+    query = "select cod_tipo,tipo from tipo_atencion "
+    cursor.execute(query)
+    atencion = cursor.fetchall()
+
+    conn = conectar()
+    cursor = conn.cursor()
+    query = "select * from especie "
+    cursor.execute(query)
+    especies = cursor.fetchall()
+
+    
+
+    return render_template('sistema/modales/programar_cita_valoracion.html',mascotas = mascota, fecha = fecha,clientes = clientes,atencion = atencion,especies = especies)
+
+
+
+
 
 
 @bp.route('/modalDetalleCita', methods=['POST'])

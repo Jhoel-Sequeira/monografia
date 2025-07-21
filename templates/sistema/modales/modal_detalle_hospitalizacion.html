@@ -105,7 +105,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-
+                <button class="btn btn-secondary" onclick="valoracion()">Valoración</button>
                 <button type="button" onclick="marcarSalidaHospitalizacion()" class="btn btn-success"><i
                         class="ti ti-checklist"></i> Marcar Salida</button>
             </div>
@@ -252,10 +252,19 @@
                 <button class="btn btn-secondary" data-bs-target="#agregarUsuario" id="regresar1" data-bs-toggle="modal"
                     data-bs-dismiss="modal">Regresar</button>
                 <button class="btn btn-primary" onclick="NuevaMascota()">Guardar</button>
+
             </div>
         </div>
     </div>
 </div>
+<!-- MODALES -->
+
+<div id="agendar-modal-consulta"></div>
+<input id="agregar1" type="hidden" data-bs-toggle="modal" data-bs-target="#agendarConsulta">
+
+<div id="detalle-modal"></div>
+<input id="detalle" type="hidden" data-bs-toggle="modal" data-bs-target="#detalleCita">
+
 
 
 
@@ -312,6 +321,41 @@
     }
 
 
+    function valoracion() {
+    // Obtener la fecha de hoy en formato YYYY-MM-DD
+    const hoy = new Date();
+    const fechaSeleccionada = hoy.toISOString().split('T')[0];
+
+    $.ajax({
+        url: "{{ url_for('sistema.modalAgendarValoracion') }}",
+        type: "POST",
+        data: {
+            fecha: fechaSeleccionada,
+            id: $('#id').val()
+        },
+        success: function (response) {
+            // Cerrar primer modal
+            $('#detalleHospitalizacion').modal('hide');
+
+            // Esperar un poco para asegurar el cierre antes de abrir el segundo
+            setTimeout(() => {
+                // Mostrar contenido en el segundo modal
+                $('#agendar-modal-consulta').html(response); // o response.htmlresponse si usas JSON
+
+                // Abrir el segundo modal
+                $('#agregar1').click();
+            }, 300); // 300ms de espera es suficiente
+        },
+        error: function (error) {
+            console.error("Error en la solicitud AJAX:", error);
+        },
+    });
+}
+
+
+
+
+
 
     $("#cliente").change(function () {
         $.ajax({
@@ -361,7 +405,7 @@
             processData: false,
 
             success: function (response) {
-                Swal.fire({ icon: 'success', title: 'Exito', confirmButtonText: 'Ok', text: 'Usuario Actualizado' }).then((result) => { /* Read more about isConfirmed, isDenied below */
+                Swal.fire({ icon: 'success', title: 'Exito', confirmButtonText: 'Ok', text: 'Registro de Salida exitoso' }).then((result) => { /* Read more about isConfirmed, isDenied below */
                     if (result.isConfirmed) {
                         cargarHospitalizacion();
                         $('#cerrarDet').click();
