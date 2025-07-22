@@ -1,0 +1,215 @@
+<div class="table-container">
+  <table class="table" id="tabla-caja">
+    <thead style="background-color: white !important">
+      <tr>
+        <th style="width: 180px">Producto</th>
+        <th>Cantidad</th>
+        <th>Descuento</th>
+        <th style="width: 100px">Subtotal</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody
+      style="background-color: transparent !important"
+      class="overflow-hidden"
+    >
+      {% for medicamento in medicamentos %}
+      <tr
+        id="{{medicamento.cod_detalleCompra}}"
+        style="background-color: transparent !important"
+      >
+        <td>{{medicamento.nom_producto}}</td>
+        <td>{{medicamento.cantidad}}</td>
+        <td>
+          {% if medicamento.descuento == 0.0 %}
+          <!-- No mostrar nada si el descuento es 0.0 -->
+          {% elif medicamento.descuento < 1 %} {{ medicamento.descuento * 100
+          }}%
+          <!-- Si es porcentaje -->
+          {% else %} C$ {{ medicamento.descuento }}
+          <!-- Si es cantidad -->
+          {% endif %}
+        </td>
+        <td>
+          {% if medicamento.cantidad == 0 %}
+            {# Mostrar solo el valor del descuento como negativo #}
+            {% if medicamento.descuento == 0.0 %}
+              <!-- No mostrar nada -->
+            {% elif medicamento.descuento < 1 %}
+              -C$ {{ (medicamento.precio * medicamento.descuento) | round(2) }}
+            {% else %}
+              -C$ {{ medicamento.descuento | round(2) }}
+            {% endif %}
+          {% else %}
+            {# Calcular subtotal #}
+            {% set subtotal = medicamento.precio * medicamento.cantidad %}
+
+            {# Calcular descuento aplicado #}
+            {% if medicamento.descuento == 0.0 %}
+              {% set descuento_aplicado = 0 %}
+            {% elif medicamento.descuento < 1 %}
+              {% set descuento_aplicado = subtotal * medicamento.descuento %}
+            {% else %}
+              {% set descuento_aplicado = medicamento.descuento %}
+            {% endif %}
+
+            {# Calcular total y mostrar #}
+            {% set total = subtotal - descuento_aplicado %}
+            C$ {{ total | round(2) }}
+          {% endif %}
+        </td>
+
+
+
+
+
+
+        <td
+          style="
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100px;
+          "
+        >
+          <button
+            type="button"
+            name="eliminar"
+            class="btn btn-danger"
+            value="{{medicamento.cod_detalleCompra}}"
+            style="
+              height: 20px;
+              width: 20px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              padding: 0;
+            "
+          >
+            <i class="fas fa-trash" style="font-size: 10px"></i>
+          </button>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+
+{% if otros %}
+<script>
+  let productosSinStock = "{{ otros|join(', ') }}"; // Convertir la lista en una cadena separada por comas
+
+  Toastify({
+    text: `Lo sentimos, no tenemos stock disponible de: ${productosSinStock}.`,
+    gravity: "top",
+    position: "right",
+    className: "info",
+    duration: 5000,
+    style: {
+      background: "#5852a19d",
+    },
+  }).showToast();
+</script>
+{% endif %}
+
+<style>
+  /* Contenedor de la tabla */
+  table thead th {
+    background-color: rgba(92, 92, 92, 0.486) !important;
+    color: white;
+    text-align: start !important;
+  }
+
+  .table-container {
+    width: 100%;
+    max-height: 70vh;
+    /* Ajusta la altura según lo necesites */
+    overflow-y: auto;
+    /* Permite que solo el tbody se desplace */
+    border: 1px solid #ddd;
+    -ms-overflow-style: none;
+    /* IE y Edge */
+    scrollbar-width: none;
+    /* Firefox */
+  }
+
+  .table-container ::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* La tabla debe tener el ancho completo */
+  .table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+    /* Garantiza que las columnas mantengan su tamaño */
+  }
+
+  /* Estilo para los encabezados */
+  .table thead {
+    background-color: white;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    /* Mantiene los encabezados sobre el contenido al hacer scroll */
+  }
+
+  /* Ancho de las columnas */
+  .table th,
+  .table td {
+    padding: 8px;
+    text-align: start !important;
+    width: 20%;
+    /* Ajusta este valor si es necesario */
+    box-sizing: border-box;
+    border-bottom: 1px solid #ddd;
+  }
+
+  /* Opcional: estilo para hacer más visible el encabezado */
+  .table thead th {
+    border-bottom: 2px solid #ddd;
+    background-color: #f9f9f9;
+  }
+</style>
+<script>
+  $("#tabla-caja button[name=eliminar]").click(function () {
+    id = $(this).val();
+    alert(id)
+    alert($("#facturaIdC").val())
+
+    if ($("#receta").val() !== "") {
+      $.ajax({
+        url: "{{ url_for('sistema.eliminarProductoCajaCompra') }}",
+        type: "POST",
+        data: {
+          num: id,
+          venta: $("#facturaIdC").val(),
+        },
+        success: function (response) {
+          cargarCaja();
+          total();
+        },
+        error: function (error) {
+          // console.log(error);
+        },
+      });
+    } else {
+      $.ajax({
+        url: "{{ url_for('sistema.eliminarProductoCajaCompra') }}",
+        type: "POST",
+        data: {
+          num: id,
+          venta: $("#facturaIdC").val(),
+        },
+        success: function (response) {
+          cargarCaja();
+          total();
+        },
+        error: function (error) {
+          // console.log(error);
+        },
+      });
+    }
+  });
+</script>

@@ -892,6 +892,57 @@ def eliminarProductoCaja():
 
     return 'si'
 
+
+@bp.route('/eliminarProductoCajaCompra', methods=['POST', 'GET'])
+def eliminarProductoCajaCompra():
+    if request.method == "POST":
+        medicamento = request.form['num']
+        venta = request.form['venta']
+
+        print(venta)
+        print(medicamento)
+
+        conn = conectar()
+        cursor = conn.cursor()
+        query = "select cantidad,cod_producto,codLote from detalle_compra where cod_compra = ? and cod_detalleCompra = ? "
+        cursor.execute(query,(venta,medicamento))
+        cantidad = cursor.fetchone()
+
+        print(cantidad)
+
+        conn = conectar()
+        cursor = conn.cursor()
+        query = "delete detalle_compra where cod_compra = ? AND cod_detalleCompra = ? "
+        cursor.execute(query,(venta,medicamento))
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+        conn = conectar()
+        cursor = conn.cursor()
+        query = "delete lotes where cod_lote = ? "
+        cursor.execute(query,(cantidad[2]))
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+        conn = conectar()
+        cursor = conn.cursor()
+        query = 'update producto set stock += ? where cod_producto = ?'
+        cursor.execute(query, (cantidad[0],cantidad[1]))
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+        
+      
+
+    return 'si'
+
+
+
+
+
 @bp.route('/eliminarProductoCajaSin', methods=['POST', 'GET'])
 def eliminarProductoCajaSin():
     if request.method == "POST":
@@ -1883,6 +1934,9 @@ def ingresarMedicamentoCompra():
         cantidad = request.form['cantidad']
         descuento = request.form['descuento']
 
+        lote = request.form['lote']
+        vencimiento = request.form['fvencimiento']
+
         print('aquiii')
         print(descuento)
         print(venta)
@@ -1893,8 +1947,8 @@ def ingresarMedicamentoCompra():
 
         conn = conectar()
         cursor = conn.cursor()
-        query = "select * from detalle_compra where cod_compra = ? and cod_producto = ? and precio_venta = ?"
-        cursor.execute(query,(venta,medicamento,descuento))
+        query = "select dc.cod_detalleCompra,l.cod_lote from detalle_compra as dc inner join lotes as l on dc.codLote = l.cod_lote where dc.cod_compra = ? and dc.cod_producto = ? and dc.precio_venta = ? and l.lote = ?"
+        cursor.execute(query,(venta,medicamento,descuento,lote))
         existe = cursor.fetchone()
 
         print(existe)
@@ -1908,12 +1962,39 @@ def ingresarMedicamentoCompra():
             conn.commit()
             cursor.close()
             conn.close()
+
+            conn = conectar()
+            cursor = conn.cursor()
+            query = 'UPDATE lotes set cantidad += ? where cod_lote = ?'
+            cursor.execute(query, (cantidad,existe[1]))
+            conn.commit()
+            cursor.close()
+            conn.close()
         else:
 
             conn = conectar()
             cursor = conn.cursor()
-            query = 'INSERT INTO detalle_compra (cod_producto,cod_compra,cantidad,precio_venta) VALUES (?,?,?,?)'
-            cursor.execute(query, (medicamento,venta,cantidad,descuento))
+            query = 'INSERT INTO lotes (lote,FechaVencimiento,idProducto,cantidad) VALUES (?,?,?,?)'
+            cursor.execute(query, (lote,vencimiento,medicamento,cantidad))
+            conn.commit()
+            cursor.close()
+            conn.close()
+
+
+            conn = conectar()
+            cursor = conn.cursor()
+            query = "select cod_lote from lotes order by cod_lote desc"
+            cursor.execute(query)
+            loteI = cursor.fetchone()
+
+            print(loteI)
+
+
+
+            conn = conectar()
+            cursor = conn.cursor()
+            query = 'INSERT INTO detalle_compra (cod_producto,cod_compra,cantidad,precio_venta,codLote) VALUES (?,?,?,?,?)'
+            cursor.execute(query, (medicamento,venta,cantidad,descuento,loteI[0]))
             conn.commit()
             cursor.close()
             conn.close()
@@ -1922,7 +2003,7 @@ def ingresarMedicamentoCompra():
         print('cantidad: ', cantidad)
         conn = conectar()
         cursor = conn.cursor()
-        query = 'update producto set stock = stock-? where cod_producto = ?'
+        query = 'update producto set stock = stock + ? where cod_producto = ?'
         cursor.execute(query, (cantidad,medicamento))
         conn.commit()
         cursor.close()
@@ -2072,7 +2153,7 @@ def listadoProductosCajaCompra():
     medicamentos = cursor.fetchall()
     
 
-    return render_template('sistema/tablas/tabla-caja.html',medicamentos = medicamentos)
+    return render_template('sistema/tablas/tabla-caja-compra.html',medicamentos = medicamentos)
 
 @bp.route('/agregarReceta', methods=['POST'])
 def agregarReceta():

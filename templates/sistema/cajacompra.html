@@ -18,7 +18,7 @@
                     <div class="col">
                         <label class="form-label" for="form3Example2"><strong>Cod Factura</strong></label>
 
-                        <input type="text" id="facturaId" disabled class="form-control" placeholder="" />
+                        <input type="text" id="facturaIdC" disabled class="form-control" placeholder="" />
                     </div>
 
                 </div>
@@ -56,10 +56,15 @@
 
                 </div>
                 <div class="row">
-                    <div class="col-12">
+                    <div class="col-6">
                         <label class="form-label" for="form3Example2"><strong>Lote</strong></label>
 
                         <input type="text" class="form-control" id="lote" value="1" placeholder="10" />
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label" for="form3Example2"><strong>Fecha Vencimiento</strong></label>
+
+                        <input type="date" class="form-control" id="fvencimiento" value="1"  />
                     </div>
                 </div>
 
@@ -245,7 +250,7 @@
                     url: "{{ url_for('sistema.limpiarCajaSinRetorno') }}",
                     type: "POST",
                     data: {
-                        venta: $("#facturaId").val(),
+                        venta: $("#facturaIdC").val(),
                     },
                     success: function (response) {
                         cargarCaja();
@@ -263,7 +268,7 @@
                     url: "{{ url_for('sistema.limpiarCaja') }}",
                     type: "POST",
                     data: {
-                        venta: $("#facturaId").val(),
+                        venta: $("#facturaIdC").val(),
                     },
                     success: function (response) {
                         cargarCaja();
@@ -289,7 +294,7 @@
                 url: "{{ url_for('sistema.agregarReceta') }}",
                 type: "POST",
                 data: {
-                    num: $("#facturaId").val(),
+                    num: $("#facturaIdC").val(),
                     receta: $("#receta").val(),
                 },
                 success: function (response) {
@@ -310,7 +315,7 @@
                 url: "{{ url_for('sistema.agregarOrden') }}",
                 type: "POST",
                 data: {
-                    num: $("#facturaId").val(),
+                    num: $("#facturaIdC").val(),
                     receta: $("#receta").val(),
                 },
                 success: function (response) {
@@ -373,10 +378,12 @@
                 url: "/ingresarMedicamentoCompra",
                 type: "POST",
                 data: {
-                    venta: $("#facturaId").val(),
+                    venta: $("#facturaIdC").val(),
                     cantidad: $("#cantidad").val(),
                     medicamento: producto,
                     descuento: descuento,
+                    lote:$("#lote").val(),
+                    fvencimiento:$("#fvencimiento").val(),
                 },
                 success: function (response) {
                     $("#producto").val("");
@@ -395,7 +402,7 @@
         }
 
         function ingresarMedicamento() {
-            if ($("#Idproducto").val() == "" || $("#cantidad").val() == "") {
+            if ($("#Idproducto").val() == "" || $("#cantidad").val() == "" || $("#lote").val() == "" || $("#fvencimiento").val() == "") {
                 Swal.fire({
                     icon: "warning",
                     title: "Error",
@@ -482,7 +489,7 @@
                 type: "POST",
                 data: {},
                 success: function (response) {
-                    $("#facturaId").val(response);
+                    $("#facturaIdC").val(response);
                     $("#receta").val('');
                     $("#resultadoReceta").hide();
                     cargarCaja();
@@ -499,7 +506,7 @@
                 url: "{{ url_for('sistema.totalCajaCompra') }}",
                 type: "POST",
                 data: {
-                    num: $("#facturaId").val(),
+                    num: $("#facturaIdC").val(),
                 },
                 success: function (response) {
                     $("#total").text("C$ " + response);
@@ -532,7 +539,7 @@
                 type: "POST",
                 data: {
                     cliente: cliente,
-                    num: $("#facturaId").val(),
+                    num: $("#facturaIdC").val(),
                 },
                 success: function (response) { },
                 error: function (error) {
@@ -546,7 +553,7 @@
                 type: "POST",
                 data: {
                     cliente: cliente,
-                    num: $("#facturaId").val(),
+                    num: $("#facturaIdC").val(),
                 },
                 success: function (response) {
                     recetaAFactura();
@@ -562,7 +569,7 @@
                 url: "{{ url_for('sistema.validarFacturaCompra') }}",
                 type: "POST",
                 data: {
-                    num: $("#facturaId").val(),
+                    num: $("#facturaIdC").val(),
                 },
                 success: function (response) {
 
@@ -666,12 +673,12 @@
                 url: "/validarProductosCompra",
                 type: "POST",
                 data: {
-                    num: $("#facturaId").val(),
+                    num: $("#facturaIdC").val(),
                 },
                 success: function (response) {
                     if (response == "si") {
                         $("#receta").prop("disabled", false);
-                        printTicket($("#facturaId").val());
+                        printTicket($("#facturaIdC").val());
                         var socket = io.connect('http://' + document.domain + ':' + location.port);
 
                         socket.emit('dato_nuevo', 0);
@@ -707,7 +714,7 @@
                 url: "{{ url_for('sistema.validarProductos') }}",
                 type: "POST",
                 data: {
-                    num: $("#facturaId").val(),
+                    num: $("#facturaIdC").val(),
                 },
                 success: function (response) {
                     callback(response);
@@ -885,7 +892,7 @@
                 url: "{{ url_for('sistema.listadoProductosCajaCompra') }}",
                 type: "POST",
                 data: {
-                    num: $("#facturaId").val(),
+                    num: $("#facturaIdC").val(),
                 },
                 success: function (response) {
                     $("#tabla-caja").html(response);
