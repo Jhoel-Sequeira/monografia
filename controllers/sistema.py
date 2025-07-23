@@ -1,5 +1,7 @@
 # controllers/sistema.py
 from datetime import datetime, timedelta
+
+
 import json
 import os
 import locale
@@ -7,6 +9,7 @@ from fpdf import FPDF
 from flask import Blueprint, jsonify, render_template, request,session,redirect,make_response,current_app,url_for
 from functools import wraps
 from conexion import conectar
+from conexion import conectarBack
 from werkzeug.security import check_password_hash, generate_password_hash
 import pandas as pd
 from run import socketio
@@ -15,9 +18,17 @@ from run import socketio
 from controllers.excel import GenerarExcel_3
 from controllers.correo import enviar_correo, enviar_correo_receta, enviar_correo_registro
 
+backups_dir = 'C:\Program Files\Microsoft SQL Server\MSSQL16.MSSQLSERVER\MSSQL\Backup'
+
+
+ruta_absoluta_backups = os.path.abspath(backups_dir)
 def capturarHora():
     hi = datetime.now()
     return hi
+
+def capturarHoraBack():
+    hi = datetime.now()
+    return hi.strftime('%Y%m%d_%H%M%S')
 
 def login_required(f):
     @wraps(f)
@@ -83,6 +94,63 @@ def tablaProductos():
 
 
         return render_template('sistema/tablas/tabla_inventario.html', productos=productos, categoria = categoria)
+        
+    else:
+        return "No"
+
+
+@bp.route('/tablaBackups', methods=['POST'])
+def tablaBackups():
+    if request.method == "POST":
+        archivos = []
+        base_path = os.path.abspath(backups_dir)  # ruta absoluta
+
+        for filename in os.listdir(base_path):
+            if filename.endswith('.sql') or filename.endswith('.bak') or filename.endswith('.zip'):
+                path = os.path.join(base_path, filename)
+                tamano = os.path.getsize(path)
+                fecha_mod = os.path.getmtime(path)
+                archivos.append({
+                    'nombre': filename,
+                    'tamano': tamano,
+                    'fecha_modificacion': datetime.fromtimestamp(fecha_mod).strftime('%d/%m/%Y %H:%M')
+
+                })
+
+        archivos = sorted(archivos, key=lambda x: x['fecha_modificacion'], reverse=True)
+
+        return render_template('sistema/tablas/tabla-backups.html', backups=archivos)
+    else:
+        return "Método no permitido"
+
+
+@bp.route('/tablaLotes', methods=['POST'])
+def tablaLotes():
+
+    if request.method == "POST":
+        id = request.form['id']
+        conn = conectar()
+        cursor = conn.cursor()
+        query = """SELECT 
+                    cod_lote,
+                    lote,
+                    CAST(FechaVencimiento AS DATE) AS FechaVencimiento,
+                    cantidad
+                FROM 
+                    lotes
+                WHERE 
+                    idProducto = ?
+                ORDER BY 
+                    FechaVencimiento ASC;
+                """
+        cursor.execute(query,(id))
+        productos = cursor.fetchall()
+
+
+       
+        print(id)
+        print(productos)
+        return render_template('sistema/tablas/tabla-lotes.html', productos=productos)
         
     else:
         return "No"
@@ -593,6 +661,43 @@ def ventas():
 def compras():
     return render_template('sistema/compras.html')
 
+
+@bp.route('/backups')
+@login_required
+def backups():
+    return render_template('sistema/backups.html')
+
+
+
+@bp.route('/generarBackup', methods=['POST'])
+def generarBackup():
+    print('Entró a generarBackup')
+    hora = capturarHoraBack()
+    try:
+        nombre_backup = f"backup_{hora}"
+        backup_dir = r'C:\Program Files\Microsoft SQL Server\MSSQL16.MSSQLSERVER\MSSQL\Backup'
+
+
+        # Backup file name
+        backup_file = 'Vet_ElBuenProductor_' + nombre_backup + '.bak'
+
+        # Backup command
+        backup_command = 'BACKUP DATABASE Vet_ElBuenProductor TO DISK=\'' + os.path.join(backup_dir, backup_file) + '\''
+        conn = conectar()
+        conn.autocommit = True
+        cursor = conn.cursor()
+        # Execute the backup command
+        cursor.execute(backup_command)
+        
+        return jsonify({"status": "ok", "mensaje": "Backup generado vía SP", "archivo": nombre_backup})
+
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({"status": "error", "mensaje": str(e)}), 500
+
+
+
 @bp.route('/caja')
 @login_required
 def caja():
@@ -863,34 +968,57 @@ def comprobarStockReceta():
 @bp.route('/eliminarProductoCaja', methods=['POST', 'GET'])
 def eliminarProductoCaja():
     if request.method == "POST":
-        medicamento = request.form['num']
-        venta = request.form['venta']
+        cod_detalle = request.form['num']
+        cod_venta = request.form['venta']
 
-
+        # 1. Obtener cantidad y producto desde Det_venta
         conn = conectar()
         cursor = conn.cursor()
-        query = "select cantidad,cod_producto_1 from Det_venta where cod_venta_1 = ? and cod_detalle = ? "
-        cursor.execute(query,(venta,medicamento))
-        cantidad = cursor.fetchone()
+        query = """
+            SELECT cantidad, cod_producto_1 
+            FROM Det_venta 
+            WHERE cod_venta_1 = ? AND cod_detalle = ?
+        """
+        cursor.execute(query, (cod_venta, cod_detalle))
+        detalle = cursor.fetchone()
 
-        conn = conectar()
-        cursor = conn.cursor()
-        query = "delete Det_venta where cod_venta_1 = ? AND cod_detalle = ? "
-        cursor.execute(query,(venta,medicamento))
+        if not detalle:
+            cursor.close()
+            conn.close()
+            return 'Detalle no encontrado', 404
+
+        cantidad, cod_producto = detalle
+
+        # 2. Obtener los lotes que se usaron para esta venta
+        query = """
+            SELECT cantidadUsada, codLote 
+            FROM detalle_venta_lote 
+            WHERE codDetalle = ?
+        """
+        cursor.execute(query, (cod_detalle,))
+        lotes_usados = cursor.fetchall()
+
+        # 3. Reintegrar cada cantidad al lote correspondiente
+        for cantidad_usada, cod_lote in lotes_usados:
+            cursor.execute("""
+                UPDATE lotes SET cantidad = cantidad + ? WHERE cod_lote = ?
+            """, (cantidad_usada, cod_lote))
+
+        # 4. Eliminar registros en detalle_venta_lote
+        cursor.execute("DELETE FROM detalle_venta_lote WHERE codDetalle = ?", (cod_detalle,))
+
+        # 5. Eliminar el Det_venta
+        cursor.execute("DELETE FROM Det_venta WHERE cod_venta_1 = ? AND cod_detalle = ?", (cod_venta, cod_detalle))
+
+        # 6. (Opcional) Actualizar el stock general del producto
+        cursor.execute("UPDATE producto SET stock = stock + ? WHERE cod_producto = ?", (cantidad, cod_producto))
+
         conn.commit()
         cursor.close()
         conn.close()
 
-        conn = conectar()
-        cursor = conn.cursor()
-        query = 'update producto set stock += ? where cod_producto = ?'
-        cursor.execute(query, (cantidad[0],cantidad[1]))
-        conn.commit()
-        cursor.close()
-        conn.close()
-      
+        return 'si'
 
-    return 'si'
 
 
 @bp.route('/eliminarProductoCajaCompra', methods=['POST', 'GET'])
@@ -1874,46 +2002,92 @@ def ingresarMedicamento():
     if request.method == "POST":
         venta = request.form['venta']
         medicamento = request.form['medicamento']
-        cantidad = request.form['cantidad']
+        cantidad = int(request.form['cantidad'])
         descuento = request.form['descuento']
 
-        print('aquiii')
-        print(descuento)
-        print(venta)
-        print(medicamento)
-        print(cantidad)
-
-        # BUSCAMOS EL MEDICAMENTO ESTA EN LA FACTURA
-
+        # Verificar si el medicamento ya está en el detalle de la venta
         conn = conectar()
         cursor = conn.cursor()
-        query = "select * from Det_venta where cod_venta_1 = ? and cod_producto_1 = ? and precio_venta = ?"
-        cursor.execute(query,(venta,medicamento,descuento))
+        query = """
+            SELECT * FROM Det_venta 
+            WHERE cod_venta_1 = ? AND cod_producto_1 = ? AND precio_venta = ?
+        """
+        cursor.execute(query, (venta, medicamento, descuento))
         existe = cursor.fetchone()
 
-        print(existe)
+        # Verificar si hay suficientes lotes
+        cantidad_faltante = cantidad
+        lotes_usados = []
 
+        query = """
+            SELECT cod_lote, cantidad
+            FROM lotes
+            WHERE idProducto = ?
+            AND cantidad > 0
+            ORDER BY FechaVencimiento ASC
+        """
+        cursor.execute(query, (medicamento,))
+        lotes = cursor.fetchall()
+
+        for lote in lotes:
+            cod_lote, disponible = lote
+            if cantidad_faltante <= 0:
+                break
+            if disponible >= cantidad_faltante:
+                lotes_usados.append((cantidad_faltante, cod_lote))
+                cantidad_faltante = 0
+            else:
+                lotes_usados.append((disponible, cod_lote))
+                cantidad_faltante -= disponible
+
+        if cantidad_faltante > 0:
+            cursor.close()
+            conn.close()
+            return 'No hay suficiente stock en los lotes disponibles.', 400
+
+        # Insertar o actualizar el detalle de venta
         if existe:
-
-            conn = conectar()
-            cursor = conn.cursor()
-            query = 'UPDATE Det_venta set cantidad += ? where cod_detalle = ?'
-            cursor.execute(query, (cantidad,existe[0]))
-            conn.commit()
-            cursor.close()
-            conn.close()
+            cod_detalle = existe[0]
+            query = 'UPDATE Det_venta SET cantidad = cantidad + ? WHERE cod_detalle = ?'
+            cursor.execute(query, (cantidad, cod_detalle))
         else:
-
-            conn = conectar()
-            cursor = conn.cursor()
-            query = 'INSERT INTO Det_venta (cod_producto_1,cod_venta_1,Cantidad,precio_venta) VALUES (?,?,?,?)'
-            cursor.execute(query, (medicamento,venta,cantidad,descuento))
+            query = '''
+                INSERT INTO Det_venta (cod_producto_1, cod_venta_1, cantidad, precio_venta)
+                VALUES (?, ?, ?, ?)
+            '''
+            cursor.execute(query, (medicamento, venta, cantidad, descuento))
             conn.commit()
             cursor.close()
             conn.close()
-        
 
-        print('cantidad: ', cantidad)
+            conn = conectar()
+            cursor = conn.cursor()
+            query = """
+                SELECT * FROM Det_venta 
+                WHERE cod_venta_1 = ? AND cod_producto_1 = ? AND precio_venta = ? order by cod_venta_1 desc
+            """
+            cursor.execute(query, (venta, medicamento, descuento))
+            cod_detalle1 = cursor.fetchone()
+            cod_detalle = cod_detalle1[0]
+
+        # Registrar cada lote usado y descontar su cantidad
+        for cant_usada, cod_lote in lotes_usados:
+            # Descontar del lote
+            cursor.execute(
+                "UPDATE lotes SET cantidad = cantidad - ? WHERE cod_lote = ?",
+                (cant_usada, cod_lote)
+            )
+            # Insertar detalle del lote usado
+            cursor.execute(
+                "INSERT INTO detalle_venta_lote (codDetalle, cantidadUsada, codLote) VALUES (?, ?, ?)",
+                (cod_detalle, cant_usada, cod_lote)
+            )
+
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+
         conn = conectar()
         cursor = conn.cursor()
         query = 'update producto set stock = stock-? where cod_producto = ?'
@@ -1921,9 +2095,9 @@ def ingresarMedicamento():
         conn.commit()
         cursor.close()
         conn.close()
-       
 
-    return 'hecho'
+        return 'hecho'
+
 
 
 @bp.route('/ingresarMedicamentoCompra', methods=['POST'])

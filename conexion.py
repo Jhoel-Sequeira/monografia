@@ -29,3 +29,16 @@ def conectar():
     # Conectar a la base de datos
     conn = pyodbc.connect(connection_string)
     return conn
+
+
+def conectarBack():
+    server = 'DESKTOP-EU0OJJ3'
+    database = 'Vet_ElBuenProductor'
+    driver= '{ODBC Driver 17 for SQL Server}'
+
+    # Crear la cadena de conexión usando la autenticación integrada de Windows
+    connection_string = f"DRIVER={driver};SERVER={server};DATABASE={database};Trusted_Connection=yes"
+
+    # Conectar a la base de datos
+    conn = pyodbc.connect(connection_string)
+    return conn

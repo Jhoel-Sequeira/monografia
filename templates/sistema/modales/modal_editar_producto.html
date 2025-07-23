@@ -137,6 +137,12 @@
 
                     </div>
                 </div>
+                <div class="row mt-2">
+                        <div class="col">
+                            <div id="tabla-lote"></div>
+                        </div>
+
+                </div>
             </div>
             
             <div class="modal-footer">
@@ -165,6 +171,9 @@
 {%endfor%}
 
 <script>
+    $(document).ready(function () {
+            cargarLotes();
+        });
     document.querySelectorAll('.cuerpo-modal input, .cuerpo-modal select, .cuerpo-modal file').forEach(element => {
         element.disabled = true;
     });
@@ -255,6 +264,23 @@
                 }
             });
         }
+    }
+     function cargarLotes() {
+        $.ajax({
+            url: "{{ url_for('sistema.tablaLotes') }}",
+            type: "POST",
+            data: {
+                id:$('#id').val(),
+            },
+            success: function (response) {
+                $("#tabla-lote").html(response);
+                $("#tabla-lote").append(response.htmlresponse);
+
+            },
+            error: function (error) {
+                // console.log(error);
+            },
+        });
     }
 
 
