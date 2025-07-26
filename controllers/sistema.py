@@ -1154,6 +1154,10 @@ def limpiarCajaSinRetorno():
 @bp.route('/facturar', methods=['POST', 'GET'])
 def facturar():
     num = request.args.get('id')
+    cantidad = 0
+    cod_producto = 0
+    precio = 0
+    descuento_raw = 0 
 
     conn = conectar()
     cursor = conn.cursor()
@@ -1235,6 +1239,15 @@ def facturar():
     query = "select p.nom_producto,dv.cantidad,p.precio,p.stock,p.stock_critico,dv.precio_venta as descuento,p.cod_producto from detalle_carrito as dv inner join producto as p on dv.cod_producto = p.cod_producto INNER JOIN venta AS v on dv.cod_carrito = v.id_carrito where v.cod_venta = ?"
     cursor.execute(query,(num))
     detalle = cursor.fetchall()
+
+
+    if not detalle:
+        conn = conectar()
+        cursor = conn.cursor()
+        query = "select p.nom_producto,dv.cantidad,p.precio,p.stock,p.stock_critico,dv.precio_venta as descuento,p.cod_producto from Det_venta as dv inner join producto as p on dv.cod_producto_1 = p.cod_producto INNER JOIN venta AS v on dv.cod_venta_1 = v.cod_venta where v.cod_venta = ?"
+        cursor.execute(query,(num))
+        detalle = cursor.fetchall()
+
 
     print(detalle)
 
@@ -1323,25 +1336,25 @@ def facturar():
         descuento_raw = float(fila[5])  # Descuento aplicado
         cod_producto = fila[6]
 
-    # Actualizar stock
-    conn = conectar()
-    cursor = conn.cursor()
-    cursor.execute('UPDATE producto SET stock = stock - ? WHERE cod_producto = ?', (cantidad, cod_producto))
-    conn.commit()
-    cursor.close()
-    conn.close()
+        # Actualizar stock
+        conn = conectar()
+        cursor = conn.cursor()
+        cursor.execute('UPDATE producto SET stock = stock - ? WHERE cod_producto = ?', (cantidad, cod_producto))
+        conn.commit()
+        cursor.close()
+        conn.close()
 
-    # Calcular subtotal y descuento
-    subtotal = cantidad * precio if cantidad else precio
+        # Calcular subtotal y descuento
+        subtotal = cantidad * precio if cantidad else precio
 
-    if descuento_raw == 0.0:
-        descuento_aplicado = 0
-    elif descuento_raw < 1:
-        descuento_aplicado = subtotal * descuento_raw  # Descuento en %
-    else:
-        descuento_aplicado = descuento_raw  # Descuento directo
+        if descuento_raw == 0.0:
+            descuento_aplicado = 0
+        elif descuento_raw < 1:
+            descuento_aplicado = subtotal * descuento_raw  # Descuento en %
+        else:
+            descuento_aplicado = descuento_raw  # Descuento directo
 
-    total = subtotal - descuento_aplicado
+        total = subtotal - descuento_aplicado
 
     pdf.set_line_width(0.0)
     pdf.set_font('Arial', '', 7.5)
