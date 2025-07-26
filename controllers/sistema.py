@@ -2598,6 +2598,23 @@ def tablaCompras():
     else:
         return "No"
 
+
+@bp.route('/tablaVentas', methods=['POST'])
+def tablaVentas():
+
+    if request.method == "POST":
+
+        conn = conectar()
+        cursor = conn.cursor()
+        query = "SELECT v.cod_venta, CONVERT(DATE, v.fecha_venta) AS fecha,FORMAT(v.fecha_venta, 'HH:mm') AS hora, cred.usuario AS vendedor, SUM(dv.cantidad * p.precio - dv.precio_venta) AS total_venta, e.NombreEstado AS estado FROM venta AS v INNER JOIN cliente AS vendedor ON vendedor.num_cliente = v.vendedor INNER JOIN Det_venta AS dv ON v.cod_venta = dv.cod_venta_1 INNER JOIN producto AS p ON dv.cod_producto_1 = p.cod_producto INNER JOIN estado AS e ON v.cod_estado = e.id_estado INNER JOIN credenciales as cred on vendedor.id_credencial = cred.id_credencial GROUP BY v.cod_venta, CONVERT(DATE, v.fecha_venta), FORMAT(v.fecha_venta, 'HH:mm'), vendedor.nombres_cliente, vendedor.apellidos_cliente, e.NombreEstado, cred.usuario order by v.cod_venta desc;"
+        cursor.execute(query)
+        ventas = cursor.fetchall()
+
+        return render_template('sistema/tablas/tabla_ventas.html', ventas=ventas)
+        
+    else:
+        return "No"
+
 #  FIN CARGA DE LA TABLA
 
 # TRAER CLIENTE DE LA ORDEN DE COMPRA
