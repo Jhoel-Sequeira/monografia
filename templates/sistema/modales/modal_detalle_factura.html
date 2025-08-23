@@ -95,12 +95,13 @@
                                     <td>
                                         {% if medicamento.descuento == 0.0 %}
                                         <!-- No mostrar nada si el descuento es 0.0 -->
-                                        {% elif medicamento.descuento < 1 %} {{ medicamento.descuento * 100 }}% <!-- Si
-                                            es porcentaje -->
+                                        {% elif medicamento.descuento < 1 %} {{ "%.2f" |format(medicamento.descuento *
+                                            100) }}% <!-- Si es porcentaje -->
                                             {% else %}
-                                            C$ {{ medicamento.descuento }} <!-- Si es cantidad -->
+                                            C$ {{ "%.2f"|format(medicamento.descuento) }} <!-- Si es cantidad -->
                                             {% endif %}
                                     </td>
+
                                     <td>
                                         {% set subtotal = medicamento.precio * medicamento.cantidad %}
 
@@ -109,7 +110,8 @@
                                         {% elif medicamento.descuento < 1 %} {% set descuento_aplicado=subtotal *
                                             medicamento.descuento %} {% else %} {% set
                                             descuento_aplicado=medicamento.descuento %} {% endif %} {% set
-                                            total=subtotal - descuento_aplicado %} C$ {{ total }} </td>
+                                            total=subtotal - descuento_aplicado %} C$ {{ "%.2f" |format(total) }} </td>
+
 
                                 </tr>
                                 {% endfor %}
@@ -248,5 +250,5 @@
         element.disabled = true;
     });
 
-    
+
 </script>

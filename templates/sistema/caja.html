@@ -584,7 +584,9 @@
           cliente: cliente,
           num: $("#facturaId").val(),
         },
-        success: function (response) { },
+        success: function (response) { 
+          alert($("#facturaId").val())
+        },
         error: function (error) {
           // console.log(error);
         },

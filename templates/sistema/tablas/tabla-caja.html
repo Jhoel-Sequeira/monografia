@@ -9,83 +9,52 @@
         <th></th>
       </tr>
     </thead>
-    <tbody
-      style="background-color: transparent !important"
-      class="overflow-hidden"
-    >
+    <tbody style="background-color: transparent !important" class="overflow-hidden">
       {% for medicamento in medicamentos %}
-      <tr
-        id="{{medicamento.cod_detalle}}"
-        style="background-color: transparent !important"
-      >
+      <tr id="{{medicamento.cod_detalle}}" style="background-color: transparent !important">
         <td>{{medicamento.nom_producto}}</td>
         <td>{{medicamento.cantidad}}</td>
         <td>
           {% if medicamento.descuento == 0.0 %}
           <!-- No mostrar nada si el descuento es 0.0 -->
-          {% elif medicamento.descuento < 1 %} {{ medicamento.descuento * 100
-          }}%
-          <!-- Si es porcentaje -->
-          {% else %} C$ {{ medicamento.descuento }}
-          <!-- Si es cantidad -->
-          {% endif %}
+          {% elif medicamento.descuento < 1 %} {{ medicamento.descuento * 100 }}% <!-- Si es porcentaje -->
+            {% else %} C$ {{ medicamento.descuento }}
+            <!-- Si es cantidad -->
+            {% endif %}
         </td>
         <td>
           {% if medicamento.cantidad == 0 %}
-            {# Mostrar solo el valor del descuento como negativo #}
-            {% if medicamento.descuento == 0.0 %}
-              <!-- No mostrar nada -->
-            {% elif medicamento.descuento < 1 %}
-              -C$ {{ (medicamento.precio * medicamento.descuento) | round(2) }}
-            {% else %}
-              -C$ {{ medicamento.descuento | round(2) }}
-            {% endif %}
-          {% else %}
-            {# Calcular subtotal #}
-            {% set subtotal = medicamento.precio * medicamento.cantidad %}
-
-            {# Calcular descuento aplicado #}
-            {% if medicamento.descuento == 0.0 %}
-              {% set descuento_aplicado = 0 %}
-            {% elif medicamento.descuento < 1 %}
-              {% set descuento_aplicado = subtotal * medicamento.descuento %}
-            {% else %}
-              {% set descuento_aplicado = medicamento.descuento %}
-            {% endif %}
-
-            {# Calcular total y mostrar #}
-            {% set total = subtotal - descuento_aplicado %}
-            C$ {{ total | round(2) }}
-          {% endif %}
-        </td>
+          {# Mostrar solo el valor del descuento como negativo #}
+          {% if medicamento.descuento == 0.0 %}
+          <!-- No mostrar nada -->
+          {% elif medicamento.descuento < 1 %} -C$ {{ "%.2f" |format(medicamento.precio * medicamento.descuento) }} {%
+            else %} -C$ {{ "%.2f" |format(medicamento.descuento) }} {% endif %} {% else %} {# Calcular subtotal #} {%
+            set subtotal=medicamento.precio * medicamento.cantidad %} {# Calcular descuento aplicado #} {% if
+            medicamento.descuento==0.0 %} {% set descuento_aplicado=0 %} {% elif medicamento.descuento < 1 %} {% set
+            descuento_aplicado=subtotal * medicamento.descuento %} {% else %} {% set
+            descuento_aplicado=medicamento.descuento %} {% endif %} {# Calcular total y mostrar #} {% set total=subtotal
+            - descuento_aplicado %} C$ {{ "%.2f" |format(total) }} {% endif %} </td>
 
 
 
 
 
 
-        <td
-          style="
+
+        <td style="
             display: flex;
             justify-content: center;
             align-items: center;
             width: 100px;
-          "
-        >
-          <button
-            type="button"
-            name="eliminar"
-            class="btn btn-danger"
-            value="{{medicamento.cod_detalle}}"
-            style="
+          ">
+          <button type="button" name="eliminar" class="btn btn-danger" value="{{medicamento.cod_detalle}}" style="
               height: 20px;
               width: 20px;
               display: flex;
               align-items: center;
               justify-content: center;
               padding: 0;
-            "
-          >
+            ">
             <i class="fas fa-trash" style="font-size: 10px"></i>
           </button>
         </td>

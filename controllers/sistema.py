@@ -2623,6 +2623,8 @@ def tablaVentas():
         cursor.execute(query)
         ventas = cursor.fetchall()
 
+        print(ventas)
+
         return render_template('sistema/tablas/tabla_ventas.html', ventas=ventas)
         
     else:
@@ -2859,7 +2861,7 @@ def modalDetalleCita():
 @login_required
 def horasDisponibles():
     fecha = request.form['fecha']  # Fecha en formato 'YYYY-MM-DD'
-
+    print(fecha)
     conn = conectar()
     cursor = conn.cursor()
     
@@ -2901,6 +2903,7 @@ def horasDisponibles():
     # Cerrar la conexión
     cursor.close()
     conn.close()
+    print(intervalos_disponibles)
 
     return jsonify({"horas_disponibles": intervalos_disponibles})
 

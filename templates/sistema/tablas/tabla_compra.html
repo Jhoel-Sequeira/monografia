@@ -50,9 +50,9 @@
                             </td>
                            
                             <td class="border-bottom-0">
-
-                                <span class="fw-normal">C$ {{venta.total_venta}}</span>
+                            <span class="fw-normal">C$ {{ "{:,.2f}".format(venta.total_venta) }}</span>
                             </td>
+
 
                             {%if venta.estado == 'FACTURADO'%}
                             <!-- GREEN -->

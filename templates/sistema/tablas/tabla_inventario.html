@@ -78,7 +78,8 @@
                                 <!-- <h6 class="fw-semibold mb-1">{{producto.tipos}}</h6> -->
                             </td>
                             <td class="border-bottom-0">
-                                <span class="fw-normal">{{producto.precio}} C$</span>
+                               <span class="fw-normal">C$ {{ "{:,.2f}".format(producto.precio) }} </span>
+
                                 <!-- <h6 class="fw-semibold mb-0 fs-4">{{producto.precio}}</h6> -->
                             </td>
                             {%if producto.stock > producto.stock_critico%}

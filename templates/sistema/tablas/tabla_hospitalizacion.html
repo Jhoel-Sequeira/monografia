@@ -61,7 +61,8 @@
                             </td> -->
                             <td class="border-bottom-0">
 
-                                <span class="fw-normal">{{hospitalizacion.fecha_hosp}}</span>
+                                <span class="fw-normal">    {{ hospitalizacion.fecha_hosp.strftime("%d/%m/%Y %H:%M") }}
+</span>
                             </td>
 
                             {%if hospitalizacion.NombreEstado == 'FINALIZADO'%}
