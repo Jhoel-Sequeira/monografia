@@ -38,6 +38,9 @@
     <div id="calendario-cliente">
     </div>
 </div>
+<div id="agendar-modal"></div>
+<input id="agregar" type="hidden" data-bs-toggle="modal" data-bs-target="#agendarConsulta">
+
 <script>
     var consultas = new Array()
     function cale() {
@@ -349,6 +352,27 @@
 cargareventos();
 
 });
+function Agendar(fechaSeleccionada, eventosDelDia) {
+        var horasOcupadas = eventosDelDia.map(function (evento) {
+            return evento.start.toISOString().split('T')[1].substring(0, 5); // Extrae HH:MM
+        });
+
+        $.ajax({
+            url: "{{ url_for('sistema.modalAgendarCliente') }}",
+            type: "POST",
+            data: {
+                fecha: fechaSeleccionada,
+            },
+            success: function (response) {
+                $('#agendar-modal').html(response);
+                $('#agendar-modal').append(response.htmlresponse);
+                $('#agregar').click();
+            },
+            error: function (error) {
+                console.error("Error en la solicitud AJAX:", error);
+            },
+        });
+    }
 
 function cargareventos() {
 

@@ -2778,6 +2778,33 @@ def modalAgendar():
 
     return render_template('sistema/modales/programar_cita.html', fecha = fecha,clientes = clientes,atencion = atencion,especies = especies)
 
+@bp.route('/modalAgendarCliente', methods=['POST'])
+@login_required
+def modalAgendarCliente():
+    fecha = request.form['fecha']
+
+    conn = conectar()
+    cursor = conn.cursor()
+    query = "select num_cliente,nombres_cliente + ' ' + apellidos_cliente as Nombre from cliente  where num_cliente = ?"
+    cursor.execute(query,(session['id']))
+    clientes = cursor.fetchall()
+
+    conn = conectar()
+    cursor = conn.cursor()
+    query = "select cod_tipo,tipo from tipo_atencion "
+    cursor.execute(query)
+    atencion = cursor.fetchall()
+
+    conn = conectar()
+    cursor = conn.cursor()
+    query = "select * from especie "
+    cursor.execute(query)
+    especies = cursor.fetchall()
+
+    
+
+    return render_template('sistema/modales/programar_cita_cliente.html', fecha = fecha,clientes = clientes,atencion = atencion,especies = especies)
+
 
 @bp.route('/modalAgendarValoracion', methods=['POST'])
 @login_required

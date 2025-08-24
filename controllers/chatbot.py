@@ -663,7 +663,16 @@ def procesar_abrir(solicitud, usuario=None):
 def procesar_entrada(filtered_tokens, usuario, app, texto_original: str = ""):
     tokens = set(filtered_tokens)
 
-    # Agendar cita (flujo interactivo, requiere login)
+    # 🔹 Si ya hay flujo activo de agendar, continuar aunque el mensaje no diga "agendar"
+    if session.get('flow_agendar'):
+        return procesar_agendar_interactivo(usuario, texto_original or " ".join(filtered_tokens))
+
+    # 🔹 Auto-iniciar flujo si el mensaje ya trae "mascota <ID>" (mejor UX)
+    if re.search(r'\b(?:id|mascota)\s*[:#-]?\s*(\d+)\b', (texto_original or "").lower()):
+        _flow_get()  # inicia si no existe
+        return procesar_agendar_interactivo(usuario, texto_original or " ".join(filtered_tokens))
+
+    # 🚀 Inicio explícito del flujo de agendar
     if ('cita' in tokens) and any(t in tokens for t in ['agendar','agenda','agendo','reservar','programar','programa']):
         return procesar_agendar_interactivo(usuario, texto_original or " ".join(filtered_tokens))
 
