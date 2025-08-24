@@ -169,7 +169,7 @@ def login():
                     session["pass"] = contraseña
                     session['rol'] = rows[6]
 
-                    if session['rol'] == 'ADMINISTRADOR' or session['rol'] == 'USUARIO' or session['rol'] == 'VETERINARIO':
+                    if session['rol'] == 'ADMINISTRADOR' or session['rol'] == 'CAJERA' or session['rol'] == 'VETERINARIO':
                          return redirect('/sistema')  # Cambia esto por la ruta correcta de sistema.py
                     else:
                         #session['last_seen'] = datetime.now()
@@ -883,25 +883,28 @@ def cargarTabla():
 # FIN DE LA TIENDA
 
 # MODULO DE CHATBOT
-@bp.route('/recibirMensaje',methods=["GET", "POST"])
+
+@bp.route('/recibirMensaje', methods=["GET", "POST"])
 def recibirMensaje():
     if request.method == 'POST':
+        # texto original (con números)
+        solicitud = request.form.get('mensaje') or (request.json.get('mensaje') if request.is_json else None)
+        if not solicitud:
+            return "No recibí tu mensaje."
 
-        solicitud = request.form['mensaje']
+        # ⬇️ OPCIÓN 1: aceptar números en los tokens
         doc = nlp(solicitud.lower())
-        # LINEA CON LAS STOP_WORDS PRESENTA PROBLEMAS CON ALGUNOS VERBOS
-        #lemmatized_tokens = [token.lemma_ for token in doc if token.is_alpha and not token.is_stop]
-        #LINEA SIN LOS STOP WORDS
-        lemmatized_tokens = [token.lemma_ for token in doc if token.is_alpha ]
+        lemmatized_tokens = [t.lemma_ for t in doc if t.is_alpha or t.like_num]
+        filtered_tokens   = [tok for tok in lemmatized_tokens if tok.isalnum()]
+        print("PRIMER FILTRO:", filtered_tokens)
 
-        filtered_tokens = [token for token in lemmatized_tokens if token.isalnum()]
-        print("PRIMER FILTRO: ", filtered_tokens)
         if session.get("id"):
-            resultado = controllers.chatbot.procesar_entrada(filtered_tokens, session["id"], current_app)
-            return resultado
+            # Pasamos también el texto original (útil para regex de fecha/hora/ID)
+            return controllers.chatbot.procesar_entrada(filtered_tokens, session["id"], current_app, solicitud)
         else:
-            return "Su usuario no fue encontrado, usted podrá hacer consultas sencillas como horarios, precios, servicios, etc."
-
+            return controllers.chatbot.procesar_entrada_publica(filtered_tokens)
+    else:
+        return "Usa método POST para enviar el mensaje."
 
 
 

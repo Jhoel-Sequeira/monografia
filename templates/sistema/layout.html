@@ -119,7 +119,7 @@
               <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
               <span class="hide-menu">MODULOS</span>
             </li>
-            {%if session.rol == 'ADMINISTRADOR' or session.rol == 'USUARIO'%}
+            {%if session.rol == 'ADMINISTRADOR' or session.rol == 'CAJERA'%}
             <li class="sidebar-item">
               <a class="sidebar-link" href="#" id="toggle-submenu-inventario" aria-expanded="false">
                 <span>
@@ -162,7 +162,7 @@
             </script>
             {%endif%}
 
-            {%if session.rol == 'ADMINISTRADOR' or session.rol == 'USUARIO'%}
+            {%if session.rol == 'ADMINISTRADOR' or session.rol == 'CAJERA'%}
             <li class="sidebar-item">
               <a class="sidebar-link" href="#" id="toggle-submenu-ventas" aria-expanded="false">
                 <span>
@@ -320,7 +320,7 @@
             </script>
             {%endif%}
 
-            {%if session.rol == 'VETERINARIO' or session.rol == 'ADMINISTRADOR' or session.rol == 'USUARIO'%}
+            {%if session.rol == 'VETERINARIO' or session.rol == 'ADMINISTRADOR' or session.rol == 'CAJERA'%}
             <li class="sidebar-item">
               <a class="sidebar-link" href="#" id="toggle-submenu-hospitalizacion" aria-expanded="false">
                 <span>
